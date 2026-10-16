@@ -1,0 +1,7 @@
+select *
+from public.update_ingredient_inline(
+	'{{ appsmith.user.email }}'::text,
+	{{ Number(this.params.ingredient_id || 0) }},
+	'{{ appsmith.store.current_client_id }}'::uuid,
+	{{ JSON.stringify(this.params.changes || {}) }}::jsonb
+);

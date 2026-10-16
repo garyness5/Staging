@@ -1,0 +1,45 @@
+with src as (
+    select id
+    from public.rec_items
+    where id = {{ Number(appsmith.store.current_recipe_id || 0) }}
+      and client_id = '{{ appsmith.store.current_client_id }}'::uuid
+      and coalesce(deleted, false) = false
+)
+select
+    (
+        select count(*)
+        from public.rec_components rc
+        join public.rec_items parent
+          on parent.id = rc.recipe_id
+        join src s
+          on s.id = rc.child_recipe_id
+        where rc.item_type = 'recipe'
+          and parent.client_id = '{{ appsmith.store.current_client_id }}'::uuid
+          and coalesce(parent.deleted, false) = false
+    ) as recipe_count,
+
+    (
+        select count(*)
+        from public.dsh_components dc
+        join public.dsh_items parent
+          on parent.id = dc.dish_id
+        join src s
+          on s.id = dc.child_recipe_id
+        where dc.item_type = 'recipe'
+          and parent.client_id = '{{ appsmith.store.current_client_id }}'::uuid
+          and coalesce(parent.deleted, false) = false
+    ) as dish_count,
+
+    (
+        select count(*)
+        from public.mnu_components mc
+        join public.mnu_items parent
+          on parent.id = mc.menu_id
+        join src s
+          on s.id = mc.child_recipe_id
+        where mc.item_type = 'recipe'
+          and parent.client_id = '{{ appsmith.store.current_client_id }}'::uuid
+          and coalesce(parent.deleted, false) = false
+    ) as menu_count,
+
+    0 as event_count;

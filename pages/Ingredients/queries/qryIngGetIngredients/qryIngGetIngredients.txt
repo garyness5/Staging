@@ -1,0 +1,45 @@
+select
+    -- Visible / operational columns first
+    v.name,
+    v.category_name,
+    v.supplier_name,
+    v.packaging_name,
+    v.purchase_qty,
+    v.purchase_unit,
+    v.total_cost,
+    v.wastage_percent,
+    v.price_per_unit as net_cost,
+    v.allergen_names,
+    v.diet_tag_names,
+    v.active,
+
+    -- Hidden / technical columns after
+    v.id,
+    v.item_code,
+    v.supplier_id,
+    v.packaging_id,
+    v.category_id,
+    v.purchase_unit_id,
+    v.notes,
+    v.created_at,
+    v.updated_at,
+    v.name_norm,
+    v.client_id,
+    v.purchase_unit_name,
+    v.unit_type,
+    v.factor_to_base,
+    v.yield_base_qty,
+    v.base_unit,
+    v.cost_per_base_unit,
+    v.deleted,
+
+    (
+			count(*) over (
+				partition by v.name_norm
+			) > 1
+		) as duplicate_name
+
+from public.vw_ing_items v
+where v.client_id = '{{ appsmith.store.current_client_id }}'::uuid
+  and coalesce(v.deleted, false) = false
+order by v.name;

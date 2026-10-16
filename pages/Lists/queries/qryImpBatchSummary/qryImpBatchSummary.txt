@@ -1,0 +1,4 @@
+select *
+from public.get_ingredient_import_batch_summary(
+    {{ appsmith.store.impBatchId }}
+);

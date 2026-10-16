@@ -1,0 +1,37 @@
+SELECT public.commit_ingredient_import(
+	'{{ appsmith.user.email }}'::text,
+
+	'{{ appsmith.store.current_client_id }}'::uuid,
+
+	{{
+	appsmith.store.impReviewSnapshot?.supplier_id === "__NO_SUPPLIER__"
+	? null
+	: Number(appsmith.store.impReviewSnapshot?.supplier_id)
+	}}::bigint,
+
+	{{
+	appsmith.store.impReviewSnapshot?.supplier_id === "__NO_SUPPLIER__"
+	}}::boolean,
+
+	'{{
+	appsmith.store.impReviewSnapshot?.header_signature || ""
+	}}'::text,
+
+	'{{
+	JSON.stringify(
+		appsmith.store.impReviewSnapshot?.header_mappings || []
+	).replaceAll("'", "''")
+	}}'::jsonb,
+
+	'{{
+	JSON.stringify(
+		appsmith.store.impReviewSnapshot?.value_mappings || []
+	).replaceAll("'", "''")
+	}}'::jsonb,
+
+	'{{
+	JSON.stringify(
+		appsmith.store.impReviewSnapshot?.rows || []
+	).replaceAll("'", "''")
+	}}'::jsonb
+) AS result;

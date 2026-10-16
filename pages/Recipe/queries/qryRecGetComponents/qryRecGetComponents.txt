@@ -1,0 +1,11 @@
+select c.*
+from public.vw_rec_components c
+where c.recipe_id = {{ Number(appsmith.store.current_recipe_id || 0) }}
+  and exists (
+		select 1
+		from public.rec_items r
+		where r.id = c.recipe_id
+		and r.client_id = '{{ appsmith.store.current_client_id }}'::uuid
+		and coalesce(r.deleted, false) = false
+	)
+order by c.line_no;

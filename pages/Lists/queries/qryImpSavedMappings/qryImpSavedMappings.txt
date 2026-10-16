@@ -1,0 +1,18 @@
+select *
+from public.get_ingredient_import_saved_mappings(
+	'{{ appsmith.user.email }}'::text,
+
+	'{{ appsmith.store.current_client_id }}'::uuid,
+
+	{{
+	!selImportListSupplier.selectedOptionValue
+	? null
+	: selImportListSupplier.selectedOptionValue === "__NO_SUPPLIER__"
+	? null
+	: Number(selImportListSupplier.selectedOptionValue)
+	}},
+
+	{{
+	appsmith.store.impHeaderSignature || null
+	}}
+);

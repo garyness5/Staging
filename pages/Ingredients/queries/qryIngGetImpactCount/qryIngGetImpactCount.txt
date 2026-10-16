@@ -1,0 +1,35 @@
+select
+  (
+		select count(*)
+		from public.rec_components rc
+		join public.rec_items r
+		on r.id = rc.recipe_id
+		where rc.item_type = 'ingredient'
+		and rc.ingredient_id = {{ Number(this.params.ingredient_id || 0) }}
+		and r.client_id = '{{ appsmith.store.current_client_id }}'::uuid
+		and coalesce(r.deleted, false) = false
+	) as recipe_count,
+
+  (
+		select count(*)
+		from public.dsh_components dc
+		join public.dsh_items d
+		on d.id = dc.dish_id
+		where dc.item_type = 'ingredient'
+		and dc.ingredient_id = {{ Number(this.params.ingredient_id || 0) }}
+		and d.client_id = '{{ appsmith.store.current_client_id }}'::uuid
+		and coalesce(d.deleted, false) = false
+	) as dish_count,
+
+  (
+		select count(*)
+		from public.mnu_components mc
+		join public.mnu_items m
+		on m.id = mc.menu_id
+		where mc.item_type = 'ingredient'
+		and mc.ingredient_id = {{ Number(this.params.ingredient_id || 0) }}
+		and m.client_id = '{{ appsmith.store.current_client_id }}'::uuid
+		and coalesce(m.deleted, false) = false
+	) as menu_count,
+
+  0 as event_count;

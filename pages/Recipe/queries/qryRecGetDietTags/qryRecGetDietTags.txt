@@ -1,0 +1,4 @@
+select *
+from public.get_diet_tags(
+    '{{ appsmith.store.current_client_id }}'::uuid
+);

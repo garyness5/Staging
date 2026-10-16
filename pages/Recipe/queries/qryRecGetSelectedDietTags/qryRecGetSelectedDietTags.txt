@@ -1,0 +1,8 @@
+select rdt.helper_list_item_id::text as value
+from public.rec_diet_tags rdt
+join public.rec_items r
+  on r.id = rdt.recipe_id
+where rdt.recipe_id = {{ Number(appsmith.store.current_recipe_id || 0) }}
+  and r.client_id = '{{ appsmith.store.current_client_id }}'::uuid
+  and coalesce(r.deleted, false) = false
+order by rdt.helper_list_item_id;

@@ -1,0 +1,17 @@
+SELECT
+    si.id,
+    si.ingredient_id,
+    si.item_code,
+    si.supplier_name,
+    si.name_norm,
+    si.last_qty,
+    si.last_unit_id,
+    si.last_cost
+FROM public.ing_supplier_items si
+WHERE si.client_id = {{ appsmith.store.current_client_id }}::uuid
+  AND si.supplier_id = {{
+        selImportListSupplier.selectedOptionValue === "__NO_SUPPLIER__"
+        ? -1
+        : Number(selImportListSupplier.selectedOptionValue || -1)
+      }}
+ORDER BY si.id;

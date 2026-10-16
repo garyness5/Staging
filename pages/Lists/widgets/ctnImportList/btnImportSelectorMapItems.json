@@ -1,0 +1,56 @@
+{
+  "animateLoading": true,
+  "borderRadius": "0px",
+  "bottomRow": 71,
+  "boxShadow": "none",
+  "buttonColor": "#231f20",
+  "buttonVariant": "TERTIARY",
+  "disabledWhenInvalid": false,
+  "dynamicBindingPathList": [],
+  "dynamicPropertyPathList": [
+    {
+      "key": "onClick"
+    },
+    {
+      "key": "labelTextColor"
+    }
+  ],
+  "dynamicTriggerPathList": [
+    {
+      "key": "onClick"
+    }
+  ],
+  "isDefaultClickDisabled": true,
+  "isDisabled": false,
+  "isLoading": false,
+  "isVisible": true,
+  "key": "iu27lzhy00",
+  "labelStyle": "BOLD",
+  "labelTextColor": "",
+  "labelTextSize": "1rem",
+  "leftColumn": 5,
+  "minWidth": 120,
+  "mobileBottomRow": 19,
+  "mobileLeftColumn": 0,
+  "mobileRightColumn": 16,
+  "mobileTopRow": 15,
+  "needsErrorInfo": false,
+  "onClick": "{{\nstoreValue(\n\t\"accImportMapItems\",\n\t!appsmith.store.accImportMapItems\n)\n}}",
+  "originalBottomRow": 71,
+  "originalTopRow": 67,
+  "parentColumnSpace": 17.9375,
+  "parentId": "h3qxav0gki",
+  "parentRowSpace": 10,
+  "placement": "START",
+  "recaptchaType": "V3",
+  "renderMode": "CANVAS",
+  "resetFormOnClick": false,
+  "responsiveBehavior": "hug",
+  "rightColumn": 64,
+  "text": "Map Categories & Units",
+  "topRow": 67,
+  "type": "BUTTON_WIDGET",
+  "version": 1,
+  "widgetId": "3dgxb7s8gn",
+  "widgetName": "btnImportSelectorMapItems"
+}

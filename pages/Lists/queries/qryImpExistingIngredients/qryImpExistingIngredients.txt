@@ -1,0 +1,9 @@
+SELECT
+    i.id,
+    i.name,
+    i.name_norm,
+    i.item_code
+FROM public.ing_items i
+WHERE i.client_id = {{ appsmith.store.current_client_id }}::uuid
+  AND COALESCE(i.deleted, false) = false
+ORDER BY i.id;

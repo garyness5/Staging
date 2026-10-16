@@ -1,0 +1,5 @@
+SELECT *
+FROM vw_rec_items
+WHERE client_id = '{{ appsmith.store.current_client_id }}'::uuid
+  AND coalesce(deleted, false) = false
+ORDER BY name ASC;

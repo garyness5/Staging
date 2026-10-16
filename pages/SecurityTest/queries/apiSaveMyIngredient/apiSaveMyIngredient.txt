@@ -1,0 +1,7 @@
+{
+  "operation": "save_my_ingredient",
+  "ingredient_id": null,
+  "payload": {
+    "name": "SECURITY TEST - Edge Save B"
+  }
+}

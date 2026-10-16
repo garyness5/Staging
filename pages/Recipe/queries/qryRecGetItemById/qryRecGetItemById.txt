@@ -1,0 +1,4 @@
+select *
+from vw_rec_items
+where id = {{ Number(appsmith.store.current_recipe_id || 0) }}
+  and client_id = '{{ appsmith.store.current_client_id }}'::uuid;

@@ -1,0 +1,6 @@
+select *
+from public.create_ingredient_import_batch(
+	'{{ appsmith.store.current_client_id }}'::uuid,
+	{{ selImportListSupplier.selectedOptionValue }},
+	{{ filImportListPriceList.files[0]?.name || null }}
+);

@@ -1,0 +1,30 @@
+select *
+from public.save_ingredient(
+	'{{ appsmith.user.email }}'::text,
+
+	{{
+	appsmith.store.IngForm_mode === "edit"
+	? Number(appsmith.store.IngForm_edit_id || 0)
+	: 0
+	}},
+
+	'{{ appsmith.store.current_client_id }}'::uuid,
+
+	'{{
+	JSON.stringify({
+		name: inpIngIngredient.text?.trim() || "",
+		category_id: selIngCategory.selectedOptionValue || null,
+		purchase_unit_id: selIngPurchaseUnit.selectedOptionValue || null,
+		purchase_qty: inpIngQuantity.text || null,
+		total_cost: inpIngPurchaseCost.text || null,
+		wastage_percent: inpIngWastage.text || 0,
+		supplier_id: selIngSupplier.selectedOptionValue || null,
+		packaging_id: selIngPackaging.selectedOptionValue || null,
+		item_code: inpIngSupplierCode.text?.trim() || null,
+		notes: rteIngNotes.text || null,
+		active: chkIngActive.isChecked !== false,
+		allergen_ids: msIngAllergens.selectedOptionValues || [],
+		diet_tag_ids: msIngDietTags.selectedOptionValues || []
+	}).replaceAll("'", "''")
+	}}'::jsonb
+);

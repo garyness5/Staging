@@ -1,0 +1,5 @@
+select *
+from public.stage_ingredient_import_rows(
+    {{ appsmith.store.impBatchId }},
+    {{ JSON.stringify(appsmith.store.impParsedRows) }}::jsonb
+);

@@ -1,0 +1,8 @@
+select
+    current_user,
+    session_user,
+    has_table_privilege(
+        current_user,
+        'public.ing_items',
+        'SELECT'
+    ) as can_select_ingredients;

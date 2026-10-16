@@ -1,0 +1,17 @@
+select
+  id,
+  abbreviation,
+  name,
+  unit_type,
+  factor_to_base
+from public.units
+where active = true
+order by
+  case unit_type
+    when 'weight' then 1
+    when 'volume' then 2
+    when 'count' then 3
+    else 99
+  end,
+  factor_to_base desc,
+  abbreviation;

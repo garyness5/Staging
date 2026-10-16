@@ -1,0 +1,6 @@
+select *
+from public.delete_ingredient(
+	'{{ appsmith.user.email }}'::text,
+	{{ Number(this.params.ingredient_id || 0) }},
+	'{{ appsmith.store.current_client_id }}'::uuid
+);

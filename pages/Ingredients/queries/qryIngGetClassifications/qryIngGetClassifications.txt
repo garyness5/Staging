@@ -1,0 +1,23 @@
+select
+    'allergen'::text as classification_type,
+    ia.helper_list_item_id
+from public.ing_allergens ia
+join public.ing_items i
+    on i.id = ia.ingredient_id
+where ia.ingredient_id = {{ Number(appsmith.store.IngForm_edit_id || 0) }}
+  and i.client_id = '{{ appsmith.store.current_client_id }}'::uuid
+  and coalesce(i.deleted, false) = false
+
+union all
+
+select
+    'diet_tag'::text as classification_type,
+    idt.helper_list_item_id
+from public.ing_diet_tags idt
+join public.ing_items i
+    on i.id = idt.ingredient_id
+where idt.ingredient_id = {{ Number(appsmith.store.IngForm_edit_id || 0) }}
+  and i.client_id = '{{ appsmith.store.current_client_id }}'::uuid
+  and coalesce(i.deleted, false) = false
+
+order by classification_type, helper_list_item_id;
