@@ -1,8 +1,6 @@
 export default {
-
 	listCode() {
 		const listId = String(selListsType.selectedOptionValue || "");
-
 		const lists = apiGetHelperLists.data?.helper_lists || [];
 
 		return lists.find(
@@ -11,7 +9,7 @@ export default {
 	},
 
 	impact() {
-		return qryGetListItemImpact.data?.[0] || {};
+		return apiGetHelperItemImpact.data?.impact || {};
 	},
 
 	ingredientCount() {
@@ -64,26 +62,17 @@ export default {
 	},
 
 	canRenameSelected() {
-		return (
-			this.hasSelection() &&
-			!this.isProtectedSystemItem()
-		);
+		return this.hasSelection() && !this.isProtectedSystemItem();
 	},
 
 	canReplaceDeleteSelected() {
-		return (
-			this.hasSelection() &&
-			!this.isProtectedSystemItem()
-		);
+		return this.hasSelection() && !this.isProtectedSystemItem();
 	},
 
 	replaceSaveDisabled() {
-		const action =
-					radPLReplaceDeleteAction.selectedOptionValue;
+		const action = radPLReplaceDeleteAction.selectedOptionValue;
 
-		if (!action) {
-			return true;
-		}
+		if (!action) return true;
 
 		if (
 			action === "replace" &&
@@ -101,43 +90,25 @@ export default {
 
 	replaceActionOptions() {
 		if (this.isDietTag()) {
-			return [
-				{
-					label: "Delete",
-					value: "delete"
-				}
-			];
+			return [{ label: "Delete", value: "delete" }];
 		}
 
 		return [
-			{
-				label: "Replace",
-				value: "replace"
-			},
-			{
-				label: "Delete",
-				value: "delete"
-			}
+			{ label: "Replace", value: "replace" },
+			{ label: "Delete", value: "delete" }
 		];
 	},
 
 	replaceActionDefault() {
-		return this.isDietTag()
-			? "delete"
-		: "replace";
+		return this.isDietTag() ? "delete" : "replace";
 	},
 
 	replacementOptions() {
-		const selectedId =
-					String(tblListsItems.selectedRow?.id || "");
-
-		const items =
-					apiGetHelperItems.data?.helper_items || [];
+		const selectedId = String(tblListsItems.selectedRow?.id || "");
+		const items = apiGetHelperItems.data?.helper_items || [];
 
 		const options = items
-		.filter(
-			item => String(item.id) !== selectedId
-		)
+		.filter(item => String(item.id) !== selectedId)
 		.map(item => ({
 			label: String(item.name || ""),
 			value: String(item.id)
@@ -145,12 +116,7 @@ export default {
 
 		return options.length
 			? options
-		: [
-			{
-				label: "",
-				value: ""
-			}
-		];
+		: [{ label: "", value: "" }];
 	},
 
 	deleteMessage() {
@@ -160,5 +126,4 @@ export default {
 
 		return "<b>This item is not currently being used.</b>";
 	}
-
 };

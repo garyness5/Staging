@@ -15,7 +15,6 @@ export default {
 		return true;
 	},
 
-
 	async saveAdd() {
 		const newName = (inpPLAddName.text || "").trim();
 
@@ -122,13 +121,16 @@ export default {
 	async saveRename() {
 		const newName = (inpPLRenameName.text || "").trim();
 
-		const oldId = Number(tblListsItems.selectedRow?.id || 0);
+		const oldId = Number(
+			tblListsItems.selectedRow?.id || 0
+		);
 
 		if (!newName || !oldId) {
 			return false;
 		}
 
-		const exists = (apiGetHelperItems.data?.helper_items || [])
+		const exists =
+					(apiGetHelperItems.data?.helper_items || [])
 		.some(
 			item =>
 			Number(item.id) !== oldId &&
@@ -137,7 +139,10 @@ export default {
 		);
 
 		if (exists) {
-			showAlert("Name already exists in this list", "warning");
+			showAlert(
+				"Name already exists in this list",
+				"warning"
+			);
 			return false;
 		}
 
@@ -164,6 +169,7 @@ export default {
 			showAlert("Item renamed", "success");
 
 			return true;
+
 		} catch (error) {
 			showAlert(
 				"Unable to rename item. Check whether the name already exists.",
@@ -183,14 +189,31 @@ export default {
 			return false;
 		}
 
-		await qryGetListItemImpact.run();
+		try {
+			const valid = await jsAuthSession.ensureValid();
 
-		resetWidget("radPLReplaceDeleteAction");
-		resetWidget("selPLReplaceWith");
+			if (!valid) {
+				showAlert("Session expired. Please sign in again.", "error");
+				return false;
+			}
 
-		showModal(mdlPLReplace.name);
+			const result = await apiGetHelperItemImpact.run();
 
-		return true;
+			if (!result?.authenticated || !result?.impact) {
+				showAlert("Unable to check item usage.", "error");
+				return false;
+			}
+
+			resetWidget("radPLReplaceDeleteAction");
+			resetWidget("selPLReplaceWith");
+
+			showModal(mdlPLReplace.name);
+			return true;
+
+		} catch (error) {
+			showAlert("Unable to check item usage.", "error");
+			return false;
+		}
 	},
 
 	onReplaceDeleteActionChange() {
@@ -198,65 +221,133 @@ export default {
 	},
 
 	async saveReplaceDelete() {
-		const action =
-					jsPicklistRules.isDietTag()
-		? "delete"
-		: radPLReplaceDeleteAction.selectedOptionValue;
-
-		const replaceToId =
-					jsPicklistRules.isDietTag()
-		? null
-		: selPLReplaceWith.selectedOptionValue;
-
-		if (!action) {
+		if (!jsPicklistRules.hasSelection()) {
+			showAlert("Select an item first.", "warning");
 			return false;
 		}
 
-		if (
-			action === "replace" &&
-			!replaceToId
-		) {
+		if (jsPicklistRules.isProtectedSystemItem()) {
+			return false;
+		}
+
+		const action = jsPicklistRules.isDietTag()
+		? "delete"
+		: radPLReplaceDeleteAction.selectedOptionValue;
+
+		const replaceToId = jsPicklistRules.isDietTag()
+		? null
+		: (selPLReplaceWith.selectedOptionValue || null);
+
+		if (!action || !["replace", "delete"].includes(action)) {
+			showAlert("Select an action first.", "warning");
+			return false;
+		}
+
+		if (action === "replace" && !replaceToId) {
 			showAlert(
 				"Select a replacement item first.",
 				"warning"
 			);
-
 			return false;
 		}
 
-		await qryGetListItemImpact.run();
+		const sourceId = tblListsItems.selectedRow?.id;
 
-		await storeValue(
-			"plReplaceAction",
-			action === "replace"
-			? "Replace"
-			: "Delete"
-		);
+		if (!sourceId) {
+			showAlert("Select an item first.", "warning");
+			return false;
+		}
 
-		await storeValue(
-			"plReplaceToId",
-			replaceToId || null
-		);
+		if (
+			replaceToId &&
+			String(replaceToId) === String(sourceId)
+		) {
+			showAlert(
+				"Select a different replacement item.",
+				"warning"
+			);
+			return false;
+		}
 
-		return await this.confirmReplaceDelete();
+		return await this.confirmReplaceDelete({
+			helper_item_id: String(sourceId),
+			replace_with_id: replaceToId
+			? String(replaceToId)
+			: null,
+			delete_original: action === "delete"
+		});
 	},
 
-	async confirmReplaceDelete() {
-		await qryReplaceDeleteListItem.run();
+	async confirmReplaceDelete(params) {
+		if (!params?.helper_item_id) {
+			showAlert("Invalid Replace/Delete request.", "error");
+			return false;
+		}
 
-		await qryGetPicklistItems.run();
+		try {
+			const valid = await jsAuthSession.ensureValid();
 
-		closeModal(mdlPLReplace.name);
+			if (!valid) {
+				showAlert(
+					"Session expired. Please sign in again.",
+					"error"
+				);
+				return false;
+			}
 
-		showAlert(
-			appsmith.store.plReplaceAction === "Replace"
+			const result = await apiReplaceDeleteHelperItem.run({
+				helper_item_id: params.helper_item_id,
+				replace_with_id: params.replace_with_id,
+				delete_original: params.delete_original
+			});
+
+			if (
+				result?.authenticated !== true ||
+				!["replace", "replace_delete", "delete"]
+				.includes(result.action)
+			) {
+				showAlert(
+					"Unable to complete Replace/Delete.",
+					"error"
+				);
+				return false;
+			}
+
+			await apiGetHelperItems.run({
+				list_id: selListsType.selectedOptionValue
+			});
+
+			closeModal(mdlPLReplace.name);
+
+			const message =
+						result.action === "replace"
 			? "Item replaced everywhere used."
-			: appsmith.store.plReplaceToId
+			: result.action === "replace_delete"
 			? "Item replaced everywhere used and deleted."
-			: "Item deleted.",
-			"success"
-		);
+			: "Item deleted.";
 
-		return true;
-	},
-}
+			showAlert(message, "success");
+
+			return true;
+
+		} catch (error) {
+			const message = String(
+				error?.message || error || ""
+			);
+
+			if (message.includes("409")) {
+				showAlert(
+					"Replacement conflicts with existing records. No changes were made.",
+					"warning"
+				);
+			} else {
+				showAlert(
+					"Unable to complete Replace/Delete.",
+					"error"
+				);
+			}
+
+			return false;
+		}
+	}
+};

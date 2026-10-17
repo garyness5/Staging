@@ -64,5 +64,18 @@ export default {
 			refreshRequired:
 			expiresAt <= Date.now() + 5 * 60 * 1000
 		};
-	}
+	},
+	
+	check() {
+    const token = String(appsmith.store.savveyra_access_token || "");
+
+    return {
+      tokenPresent: !!token,
+      tokenLength: token.length,
+      tokenSegments: token.split(".").length,
+      expiresAt: new Date(
+        Number(appsmith.store.savveyra_token_expires_at || 0)
+      ).toISOString()
+    };
+  }
 };
