@@ -26,12 +26,16 @@ export default {
 		const fromImport =
 					appsmith.store.plAddContext === "ingredientImport";
 
+		const helperLists =
+					apiGetHelperLists.data?.helper_lists || [];
+
 		let listId;
 
 		if (fromImport) {
-			const supplierList = (qryGetHelperLists.data || []).find(
+			const supplierList = helperLists.find(
 				x => x.list_code === "supplier"
 			);
+
 			if (!supplierList) {
 				showAlert("Supplier list could not be found.", "error");
 				return false;
@@ -42,44 +46,56 @@ export default {
 			listId = selListsType.selectedOptionValue;
 		}
 
-		const picklistItems = await qryGetPicklistItems.run({
-			list_id: listId
-		});
-
-		const exists = (picklistItems || []).some(
-			item =>
-			item.name &&
-			this.norm(item.name) === this.norm(newName)
-		);
-
-		if (exists) {
-			showAlert("Name already exists in this list", "warning");
+		if (!listId) {
+			showAlert("Select a list first.", "warning");
 			return false;
 		}
 
-		const addedItem = await qryAddListItem.run({
-			list_id: listId
-		});
+		try {
+			const addedItem = await apiAddHelperItem.run({
+				list_id: listId,
+				name: newName
+			});
 
-		await qryGetPicklistItems.run({
-			list_id: listId
-		});
+			await apiGetHelperItems.run({
+				list_id: listId
+			});
 
-		if (fromImport) {
-			await qryImpSuppliers.run();
-
-			const newSupplier = addedItem?.[0];
-
-			if (newSupplier?.id) {
-				await storeValue("impSelectedSupplierId", String(newSupplier.id));
+			if (fromImport) {
+				if (addedItem?.helper_item_id) {
+					await storeValue(
+						"impSelectedSupplierId",
+						String(addedItem.helper_item_id)
+					);
+				}
 			}
+
+			resetWidget("inpPLAddName");
+			closeModal("mdlPLAdd");
+
+			showAlert("Item added.", "success");
+
+			return true;
+
+		} catch (error) {
+			const message = String(
+				error?.message || error || ""
+			);
+
+			if (
+				message.includes("409") ||
+				message.includes("Name already exists")
+			) {
+				showAlert(
+					"Name already exists in this list.",
+					"warning"
+				);
+			} else {
+				showAlert("Unable to add item.", "error");
+			}
+
+			return false;
 		}
-
-		resetWidget("inpPLAddName");
-
-		closeModal("mdlPLAdd");
-
-		return true;
 	},
 
 	async openRename() {
@@ -104,47 +120,57 @@ export default {
 	},
 
 	async saveRename() {
-		const newName =
-					(inpPLRenameName.text || "").trim();
+		const newName = (inpPLRenameName.text || "").trim();
 
-		const oldId =
-					Number(tblListsItems.selectedRow?.id || 0);
+		const oldId = Number(tblListsItems.selectedRow?.id || 0);
 
 		if (!newName || !oldId) {
 			return false;
 		}
 
-		const exists =
-					(qryGetPicklistItems.data || [])
+		const exists = (apiGetHelperItems.data?.helper_items || [])
 		.some(
 			item =>
 			Number(item.id) !== oldId &&
 			item.name &&
-			this.norm(item.name) ===
-			this.norm(newName)
+			this.norm(item.name) === this.norm(newName)
 		);
 
 		if (exists) {
-			showAlert(
-				"Name already exists in this list",
-				"warning"
-			);
-
+			showAlert("Name already exists in this list", "warning");
 			return false;
 		}
 
-		await qryRenameListItem.run();
+		try {
+			const result = await apiRenameHelperItem.run({
+				helper_item_id: oldId,
+				name: newName
+			});
 
-		await qryGetPicklistItems.run();
+			if (
+				result?.authenticated !== true ||
+				Number(result.helper_item_id) !== oldId
+			) {
+				showAlert("Unable to rename item", "error");
+				return false;
+			}
 
-		closeModal(mdlPLRename.name);
+			await apiGetHelperItems.run({
+				list_id: selListsType.selectedOptionValue
+			});
 
-		showAlert(
-			"Item renamed",
-			"success"
-		);
+			closeModal(mdlPLRename.name);
 
-		return true;
+			showAlert("Item renamed", "success");
+
+			return true;
+		} catch (error) {
+			showAlert(
+				"Unable to rename item. Check whether the name already exists.",
+				"error"
+			);
+			return false;
+		}
 	},
 
 	async openReplaceDelete() {

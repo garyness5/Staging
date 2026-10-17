@@ -1,15 +1,13 @@
 export default {
 
 	listCode() {
-		return (
-			qryGetListItemImpact.data?.[0]?.list_code ||
-			qryGetHelperLists.data?.find(
-				x =>
-				String(x.id) ===
-				String(selListsType.selectedOptionValue)
-			)?.list_code ||
-			""
-		);
+		const listId = String(selListsType.selectedOptionValue || "");
+
+		const lists = apiGetHelperLists.data?.helper_lists || [];
+
+		return lists.find(
+			item => String(item.id) === listId
+		)?.list_code || "";
 	},
 
 	impact() {
@@ -62,10 +60,7 @@ export default {
 	},
 
 	isProtectedSystemItem() {
-		return (
-			this.isDietTag() &&
-			this.isSystemItem()
-		);
+		return this.isSystemItem();
 	},
 
 	canRenameSelected() {
@@ -136,11 +131,12 @@ export default {
 		const selectedId =
 					String(tblListsItems.selectedRow?.id || "");
 
-		const options =
-					(qryGetPicklistItems.data || [])
+		const items =
+					apiGetHelperItems.data?.helper_items || [];
+
+		const options = items
 		.filter(
-			item =>
-			String(item.id) !== selectedId
+			item => String(item.id) !== selectedId
 		)
 		.map(item => ({
 			label: String(item.name || ""),
@@ -164,4 +160,5 @@ export default {
 
 		return "<b>This item is not currently being used.</b>";
 	}
-}
+
+};

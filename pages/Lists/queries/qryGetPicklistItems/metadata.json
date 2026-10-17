@@ -29,7 +29,7 @@
     ],
     "name": "qryGetPicklistItems",
     "pageId": "Lists",
-    "runBehaviour": "AUTOMATIC",
+    "runBehaviour": "MANUAL",
     "userSetOnLoad": false
   }
 }

@@ -14,6 +14,30 @@
       "isDefault": true
     },
     {
+      "id": "Lists",
+      "isDefault": false
+    },
+    {
+      "id": "Ingredients",
+      "isDefault": false
+    },
+    {
+      "id": "RecipeList",
+      "isDefault": false
+    },
+    {
+      "id": "Recipe",
+      "isDefault": false
+    },
+    {
+      "id": "DishList",
+      "isDefault": false
+    },
+    {
+      "id": "Dish",
+      "isDefault": false
+    },
+    {
       "id": "MenuList",
       "isDefault": false
     },
@@ -51,30 +75,6 @@
     },
     {
       "id": "Print",
-      "isDefault": false
-    },
-    {
-      "id": "Lists",
-      "isDefault": false
-    },
-    {
-      "id": "Ingredients",
-      "isDefault": false
-    },
-    {
-      "id": "RecipeList",
-      "isDefault": false
-    },
-    {
-      "id": "Recipe",
-      "isDefault": false
-    },
-    {
-      "id": "DishList",
-      "isDefault": false
-    },
-    {
-      "id": "Dish",
       "isDefault": false
     },
     {

@@ -62,10 +62,9 @@
     "saved_qty",
     "saved_unit_id",
     "saved_unit_abbreviation",
-    "delete_action",
-    "line_no"
+    "delete_action"
   ],
-  "columnUpdatedAt": 1790643150497,
+  "columnUpdatedAt": 1792173301799,
   "columnWidthMap": {
     "active": 103,
     "allergen_names": 124,
@@ -223,9 +222,6 @@
     },
     {
       "key": "primaryColumns.component_name.cellBackground"
-    },
-    {
-      "key": "primaryColumns.line_no.computedValue"
     }
   ],
   "dynamicPropertyPathList": [
@@ -1012,40 +1008,6 @@
       "label": "Line Cost",
       "notation": "standard",
       "originalId": "line_cost",
-      "sticky": "",
-      "textColor": "",
-      "textSize": "0.875rem",
-      "thousandSeparator": true,
-      "validation": {},
-      "verticalAlignment": "CENTER",
-      "width": 150
-    },
-    "line_no": {
-      "alias": "line_no",
-      "allowCellWrapping": false,
-      "allowSameOptionsInNewRow": true,
-      "cellBackground": "",
-      "columnType": "number",
-      "computedValue": "{{(() => { const tableData = tblDshComponents.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (currentRow[\"line_no\"])) : line_no })()}}",
-      "currencyCode": "USD",
-      "decimals": 0,
-      "enableFilter": true,
-      "enableSort": true,
-      "fontStyle": "",
-      "horizontalAlignment": "LEFT",
-      "id": "line_no",
-      "index": 30,
-      "isCellEditable": false,
-      "isCellVisible": true,
-      "isDerived": false,
-      "isDisabled": false,
-      "isDiscardVisible": true,
-      "isEditable": false,
-      "isSaveVisible": true,
-      "isVisible": true,
-      "label": "line_no",
-      "notation": "standard",
-      "originalId": "line_no",
       "sticky": "",
       "textColor": "",
       "textSize": "0.875rem",

@@ -36,7 +36,7 @@
   "mobileRightColumn": 20,
   "mobileTopRow": 13,
   "needsErrorInfo": false,
-  "onClick": "{{\n  storeValue(\"plAddContext\", \"lists\");\n  showModal(\"mdlPLAdd\");\n}}",
+  "onClick": "{{\n  storeValue(\"plAddContext\", \"lists\");\n  showModal(mdlPLAdd.name);\n}}",
   "parentColumnSpace": 11.005859375,
   "parentId": "wv7i1vgy7u",
   "parentRowSpace": 10,

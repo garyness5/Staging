@@ -23,9 +23,6 @@
   "dynamicPropertyPathList": [
     {
       "key": "sourceData"
-    },
-    {
-      "key": "onOptionChange"
     }
   ],
   "dynamicTriggerPathList": [
@@ -45,7 +42,7 @@
   "labelText": "Select List",
   "labelTextSize": "1rem",
   "labelWidth": 5,
-  "leftColumn": 1,
+  "leftColumn": 0,
   "maxDynamicHeight": 9000,
   "minDynamicHeight": 4,
   "minWidth": 450,
@@ -54,7 +51,7 @@
   "mobileRightColumn": 21,
   "mobileTopRow": 15,
   "needsErrorInfo": false,
-  "onOptionChange": "{{ qryGetPicklistItems.run() }}",
+  "onOptionChange": "{{apiGetHelperItems.run()}}",
   "optionLabel": "label",
   "optionValue": "value",
   "originalBottomRow": 22,
@@ -65,9 +62,9 @@
   "placeholderText": "Select option",
   "renderMode": "CANVAS",
   "responsiveBehavior": "fill",
-  "rightColumn": 63,
+  "rightColumn": 62,
   "serverSideFiltering": false,
-  "sourceData": "{{\n  (qryGetHelperLists.data || []).map(x => ({\n    label: x.list_name,\n    value: String(x.id),\n    list_code: x.list_code,\n    behavior: x.behavior\n  }))\n}}",
+  "sourceData": "{{\n(Array.isArray(apiGetHelperLists.data?.helper_lists)\n ? apiGetHelperLists.data.helper_lists\n : []\n).map(x => ({\n\tlabel: x.list_name,\n\tvalue: String(x.id),\n\tlist_code: x.list_code,\n\tbehavior: x.behavior\n}))\n}}",
   "topRow": 15,
   "type": "SELECT_WIDGET",
   "version": 1,

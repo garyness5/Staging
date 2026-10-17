@@ -256,7 +256,7 @@
   "rightColumn": 63,
   "searchKey": "",
   "serverSidePaginationEnabled": true,
-  "tableData": "{{ qryGetPicklistItems.data || [] }}",
+  "tableData": "{{ apiGetHelperItems.data?.helper_items || [] }}",
   "textSize": "0.875rem",
   "topRow": 23,
   "totalRecordsCount": 0,

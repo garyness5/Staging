@@ -11,7 +11,7 @@
           "value": "application/json"
         }
       ],
-      "body": "{\n  \"operation\": \"my_ingredients\"\n}",
+      "body": "{\n  \"operation\": \"my_identity\"\n}",
       "bodyFormData": [],
       "encodeParamsToggle": true,
       "formData": {
@@ -20,7 +20,7 @@
       "headers": [
         {
           "key": "Authorization",
-          "value": "Bearer {{apiTestAuthLogin.data?.access_token}}"
+          "value": "Bearer {{appsmith.store.savveyra_access_token}}"
         }
       ],
       "httpMethod": "POST",

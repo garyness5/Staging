@@ -6,9 +6,21 @@ export default {
 			return false;
 		}
 
-		await qryGetHelperLists.run();
-		await qryImpSuppliers.run();
+		try {
+			await apiGetHelperLists.run();
 
-		return true;
+			const listId = selListsType.selectedOptionValue;
+
+			if (listId) {
+				await apiGetHelperItems.run({
+					list_id: listId
+				});
+			}
+
+			return true;
+		} catch (error) {
+			showAlert("Unable to load Lists.", "error");
+			return false;
+		}
 	}
 };
