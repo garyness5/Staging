@@ -29,7 +29,7 @@
     ],
     "name": "qryIngGetDietTags",
     "pageId": "Ingredients",
-    "runBehaviour": "AUTOMATIC",
+    "runBehaviour": "MANUAL",
     "userSetOnLoad": false
   }
 }

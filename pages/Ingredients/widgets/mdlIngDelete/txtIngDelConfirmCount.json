@@ -51,7 +51,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 25,
   "shouldTruncate": false,
-  "text": "{{\n`This will impact\n   Recipes: ${qryIngGetImpactCount.data?.[0]?.recipe_count || 0}\n   Dishes: ${qryIngGetImpactCount.data?.[0]?.dish_count || 0}\n   Menus: ${qryIngGetImpactCount.data?.[0]?.menu_count || 0}\n   Events: ${qryIngGetImpactCount.data?.[0]?.event_count || 0}`\n}}",
+  "text": "{{\n  `This will impact\nRecipes: ${apiIngGetImpactCount.data?.impact?.recipe_count || 0}\nDishes: ${apiIngGetImpactCount.data?.impact?.dish_count || 0}\nMenus: ${apiIngGetImpactCount.data?.impact?.menu_count || 0}\nEvents: ${apiIngGetImpactCount.data?.impact?.event_count || 0}`\n}}",
   "textAlign": "LEFT",
   "textColor": "#231F20",
   "topRow": 14,

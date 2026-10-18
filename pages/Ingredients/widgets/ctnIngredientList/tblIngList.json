@@ -81,22 +81,22 @@
     "ingredient": 137,
     "item_code": 95,
     "name": 235,
-    "net_cost": 102,
+    "net_cost": 82,
     "packaging": 108,
     "packaging_id": 96,
     "packaging_name": 106,
     "purchase_qty": 77,
-    "purchase_unit": 60,
+    "purchase_unit": 88,
     "purchase_unit_abbrev": 87,
     "purchase_unit_id": 99,
     "qty": 65,
     "supplier": 124,
     "supplier_id": 92,
     "supplier_name": 139,
-    "total_cost": 71,
+    "total_cost": 86,
     "unit": 68,
     "unit_type": 116,
-    "wastage_percent": 60,
+    "wastage_percent": 86,
     "yield_base_qty": 130,
     "yield_qty": 108,
     "yield_unit": 112,
@@ -253,9 +253,6 @@
       "key": "primaryColumns.purchase_unit.onOptionChange"
     },
     {
-      "key": "primaryColumns.category_name.onOptionChange"
-    },
-    {
       "key": "primaryColumns.supplier_name.onOptionChange"
     },
     {
@@ -269,6 +266,9 @@
     },
     {
       "key": "primaryColumns.name.onSubmit"
+    },
+    {
+      "key": "primaryColumns.category_name.onOptionChange"
     }
   ],
   "dynamicTriggerPathList": [
@@ -493,7 +493,7 @@
       "notation": "standard",
       "onOptionChange": "{{ jsIngList.saveCategoryInline(currentRow.id, currentRow.category_name) }}",
       "originalId": "category_name",
-      "selectOptions": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\n[\n\t{\n\t\tlabel: \"\",\n\t\tvalue: \"\"\n\t},\n\t...(qryIngGetCategories.data || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n)) : \n[\n\t{\n\t\tlabel: \"\",\n\t\tvalue: \"\"\n\t},\n\t...(qryIngGetCategories.data || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n })()}}",
+      "selectOptions": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\n[\n\t{ label: \"\", value: \"\" },\n\t...(apiIngGetCategories.data?.helper_items || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n)) : \n[\n\t{ label: \"\", value: \"\" },\n\t...(apiIngGetCategories.data?.helper_items || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n })()}}",
       "sortBy": "label",
       "sticky": "left",
       "textColor": "",
@@ -1002,7 +1002,7 @@
       "notation": "standard",
       "onOptionChange": "{{ jsIngList.savePackagingInline(currentRow.id, currentRow.packaging_name) }}",
       "originalId": "packaging_name",
-      "selectOptions": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\n[\n\t{\n\t\tlabel: \"\",\n\t\tvalue: \"\"\n\t},\n\t...(qryIngGetPackaging.data || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n)) : \n[\n\t{\n\t\tlabel: \"\",\n\t\tvalue: \"\"\n\t},\n\t...(qryIngGetPackaging.data || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n })()}}",
+      "selectOptions": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\n[\n  { label: \"\", value: \"\" },\n  ...(apiIngGetPackaging.data?.helper_items || []).map(x => ({\n    label: x.name,\n    value: String(x.id)\n  }))\n]\n)) : \n[\n  { label: \"\", value: \"\" },\n  ...(apiIngGetPackaging.data?.helper_items || []).map(x => ({\n    label: x.name,\n    value: String(x.id)\n  }))\n]\n })()}}",
       "sticky": "",
       "textColor": "",
       "textSize": "0.875rem",
@@ -1073,7 +1073,7 @@
       "notation": "standard",
       "onOptionChange": "{{\ncurrentRow.purchase_unit === \"__SET__\"\n? jsIngList.openSetUnit(currentRow)\n: jsIngList.saveUnitInline(\n\tcurrentRow.id,\n\tcurrentRow.purchase_unit\n)\n}}",
       "originalId": "purchase_unit",
-      "selectOptions": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\ncurrentRow.purchase_unit_id\n? jsIngList.unitOptions(currentRow.unit_type)\n: [\n\t{\n\t\tlabel: \"Set\",\n\t\tvalue: \"__SET__\"\n\t}\n]\n)) : \ncurrentRow.purchase_unit_id\n? jsIngList.unitOptions(currentRow.unit_type)\n: [\n\t{\n\t\tlabel: \"Set\",\n\t\tvalue: \"__SET__\"\n\t}\n]\n })()}}",
+      "selectOptions": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\ncurrentRow.purchase_unit_id\n  ? jsIngList.unitOptions(currentRow.unit_type)\n  : [\n      {\n        label: \"Set\",\n        value: \"__SET__\"\n      }\n    ]\n)) : \ncurrentRow.purchase_unit_id\n  ? jsIngList.unitOptions(currentRow.unit_type)\n  : [\n      {\n        label: \"Set\",\n        value: \"__SET__\"\n      }\n    ]\n })()}}",
       "sortBy": "label",
       "sticky": "",
       "textColor": "",
@@ -1212,7 +1212,7 @@
       "notation": "standard",
       "onOptionChange": "{{ jsIngList.saveSupplierInline(currentRow.id, currentRow.supplier_name) }}",
       "originalId": "supplier_name",
-      "selectOptions": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\n[\n\t{\n\t\tlabel: \"\",\n\t\tvalue: \"\"\n\t},\n\t...(qryIngGetSuppliers.data || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n)) : \n[\n\t{\n\t\tlabel: \"\",\n\t\tvalue: \"\"\n\t},\n\t...(qryIngGetSuppliers.data || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n })()}}",
+      "selectOptions": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\n[\n\t{ label: \"\", value: \"\" },\n\t...(apiIngGetSuppliers.data?.helper_items || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n)) : \n[\n\t{ label: \"\", value: \"\" },\n\t...(apiIngGetSuppliers.data?.helper_items || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n })()}}",
       "sticky": "",
       "textColor": "",
       "textSize": "0.875rem",
@@ -1394,7 +1394,7 @@
   "searchKey": "",
   "serverSidePaginationEnabled": true,
   "showInlineEditingOptionDropdown": true,
-  "tableData": "{{ jsIngList.filteredRows() }}",
+  "tableData": "{{ apiGetMyIngredients.data?.ingredients ?? [] }}",
   "textSize": "0.875rem",
   "topRow": 0,
   "totalRecordsCount": "300",

@@ -58,7 +58,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 62,
   "serverSideFiltering": false,
-  "sourceData": "{{\n  (qryIngGetCategories.data || []).map(obj => ({\n    label: obj.name,\n    value: String(obj.id)\n  }))\n}}",
+  "sourceData": "{{\n  (apiIngGetCategories.data?.helper_items || []).map(x => ({\n    label: x.name,\n    value: String(x.id)\n  }))\n}}",
   "topRow": 12,
   "type": "SELECT_WIDGET",
   "version": 1,

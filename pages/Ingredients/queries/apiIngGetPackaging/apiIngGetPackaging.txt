@@ -1,0 +1,8 @@
+{{
+{
+	operation: "my_helper_items",
+	list_id: apiIngGetHelperLists.data?.helper_lists?.find(
+		x => x.list_code === "packaging"
+	)?.id ?? null
+}
+}}

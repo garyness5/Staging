@@ -1,7 +1,7 @@
 {
   "animateLoading": true,
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
-  "bottomRow": 5,
+  "bottomRow": 24,
   "boxShadow": "{{appsmith.theme.boxShadow.appBoxShadow}}",
   "defaultText": "{{ jsIngForm.isEdit() ? (jsIngForm.editRow().notes || \"\") : \"\" }}",
   "dynamicBindingPathList": [
@@ -41,7 +41,7 @@
   "mobileRightColumn": 28,
   "mobileTopRow": 11,
   "needsErrorInfo": false,
-  "originalBottomRow": 24,
+  "originalBottomRow": 5,
   "originalTopRow": 1,
   "parentColumnSpace": 6.17401123046875,
   "parentId": "t088ygp8ko",

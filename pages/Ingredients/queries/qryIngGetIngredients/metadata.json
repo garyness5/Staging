@@ -29,7 +29,7 @@
     ],
     "name": "qryIngGetIngredients",
     "pageId": "Ingredients",
-    "runBehaviour": "AUTOMATIC",
+    "runBehaviour": "MANUAL",
     "userSetOnLoad": false
   }
 }

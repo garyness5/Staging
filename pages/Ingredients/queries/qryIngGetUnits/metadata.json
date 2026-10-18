@@ -25,7 +25,7 @@
     "dynamicBindingPathList": [],
     "name": "qryIngGetUnits",
     "pageId": "Ingredients",
-    "runBehaviour": "AUTOMATIC",
+    "runBehaviour": "MANUAL",
     "userSetOnLoad": false
   }
 }

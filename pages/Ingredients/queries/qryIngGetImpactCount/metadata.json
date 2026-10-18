@@ -29,7 +29,7 @@
     ],
     "name": "qryIngGetImpactCount",
     "pageId": "Ingredients",
-    "runBehaviour": "AUTOMATIC",
+    "runBehaviour": "MANUAL",
     "userSetOnLoad": false
   }
 }

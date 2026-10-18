@@ -32,7 +32,7 @@
     }
   ],
   "isDefaultClickDisabled": true,
-  "isDisabled": "{{ qryIngDelete.isLoading }}",
+  "isDisabled": "{{ apiIngDelete.isLoading }}",
   "isLoading": false,
   "isVisible": true,
   "key": "db5p08m351",

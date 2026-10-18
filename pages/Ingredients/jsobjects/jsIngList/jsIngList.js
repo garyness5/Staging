@@ -108,14 +108,14 @@ export default {
 		}
 
 		try {
-			await qryIngUpdateInline.run({
+			await apiIngUpdateInline.run({
 				ingredient_id:
 				Number(row.id),
 
 				changes
 			});
 
-			await qryIngGetIngredients.run();
+			await apiGetMyIngredients.run();
 
 			resetWidget(
 				"tblIngList",
@@ -130,7 +130,7 @@ export default {
 			return true;
 
 		} catch (e) {
-			await qryIngGetIngredients.run();
+			await apiGetMyIngredients.run();
 
 			resetWidget(
 				"tblIngList",
@@ -162,29 +162,31 @@ export default {
 				"Ingredient could not be identified.",
 				"error"
 			);
-
 			return false;
 		}
 
 		if (!newName) {
-			await qryIngGetIngredients.run();
+			await apiGetMyIngredients.run();
 			resetWidget("tblIngList", true);
 
 			showAlert(
 				"Ingredient Name is required.",
 				"warning"
 			);
-
 			return false;
 		}
 
 		try {
-			await qryIngRename.run({
+			const response = await apiIngRename.run({
 				ingredient_id: ingredientId,
-				new_name: newName
+				name: newName
 			});
 
-			await qryIngGetIngredients.run();
+			if (!response?.authenticated) {
+				throw new Error("Ingredient rename was not confirmed.");
+			}
+
+			await apiGetMyIngredients.run();
 			resetWidget("tblIngList", true);
 
 			showAlert(
@@ -195,16 +197,15 @@ export default {
 			return true;
 
 		} catch (e) {
-			await qryIngGetIngredients.run();
+			await apiGetMyIngredients.run();
 
-			// Reject the optimistic table edit and reconstruct
-			// from durable Published State.
+			// Reject the optimistic table edit and restore
+			// the last saved database state.
 			resetWidget("tblIngList", true);
 
-			showAlert(
-				e?.message ||
-				"Ingredient Name could not be updated.",
-				"error"
+			jsUserErrors.show(
+				e,
+				"Ingredient Name could not be updated."
 			);
 
 			return false;
@@ -217,18 +218,15 @@ export default {
 	// ============================================================
 
 	unitOptions(unitType) {
-		return (
-			qryIngGetUnits.data || []
-		)
+		const type = String(unitType || "").trim().toLowerCase();
+
+		return (apiIngGetUnits.data?.units || [])
 			.filter(u =>
-							u.unit_type === unitType
+							String(u.unit_type || "").trim().toLowerCase() === type
 						 )
 			.map(u => ({
-			label:
-			u.abbreviation,
-
-			value:
-			String(u.id)
+			label: u.abbreviation,
+			value: String(u.id)
 		}));
 	},
 
@@ -250,7 +248,7 @@ export default {
 		}
 
 		try {
-			await qryIngUpdateInline.run({
+			await apiIngUpdateInline.run({
 				ingredient_id:
 				Number(ingredientId),
 
@@ -260,7 +258,7 @@ export default {
 				}
 			});
 
-			await qryIngGetIngredients.run();
+			await apiGetMyIngredients.run();
 
 			resetWidget(
 				"tblIngList",
@@ -275,7 +273,7 @@ export default {
 			return true;
 
 		} catch (e) {
-			await qryIngGetIngredients.run();
+			await apiGetMyIngredients.run();
 
 			resetWidget(
 				"tblIngList",
@@ -314,7 +312,7 @@ export default {
 
 	async saveCategoryInline(ingredientId, newCategoryId) {
 		try {
-			await qryIngUpdateInline.run({
+			await apiIngUpdateInline.run({
 				ingredient_id: Number(ingredientId),
 				changes: {
 					category_id:
@@ -324,7 +322,7 @@ export default {
 				}
 			});
 
-			await qryIngGetIngredients.run();
+			await apiGetMyIngredients.run();
 			resetWidget("tblIngList", true);
 
 		} catch (e) {
@@ -351,7 +349,7 @@ export default {
 		}
 
 		try {
-			await qryIngUpdateInline.run({
+			await apiIngUpdateInline.run({
 				ingredient_id:
 				Number(ingredientId),
 
@@ -363,7 +361,7 @@ export default {
 				}
 			});
 
-			await qryIngGetIngredients.run();
+			await apiGetMyIngredients.run();
 
 			resetWidget(
 				"tblIngList",
@@ -378,7 +376,7 @@ export default {
 			return true;
 
 		} catch (e) {
-			await qryIngGetIngredients.run();
+			await apiGetMyIngredients.run();
 
 			resetWidget(
 				"tblIngList",
@@ -414,7 +412,7 @@ export default {
 		}
 
 		try {
-			await qryIngUpdateInline.run({
+			await apiIngUpdateInline.run({
 				ingredient_id:
 				Number(ingredientId),
 
@@ -426,7 +424,7 @@ export default {
 				}
 			});
 
-			await qryIngGetIngredients.run();
+			await apiGetMyIngredients.run();
 
 			resetWidget(
 				"tblIngList",
@@ -441,7 +439,7 @@ export default {
 			return true;
 
 		} catch (e) {
-			await qryIngGetIngredients.run();
+			await apiGetMyIngredients.run();
 
 			resetWidget(
 				"tblIngList",
@@ -482,7 +480,7 @@ export default {
 		}
 
 		try {
-			await qryIngUpdateInline.run({
+			await apiIngUpdateInline.run({
 				ingredient_id:
 				ingredientId,
 
@@ -494,7 +492,7 @@ export default {
 				}
 			});
 
-			await qryIngGetIngredients.run();
+			await apiGetMyIngredients.run();
 
 			resetWidget(
 				"tblIngList",
@@ -504,7 +502,7 @@ export default {
 			return true;
 
 		} catch (e) {
-			await qryIngGetIngredients.run();
+			await apiGetMyIngredients.run();
 
 			resetWidget(
 				"tblIngList",
@@ -528,7 +526,7 @@ export default {
 
 	filteredRows() {
 		const rows =
-					qryIngGetIngredients.data || [];
+					apiGetMyIngredients.data?.ingredients || [];
 
 		const status =
 					String(

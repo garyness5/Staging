@@ -59,7 +59,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 60,
   "serverSideFiltering": false,
-  "sourceData": "{{\n  qryIngGetSuppliers.data.map((obj) => {\n    return {\n      label: obj.name,\n      value: String(obj.id)\n    }\n  })\n}}",
+  "sourceData": "{{\n(apiIngGetSuppliers.data?.helper_items || []).map(x => ({\n\tlabel: x.name,\n\tvalue: String(x.id)\n}))\n}}",
   "topRow": 13,
   "type": "SELECT_WIDGET",
   "version": 1,
