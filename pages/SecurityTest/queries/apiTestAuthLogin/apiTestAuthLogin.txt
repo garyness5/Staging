@@ -1,4 +1,0 @@
-{
-  "email": "{{inpTestAuthEmail.text}}",
-  "password": "{{inpTestAuthPassword.text}}"
-}

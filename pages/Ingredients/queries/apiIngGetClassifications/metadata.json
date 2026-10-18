@@ -52,7 +52,7 @@
     ],
     "name": "apiIngGetClassifications",
     "pageId": "Ingredients",
-    "runBehaviour": "MANUAL",
+    "runBehaviour": "AUTOMATIC",
     "userSetOnLoad": false
   }
 }

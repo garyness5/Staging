@@ -10,7 +10,7 @@
   "icon": "bicycle",
   "pages": [
     {
-      "id": "SecurityTest",
+      "id": "Login",
       "isDefault": true
     },
     {
