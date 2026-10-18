@@ -5,7 +5,7 @@
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
   "bottomRow": 24,
   "boxShadow": "none",
-  "defaultText": "{{ jsIngForm.isEdit() ? jsIngForm.editRow().total_cost : \"\" }}",
+  "defaultText": "{{\njsIngForm.isEdit() && jsIngForm.editRow()?.total_cost != null\n? String(jsIngForm.editRow().total_cost)\n: \"\"\n}}",
   "dynamicBindingPathList": [
     {
       "key": "accentColor"

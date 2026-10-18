@@ -4,7 +4,7 @@
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
   "bottomRow": 21,
   "boxShadow": "none",
-  "defaultOptionValue": "{{ ((options, serverSideFiltering) => (  jsIngForm.isEdit() ? String(jsIngForm.editRow().packaging_id) : \"\" ))(selIngPackaging.options, selIngPackaging.serverSideFiltering) }}",
+  "defaultOptionValue": "{{ ((options, serverSideFiltering) => ( \njsIngForm.isEdit() && jsIngForm.editRow()?.packaging_id != null\n? String(jsIngForm.editRow().FIELD_ID)\n: \"\"\n))(selIngPackaging.options, selIngPackaging.serverSideFiltering) }}",
   "dynamicBindingPathList": [
     {
       "key": "accentColor"
@@ -59,7 +59,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 60,
   "serverSideFiltering": false,
-  "sourceData": "{{\n(apiIngGetPackaging.data?.helper_items || []).map(x => ({\n\tlabel: x.name,\n\tvalue: String(x.id)\n}))\n}}",
+  "sourceData": "{{\n(apiIngGetPackaging.data?.helper_items || []).length\n? apiIngGetPackaging.data.helper_items.map(x => ({\n\tlabel: x.name,\n\tvalue: String(x.id)\n}))\n: [{ label: \"\", value: \"\" }]\n}}",
   "topRow": 17,
   "type": "SELECT_WIDGET",
   "version": 1,

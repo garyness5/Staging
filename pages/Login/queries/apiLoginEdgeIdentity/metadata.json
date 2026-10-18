@@ -1,6 +1,6 @@
 {
-  "gitSyncId": "6ad02e5d7089041c6d575f1b_9292cc7a-1dd4-42f2-b6d2-048ef860b4c4",
-  "id": "Ingredients_apiRefreshSupabaseSession",
+  "gitSyncId": "6a0a1bde3214f344228346e7_d3f1d2c8-c12f-4baa-9d51-6d5c261ed3b9",
+  "id": "Login_apiLoginEdgeIdentity",
   "pluginId": "restapi-plugin",
   "pluginType": "API",
   "unpublishedAction": {
@@ -11,28 +11,28 @@
           "value": "application/json"
         }
       ],
-      "body": "{\n  \"refresh_token\": \"{{appsmith.store.savveyra_refresh_token}}\"\n}\n",
+      "body": "{\n  \"operation\": \"my_identity\"\n}",
       "bodyFormData": [],
       "encodeParamsToggle": true,
       "formData": {
         "apiContentType": "application/json"
       },
-      "headers": [],
+      "headers": [
+        {
+          "key": "Authorization",
+          "value": "Bearer {{appsmith.store.savveyra_access_token}}"
+        }
+      ],
       "httpMethod": "POST",
       "httpVersion": "HTTP11",
       "paginationType": "NONE",
-      "path": "/auth/v1/token",
+      "path": "/functions/v1/savveyra-security-test",
       "pluginSpecifiedTemplates": [
         {
           "value": true
         }
       ],
-      "queryParameters": [
-        {
-          "key": "grant_type",
-          "value": "refresh_token"
-        }
-      ],
+      "queryParameters": [],
       "timeoutInMillisecond": 10000
     },
     "confirmBeforeExecute": false,
@@ -44,11 +44,11 @@
     },
     "dynamicBindingPathList": [
       {
-        "key": "body"
+        "key": "headers[0].value"
       }
     ],
-    "name": "apiRefreshSupabaseSession",
-    "pageId": "Ingredients",
+    "name": "apiLoginEdgeIdentity",
+    "pageId": "Login",
     "runBehaviour": "MANUAL",
     "userSetOnLoad": false
   }

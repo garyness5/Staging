@@ -5,7 +5,7 @@
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
   "bottomRow": 20,
   "boxShadow": "none",
-  "defaultText": "{{ jsIngForm.isEdit() ? jsIngForm.editRow().purchase_qty : \"\" }}",
+  "defaultText": "{{\njsIngForm.isEdit() && jsIngForm.editRow()?.purchase_qty != null\n? String(jsIngForm.editRow().purchase_qty)\n: \"\"\n}}",
   "dynamicBindingPathList": [
     {
       "key": "accentColor"

@@ -1,0 +1,11 @@
+{
+  "gitSyncId": "6ad02e5d7089041c6d575f1b_917abba6-1600-401a-8a40-c9751423e852",
+  "id": "Ingredients_jsIngSecurityTest",
+  "unpublishedCollection": {
+    "name": "jsIngSecurityTest",
+    "pageId": "Ingredients",
+    "pluginId": "js-plugin",
+    "pluginType": "JS",
+    "variables": []
+  }
+}

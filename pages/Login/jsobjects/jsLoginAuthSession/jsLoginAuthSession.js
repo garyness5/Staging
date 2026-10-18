@@ -20,7 +20,7 @@ export default {
 
 	async refresh() {
 		try {
-			const result = await apiRefreshSupabaseSession.run();
+			const result = await apiLoginRefreshSupaSession.run();
 
 			if (!result?.access_token || !result?.refresh_token) {
 				return false;

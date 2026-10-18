@@ -11,7 +11,7 @@ export default {
 		await this.clearSession();
 
 		try {
-			const result = await apiTestAuthLogin.run();
+			const result = await apiLoginAuth.run();
 
 			if (!result?.access_token || !result?.refresh_token) {
 				showAlert("Supabase login failed.", "error");

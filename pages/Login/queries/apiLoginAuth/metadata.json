@@ -1,6 +1,6 @@
 {
-  "gitSyncId": "6ad02e5d7089041c6d575f1b_9584f256-9ede-40ad-84d9-48b5d0538134",
-  "id": "Login_apiRefreshSupabaseSession",
+  "gitSyncId": "6a0a1bde3214f344228346e7_9b690f88-ab0c-470b-8982-57a469c7b0f0",
+  "id": "Login_apiLoginAuth",
   "pluginId": "restapi-plugin",
   "pluginType": "API",
   "unpublishedAction": {
@@ -11,7 +11,7 @@
           "value": "application/json"
         }
       ],
-      "body": "{\n  \"refresh_token\": \"{{appsmith.store.savveyra_refresh_token}}\"\n}\n",
+      "body": "{\n\t\"email\": \"{{inpLoginEmail.text}}\",\n\t\"password\": \"{{inpLoginPassword.text}}\"\n}",
       "bodyFormData": [],
       "encodeParamsToggle": true,
       "formData": {
@@ -30,7 +30,7 @@
       "queryParameters": [
         {
           "key": "grant_type",
-          "value": "refresh_token"
+          "value": "password"
         }
       ],
       "timeoutInMillisecond": 10000
@@ -47,7 +47,7 @@
         "key": "body"
       }
     ],
-    "name": "apiRefreshSupabaseSession",
+    "name": "apiLoginAuth",
     "pageId": "Login",
     "runBehaviour": "MANUAL",
     "userSetOnLoad": false
