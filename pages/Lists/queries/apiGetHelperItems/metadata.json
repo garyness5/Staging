@@ -52,7 +52,7 @@
     ],
     "name": "apiGetHelperItems",
     "pageId": "Lists",
-    "runBehaviour": "AUTOMATIC",
-    "userSetOnLoad": false
+    "runBehaviour": "MANUAL",
+    "userSetOnLoad": true
   }
 }

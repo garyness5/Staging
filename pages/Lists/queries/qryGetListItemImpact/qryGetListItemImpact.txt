@@ -1,5 +1,0 @@
-select public.get_helper_item_impact(
-	'{{ appsmith.user.email }}'::text,
-	'{{ appsmith.store.current_client_id }}'::uuid,
-	{{ Number(tblListsItems.selectedRow?.id || 0) }}
-) as impact;

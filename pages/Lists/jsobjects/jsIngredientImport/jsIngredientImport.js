@@ -931,8 +931,7 @@ export default {
 	},
 
 	async confirmImport() {
-		const snapshot =
-					appsmith.store.impReviewSnapshot;
+		const snapshot = appsmith.store.impReviewSnapshot;
 
 		if (!snapshot) {
 			showAlert(
@@ -943,7 +942,16 @@ export default {
 		}
 
 		try {
-			await qryCommitIngredientImport.run();
+			const response = await apiImpCommit.run();
+
+			if (
+				response?.authenticated !== true ||
+				response?.result == null
+			) {
+				throw new Error(
+					response?.error || "Ingredient Import commit failed."
+				);
+			}
 
 			await this.clearImportWorkspace();
 
@@ -955,11 +963,7 @@ export default {
 			return true;
 
 		} catch (error) {
-			jsUserErrors.show(
-				error,
-				"Ingredient Import"
-			);
-
+			jsUserErrors.show(error, "Ingredient Import");
 			return false;
 		}
 	},

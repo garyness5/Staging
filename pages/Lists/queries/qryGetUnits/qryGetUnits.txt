@@ -1,3 +1,0 @@
-select *
-from units
-order by unit_type, sort_order;

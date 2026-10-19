@@ -1,7 +1,0 @@
-select *
-from public.add_helper_item(
-	'{{ appsmith.user.email }}'::text,
-	'{{ appsmith.store.current_client_id }}'::uuid,
-	{{ Number(this.params.list_id) }},
-	{{ inpPLAddName.text }}
-);

@@ -1,9 +1,0 @@
-select
-    u.id,
-    u.name,
-    u.abbreviation
-from public.units u
-where u.active = true
-order by
-    u.unit_type,
-    u.name;

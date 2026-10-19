@@ -6,6 +6,11 @@
     "pageId": "Lists",
     "pluginId": "js-plugin",
     "pluginType": "JS",
-    "variables": []
+    "variables": [
+      {
+        "name": "ready",
+        "value": "false"
+      }
+    ]
   }
 }

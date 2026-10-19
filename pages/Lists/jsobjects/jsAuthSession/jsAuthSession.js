@@ -8,7 +8,6 @@ export default {
 
 		if (!refreshToken) return false;
 
-		// Keep the current token if more than 5 minutes remain.
 		if (token && expiresAt > Date.now() + 5 * 60 * 1000) {
 			return true;
 		}
@@ -48,6 +47,26 @@ export default {
 		}
 	},
 
+	async logout() {
+		// Hide protected Lists content immediately.
+		if (typeof jsListsPageLoad !== "undefined") {
+			jsListsPageLoad.ready = false;
+		}
+
+		// Clear session credentials.
+		await removeValue("savveyra_access_token");
+		await removeValue("savveyra_refresh_token");
+		await removeValue("savveyra_token_expires_at");
+
+		// Clear resolved tenant identity.
+		await jsAppInit.clearTenantState();
+
+		// Clear locally retained Ingredient Import data.
+		await jsIngredientImport.clearImportWorkspace();
+
+		return true;
+	},
+
 	status() {
 		const expiresAt = Number(
 			appsmith.store.savveyra_token_expires_at || 0
@@ -65,17 +84,21 @@ export default {
 			expiresAt <= Date.now() + 5 * 60 * 1000
 		};
 	},
-	
-	check() {
-    const token = String(appsmith.store.savveyra_access_token || "");
 
-    return {
-      tokenPresent: !!token,
-      tokenLength: token.length,
-      tokenSegments: token.split(".").length,
-      expiresAt: new Date(
-        Number(appsmith.store.savveyra_token_expires_at || 0)
-      ).toISOString()
-    };
-  }
+	check() {
+		const token = String(
+			appsmith.store.savveyra_access_token || ""
+		);
+
+		return {
+			tokenPresent: !!token,
+			tokenLength: token.length,
+			tokenSegments: token.split(".").length,
+			expiresAt: new Date(
+				Number(
+					appsmith.store.savveyra_token_expires_at || 0
+				)
+			).toISOString()
+		};
+	}
 };

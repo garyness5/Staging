@@ -5,9 +5,32 @@ export default {
 		await storeValue("savveyra_token_expires_at", 0, true);
 	},
 
+	async clearPreviousTenantWorkspace() {
+		const keys = [
+			"current_client_id",
+			"current_client_name",
+			"current_user_id",
+			"current_user_name",
+			"impSourceHeaders",
+			"impSourceRows",
+			"impHeaderSignature",
+			"impHeaderMapRows",
+			"impAppliedHeaderMapRows",
+			"impAppliedHeaderSignature",
+			"impSelectedSupplierId",
+			"impValueMapRows",
+			"impReviewSnapshot",
+			"impImpact"
+		];
+
+		for (const key of keys) {
+			await removeValue(key);
+		}
+
+		return true;
+	},
+
 	async login() {
-		// End the previous Supabase session before attempting
-		// to authenticate another user.
 		await this.clearSession();
 
 		try {
@@ -17,6 +40,9 @@ export default {
 				showAlert("Supabase login failed.", "error");
 				return { success: false };
 			}
+
+			// Successful login establishes a new user workspace.
+			await this.clearPreviousTenantWorkspace();
 
 			const expiresAt =
 						Date.now() + Number(result.expires_in || 3600) * 1000;
@@ -48,6 +74,14 @@ export default {
 			showAlert("Unable to establish Supabase session.", "error");
 			return { success: false };
 		}
+	},
+
+	async logout() {
+		await this.clearSession();
+		await this.clearPreviousTenantWorkspace();
+
+		showAlert("Logged out successfully.", "success");
+		return true;
 	},
 
 	checkToken() {

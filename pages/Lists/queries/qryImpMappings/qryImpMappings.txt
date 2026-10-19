@@ -1,4 +1,0 @@
-select *
-from public.get_ingredient_import_mappings(
-    {{ appsmith.store.impBatchId }}
-);

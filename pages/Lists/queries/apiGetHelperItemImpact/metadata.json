@@ -52,7 +52,7 @@
     ],
     "name": "apiGetHelperItemImpact",
     "pageId": "Lists",
-    "runBehaviour": "AUTOMATIC",
-    "userSetOnLoad": false
+    "runBehaviour": "MANUAL",
+    "userSetOnLoad": true
   }
 }
