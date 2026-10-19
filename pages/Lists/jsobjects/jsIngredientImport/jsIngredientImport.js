@@ -216,28 +216,22 @@ export default {
 
 		if (type === "Category") {
 			const match =
-						(qryImpCategories.data || []).find(
+						(apiImpGetLookups.data?.categories || []).find(
 							row =>
-							normalise(row.name) ===
-							normalise(value)
+							normalise(row.name) === normalise(value)
 						);
 
-			return match
-				? `CAT:${match.id}`
-			: "";
+			return match ? `CAT:${match.id}` : "";
 		}
 
 		if (type === "Unit") {
 			const match =
-						(qryImpUnits.data || []).find(
+						(apiImpGetLookups.data?.units || []).find(
 							row =>
-							normalise(row.abbreviation) ===
-							normalise(value)
+							normalise(row.abbreviation) === normalise(value)
 						);
 
-			return match
-				? `UNIT:${match.id}`
-			: "";
+			return match ? `UNIT:${match.id}` : "";
 		}
 
 		return "";
@@ -304,27 +298,18 @@ export default {
 
 	async rebuildValueMappings() {
 		await Promise.all([
-			qryImpCategories.run(),
-			qryImpUnits.run(),
-			qryImpSavedMappings.run()
+			apiImpGetLookups.run(),
+			apiImpGetSavedMappings.run()
 		]);
 
-		const rows =
-					this.buildValueMapRows();
+		const rows = this.buildValueMapRows();
 
-		const mappedRows =
-					this.applySavedValueMappings(rows);
+		const mappedRows = this.applySavedValueMappings(rows);
 
-		await storeValue(
-			"impValueMapRows",
-			mappedRows
-		);
+		await storeValue("impValueMapRows", mappedRows);
 
 		if (mappedRows.length > 0) {
-			await storeValue(
-				"accImportMapItems",
-				true
-			);
+			await storeValue("accImportMapItems", true);
 		}
 
 		return true;
@@ -383,8 +368,9 @@ export default {
      *
      * Client + Supplier/No Supplier + exact header signature
      */
-		const savedRows =
-					await qryImpSavedMappings.run();
+		const response = await apiImpGetSavedMappings.run();
+
+		const savedRows = response?.mappings || [];
 
 		const savedHeaderRows =
 					(savedRows || []).filter(
@@ -480,15 +466,12 @@ export default {
 	getValueMapOptions(type = "") {
 		if (type === "Category") {
 			return [
-				{
-					label: "",
-					value: ""
-				},
+				{ label: "", value: "" },
 				{
 					label: "# Add New Category",
 					value: "__ADD_NEW_CATEGORY__"
 				},
-				...(qryImpCategories.data || []).map(row => ({
+				...(apiImpGetLookups.data?.categories || []).map(row => ({
 					label: row.name,
 					value: `CAT:${row.id}`
 				}))
@@ -497,11 +480,8 @@ export default {
 
 		if (type === "Unit") {
 			return [
-				{
-					label: "",
-					value: ""
-				},
-				...(qryImpUnits.data || []).map(row => ({
+				{ label: "", value: "" },
+				...(apiImpGetLookups.data?.units || []).map(row => ({
 					label: `${row.abbreviation} (${row.name})`,
 					value: `UNIT:${row.id}`
 				}))
@@ -603,7 +583,7 @@ export default {
 
 	applySavedValueMappings(rows = []) {
 		const savedRows =
-					qryImpSavedMappings.data || [];
+					apiImpGetSavedMappings.data?.mappings || [];
 
 		const normalise = value =>
 		String(value || "")
@@ -613,13 +593,13 @@ export default {
 		.toLowerCase();
 
 		return rows.map(row => {
-			const match =
-						savedRows.find(saved =>
-													 saved.mapping_scope === "value" &&
-													 saved.mapping_type === row.type &&
-													 normalise(saved.source_value) ===
-													 normalise(row.imported_data)
-													);
+			const match = savedRows.find(saved =>
+																	 saved.mapping_scope === "value" &&
+																	 normalise(saved.mapping_type) ===
+																	 normalise(row.type) &&
+																	 normalise(saved.source_value) ===
+																	 normalise(row.imported_data)
+																	);
 
 			if (!match || !match.target_id) {
 				return row;
@@ -762,10 +742,10 @@ export default {
 					this.buildMappedImportRows();
 
 		const existingIngredients =
-					qryImpExistingIngredients.data || [];
+					apiImpGetReview.data?.ingredients || [];
 
 		const existingSupplierItems =
-					qryImpExistingSupplierItems.data || [];
+					apiImpGetReview.data?.supplier_items || [];
 
 		const supplierValue =
 					selImportListSupplier.selectedOptionValue || "";
@@ -865,10 +845,7 @@ export default {
 	},
 
 	async reviewImport() {
-		await Promise.all([
-			qryImpExistingIngredients.run(),
-			qryImpExistingSupplierItems.run()
-		]);
+		await apiImpGetReview.run();
 
 		const clone = value =>
 		JSON.parse(JSON.stringify(value));

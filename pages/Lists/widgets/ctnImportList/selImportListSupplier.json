@@ -68,7 +68,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 63,
   "serverSideFiltering": false,
-  "sourceData": "{{\n[\n\t{\n\t\tlabel: \"No Supplier\",\n\t\tvalue: \"__NO_SUPPLIER__\"\n\t},\n\t...(qryImpSuppliers.data || []).map(s => ({\n\t\tlabel: s.name,\n\t\tvalue: s.id\n\t}))\n]\n}}",
+  "sourceData": "{{\n  [\n    { label: \"No Supplier\", value: \"__NO_SUPPLIER__\" },\n    ...(apiImpGetSuppliers.data?.suppliers || []).map(s => ({\n      label: s.name,\n      value: String(s.id)\n    }))\n  ]\n}}",
   "topRow": 14,
   "type": "SELECT_WIDGET",
   "version": 1,

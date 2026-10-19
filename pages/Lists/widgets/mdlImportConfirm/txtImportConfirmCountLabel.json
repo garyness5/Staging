@@ -40,7 +40,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 62,
   "shouldTruncate": false,
-  "text": "Duplicate Names - Will Be Flagged\nMissing Ingredients Category    \nUnmapped Units - Unit Will Be Blank\nMissing Ingredient Name - Will Not Be Imported",
+  "text": "Duplicate Names - Will Be Flagged\nIngredients Missing a Category    \nUnmapped Units - Unit Will Be Blank\nMissing Ingredient Name - Will Not Be Imported",
   "textAlign": "LEFT",
   "textColor": "#231F20",
   "topRow": 30,
