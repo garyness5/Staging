@@ -54,7 +54,7 @@
   "renderMode": "CANVAS",
   "resetFormOnClick": false,
   "responsiveBehavior": "hug",
-  "rightColumn": 19,
+  "rightColumn": 20,
   "text": "Duplicate",
   "tooltip": "Duplicate selected ingredient",
   "topRow": 2,

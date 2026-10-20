@@ -1,7 +1,7 @@
 {{
 {
-  operation: "rename_my_ingredient",
-  ingredient_id: 14,
-  name: "UNAUTHORIZED RENAME TEST"
+	operation: "rename_my_ingredient",
+	ingredient_id: this.params.ingredient_id,
+	name: this.params.name
 }
 }}

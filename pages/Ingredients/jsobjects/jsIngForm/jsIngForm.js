@@ -182,18 +182,26 @@ export default {
 	// Name is the only required field.
 	// ============================================================
 
-	async save(closeAfterSave = true) {
-		const state = this.currentState();
+	async save(closeAfterSave = true, stateOverride = null) {
+		const state = stateOverride || this.currentState();
 
 		if (!state.name) {
 			showAlert("Ingredient Name is required.", "warning");
 			return false;
 		}
 
-		const numericOrNull = value =>
-		value === "" || value === null || value === undefined
-		? null
-		: Number(value);
+		const numericOrNull = value => {
+			if (value === "" || value === null || value === undefined) {
+				return null;
+			}
+
+			const cleaned = String(value)
+			.trim()
+			.replace(/,/g, "")
+			.replace(/\s/g, "");
+
+			return cleaned === "" ? null : Number(cleaned);
+		};
 
 		const purchaseQty = numericOrNull(state.purchase_qty);
 		const totalCost = numericOrNull(state.total_cost);
@@ -301,7 +309,11 @@ export default {
 
 	async cancel() {
 		if (this.isDirty()) {
+			const snapshot = this.currentState();
+
+			await storeValue("IngForm_pending_state", snapshot);
 			await storeValue("IngForm_pending_action", "close");
+
 			showModal(mdlIngUnsaved.name);
 			return false;
 		}
@@ -312,7 +324,11 @@ export default {
 
 	async requestAdd() {
 		if (this.isDirty()) {
+			const snapshot = this.currentState();
+
+			await storeValue("IngForm_pending_state", snapshot);
 			await storeValue("IngForm_pending_action", "add");
+
 			showModal(mdlIngUnsaved.name);
 			return false;
 		}
@@ -325,7 +341,17 @@ export default {
 		const action =
 					appsmith.store.IngForm_pending_action || "close";
 
-		const saved = await this.save(false);
+		const snapshot = appsmith.store.IngForm_pending_state;
+
+		if (!snapshot) {
+			showAlert(
+				"Unsaved Ingredient values could not be recovered.",
+				"error"
+			);
+			return false;
+		}
+
+		const saved = await this.save(false, snapshot);
 
 		if (!saved) {
 			return false;
@@ -339,7 +365,9 @@ export default {
 			closeModal(mdlAddIng.name);
 		}
 
+		await removeValue("IngForm_pending_state");
 		await removeValue("IngForm_pending_action");
+
 		return true;
 	},
 
@@ -355,13 +383,17 @@ export default {
 			closeModal(mdlAddIng.name);
 		}
 
+		await removeValue("IngForm_pending_state");
 		await removeValue("IngForm_pending_action");
 		return true;
 	},
 
 	async cancelDiscard() {
 		closeModal(mdlIngUnsaved.name);
+
+		await removeValue("IngForm_pending_state");
 		await removeValue("IngForm_pending_action");
+
 		return true;
 	},
 
@@ -635,11 +667,17 @@ export default {
 			.filter(x => x.classification_type === "diet_tag")
 			.map(x => String(x.helper_list_item_id));
 
+			const source = (
+				apiGetMyIngredients.data?.ingredients || []
+			).find(r => Number(r.id) === Number(row.id));
+
+			if (!source) {
+				throw new Error("Original Ingredient data could not be loaded.");
+			}
+
 			const duplicateSource = {
-				...row,
-				wastage_percent: Number(
-					String(row.wastage_percent ?? 0).replace("%", "").trim()
-				)
+				...source,
+				wastage_percent: source.wastage_percent
 			};
 
 			const started = await this.beginDuplicate(

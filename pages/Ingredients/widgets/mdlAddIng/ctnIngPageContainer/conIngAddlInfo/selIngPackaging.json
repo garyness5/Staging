@@ -4,7 +4,7 @@
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
   "bottomRow": 21,
   "boxShadow": "none",
-  "defaultOptionValue": "{{ ((options, serverSideFiltering) => ( \njsIngForm.isEdit() && jsIngForm.editRow()?.packaging_id != null\n? String(jsIngForm.editRow().FIELD_ID)\n: \"\"\n))(selIngPackaging.options, selIngPackaging.serverSideFiltering) }}",
+  "defaultOptionValue": "{{ ((options, serverSideFiltering) => ( \njsIngForm.isEdit() && jsIngForm.editRow()?.packaging_id != null\n? String(jsIngForm.editRow().packaging_id)\n: \"\"\n))(selIngPackaging.options, selIngPackaging.serverSideFiltering) }}",
   "dynamicBindingPathList": [
     {
       "key": "accentColor"
