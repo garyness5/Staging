@@ -5,7 +5,7 @@
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
   "bottomRow": 24,
   "boxShadow": "none",
-  "defaultText": "{{\njsIngForm.isEdit() && jsIngForm.editRow()?.total_cost != null\n? String(jsIngForm.editRow().total_cost)\n: \"\"\n}}",
+  "defaultText": "{{\njsIngForm.isEdit() && jsIngForm.editRow()?.total_cost != null\n? jsFmt.currency(jsIngForm.editRow().total_cost)\n: \"\"\n}}",
   "dynamicBindingPathList": [
     {
       "key": "accentColor"
@@ -18,6 +18,7 @@
     }
   ],
   "dynamicHeight": "FIXED",
+  "dynamicPropertyPathList": [],
   "dynamicTriggerPathList": [],
   "iconAlign": "left",
   "inputType": "TEXT",
@@ -31,7 +32,7 @@
   "labelPosition": "Left",
   "labelStyle": "",
   "labelTextSize": "0.875rem",
-  "labelWidth": "9",
+  "labelWidth": "11",
   "leftColumn": 1,
   "maxDynamicHeight": 9000,
   "minDynamicHeight": 4,
@@ -41,6 +42,7 @@
   "mobileRightColumn": 24,
   "mobileTopRow": 25,
   "needsErrorInfo": false,
+  "onBlur": "",
   "parentColumnSpace": 6.17401123046875,
   "parentId": "jrzubrhnbf",
   "parentRowSpace": 10,

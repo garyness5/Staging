@@ -525,44 +525,21 @@ export default {
 	// ============================================================
 
 	filteredRows() {
-		const rows =
-					apiGetMyIngredients.data?.ingredients || [];
+		const rows = apiGetMyIngredients.data?.ingredients ?? [];
 
-		const status =
-					String(
-						selIngListFilter
-						.selectedOptionValue ||
-						"all"
-					)
-		.trim()
-		.toLowerCase();
+		const status = selIngListFilter.selectedOptionValue || "all";
 
-		const search =
-					String(
-						inpIngListSearch.text || ""
-					)
+		const search = String(inpIngListSearch.text || "")
 		.trim()
 		.toLowerCase();
 
 		return rows.filter(row => {
 			const statusOk =
 						status === "all" ||
-						(
-							status === "active" &&
-							row.active === true
-						) ||
-						(
-							status === "inactive" &&
-							row.active === false
-						);
+						row.active === (status === "active");
 
-			if (!statusOk) {
-				return false;
-			}
-
-			if (!search) {
-				return true;
-			}
+			if (!statusOk) return false;
+			if (!search) return true;
 
 			return [
 				row.name,
@@ -573,10 +550,8 @@ export default {
 			]
 				.filter(Boolean)
 				.some(value =>
-							String(value)
-							.toLowerCase()
-							.includes(search)
+							String(value).toLowerCase().includes(search)
 						 );
 		});
-	}
+	},
 };

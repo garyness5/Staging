@@ -11,7 +11,7 @@
           "value": "application/json"
         }
       ],
-      "body": "{\n\t\"operation\": \"my_import_review\",\n\t\"body\": {\n\t\t\"supplier_id\": \"{{appsmith.store.impSelectedSupplierId || '__NO_SUPPLIER__'}}\"\n\t}\n}",
+      "body": "{\n\t\"operation\": \"my_import_saved_mappings\",\n\t\"body\": {\n\t\t\"supplier_id\": {{ appsmith.store.impSelectedSupplierId || \"__NO_SUPPLIER__\" }},\n\t\t\"header_signature\": {{ appsmith.store.impHeaderSignature || \"\" }}\n\t}\n}",
       "bodyFormData": [],
       "encodeParamsToggle": true,
       "formData": {

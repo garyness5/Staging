@@ -1394,7 +1394,7 @@
   "searchKey": "",
   "serverSidePaginationEnabled": true,
   "showInlineEditingOptionDropdown": true,
-  "tableData": "{{ apiGetMyIngredients.data?.ingredients ?? [] }}",
+  "tableData": "{{ jsIngList.filteredRows() }}",
   "textSize": "0.875rem",
   "topRow": 0,
   "totalRecordsCount": "300",
