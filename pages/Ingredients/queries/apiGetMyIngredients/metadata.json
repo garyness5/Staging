@@ -49,7 +49,7 @@
     ],
     "name": "apiGetMyIngredients",
     "pageId": "Ingredients",
-    "runBehaviour": "AUTOMATIC",
+    "runBehaviour": "MANUAL",
     "userSetOnLoad": false
   }
 }

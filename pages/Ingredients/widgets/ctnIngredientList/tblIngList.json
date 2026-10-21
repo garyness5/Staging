@@ -41,10 +41,10 @@
     "wastage_percent",
     "net_cost",
     "active",
+    "id",
     "item_code",
     "supplier_name",
     "packaging_name",
-    "id",
     "allergen_names",
     "diet_tag_names",
     "cost_per_base_unit",
@@ -65,7 +65,7 @@
     "deleted",
     "created_at"
   ],
-  "columnUpdatedAt": 1792341885698,
+  "columnUpdatedAt": 1792530603583,
   "columnWidthMap": {
     "active": 100,
     "allergen_names": 98,
@@ -77,7 +77,7 @@
     "deleted": 84,
     "diet_tag_names": 82,
     "factor_to_base": 127,
-    "id": 87,
+    "id": 60,
     "ingredient": 137,
     "item_code": 92,
     "name": 235,
@@ -234,6 +234,21 @@
     },
     {
       "key": "primaryColumns.net_cost.computedValue"
+    },
+    {
+      "key": "primaryColumns.purchase_qty.cellBackground"
+    },
+    {
+      "key": "primaryColumns.total_cost.cellBackground"
+    },
+    {
+      "key": "primaryColumns.item_code.cellBackground"
+    },
+    {
+      "key": "primaryColumns.category_name.cellBackground"
+    },
+    {
+      "key": "primaryColumns.supplier_name.cellBackground"
     }
   ],
   "dynamicPropertyPathList": [
@@ -269,6 +284,21 @@
     },
     {
       "key": "primaryColumns.category_name.onOptionChange"
+    },
+    {
+      "key": "primaryColumns.purchase_qty.cellBackground"
+    },
+    {
+      "key": "primaryColumns.total_cost.cellBackground"
+    },
+    {
+      "key": "primaryColumns.item_code.cellBackground"
+    },
+    {
+      "key": "primaryColumns.category_name.cellBackground"
+    },
+    {
+      "key": "primaryColumns.supplier_name.cellBackground"
     }
   ],
   "dynamicTriggerPathList": [
@@ -470,7 +500,7 @@
       "alias": "category_name",
       "allowCellWrapping": false,
       "allowSameOptionsInNewRow": true,
-      "cellBackground": "",
+      "cellBackground": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\njsIngBatch.isCellPending(\n\tcurrentRow.id,\n\t\"category_id\"\n)\n? \"#E8F2FF\"\n: \"\"\n)) : \njsIngBatch.isCellPending(\n\tcurrentRow.id,\n\t\"category_id\"\n)\n? \"#E8F2FF\"\n: \"\"\n })()}}",
       "columnType": "select",
       "computedValue": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => ( String(currentRow.category_id || \"\") )) :  String(currentRow.category_id || \"\")  })()}}",
       "currencyCode": "USD",
@@ -491,7 +521,7 @@
       "isVisible": true,
       "label": "Category",
       "notation": "standard",
-      "onOptionChange": "{{ jsIngList.saveCategoryInline(currentRow.id, currentRow.category_name) }}",
+      "onOptionChange": "{{ jsIngList.stageCategory(tblIngList.updatedRow.id, tblIngList.updatedRow.category_id) }}",
       "originalId": "category_name",
       "selectOptions": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\n[\n\t{ label: \"\", value: \"\" },\n\t...(apiIngGetCategories.data?.helper_items || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n)) : \n[\n\t{ label: \"\", value: \"\" },\n\t...(apiIngGetCategories.data?.helper_items || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n })()}}",
       "sortBy": "label",
@@ -773,7 +803,7 @@
       "alias": "item_code",
       "allowCellWrapping": false,
       "allowSameOptionsInNewRow": true,
-      "cellBackground": "",
+      "cellBackground": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\njsIngBatch.isCellPending(\n\tcurrentRow.id,\n\t\"item_code\"\n)\n? \"#E8F2FF\"\n: \"\"\n)) : \njsIngBatch.isCellPending(\n\tcurrentRow.id,\n\t\"item_code\"\n)\n? \"#E8F2FF\"\n: \"\"\n })()}}",
       "columnType": "text",
       "computedValue": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => ( currentRow.item_code || \"\" )) :  currentRow.item_code || \"\"  })()}}",
       "currencyCode": "USD",
@@ -794,7 +824,7 @@
       "isVisible": true,
       "label": "Code",
       "notation": "standard",
-      "onSubmit": "{{ jsIngList.saveInline() }}",
+      "onSubmit": "{{ jsIngList.stageCode() }}",
       "originalId": "item_code",
       "sticky": "",
       "textColor": "",
@@ -808,7 +838,7 @@
       "alias": "name",
       "allowCellWrapping": false,
       "allowSameOptionsInNewRow": true,
-      "cellBackground": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => ( currentRow.duplicate_name === true ? \"#FFE6E6\" : \"\" )) :  currentRow.duplicate_name === true ? \"#FFE6E6\" : \"\"  })()}}",
+      "cellBackground": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\njsIngBatch.isCellPending(currentRow.id, \"name\")\n? \"#E8F2FF\"\n: currentRow.duplicate_name === true\n? \"#FFE6E6\"\n: \"\"\n)) : \njsIngBatch.isCellPending(currentRow.id, \"name\")\n? \"#E8F2FF\"\n: currentRow.duplicate_name === true\n? \"#FFE6E6\"\n: \"\"\n })()}}",
       "columnType": "text",
       "computedValue": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (currentRow[\"name\"])) : name })()}}",
       "currencyCode": "USD",
@@ -829,7 +859,7 @@
       "isVisible": true,
       "label": "Ingredient",
       "notation": "standard",
-      "onSubmit": "{{ jsIngList.saveNameInline() }}",
+      "onSubmit": "{{ jsIngList.stageName() }}",
       "originalId": "name",
       "sticky": "left",
       "textColor": "",
@@ -1015,7 +1045,7 @@
       "alias": "purchase_qty",
       "allowCellWrapping": false,
       "allowSameOptionsInNewRow": true,
-      "cellBackground": "",
+      "cellBackground": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\n  jsIngBatch.isCellPending(\n    currentRow.id,\n    \"purchase_qty\"\n  )\n    ? \"#E8F2FF\"\n    : \"\"\n)) : \n  jsIngBatch.isCellPending(\n    currentRow.id,\n    \"purchase_qty\"\n  )\n    ? \"#E8F2FF\"\n    : \"\"\n })()}}",
       "columnType": "number",
       "computedValue": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => ( jsFmt.number(currentRow.purchase_qty) )) :  jsFmt.number(currentRow.purchase_qty)  })()}}",
       "currencyCode": "USD",
@@ -1036,7 +1066,7 @@
       "isVisible": true,
       "label": "Qty",
       "notation": "standard",
-      "onSubmit": "{{ jsIngList.saveInline() }}",
+      "onSubmit": "{{ jsIngList.stageQty() }}",
       "originalId": "purchase_qty",
       "sticky": "",
       "textColor": "",
@@ -1189,7 +1219,7 @@
       "alias": "supplier_name",
       "allowCellWrapping": false,
       "allowSameOptionsInNewRow": true,
-      "cellBackground": "",
+      "cellBackground": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\njsIngBatch.isCellPending(\n\tcurrentRow.id,\n\t\"supplier_id\"\n)\n? \"#E8F2FF\"\n: \"\"\n)) : \njsIngBatch.isCellPending(\n\tcurrentRow.id,\n\t\"supplier_id\"\n)\n? \"#E8F2FF\"\n: \"\"\n })()}}",
       "columnType": "select",
       "computedValue": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => ( String(currentRow.supplier_id || \"\") )) :  String(currentRow.supplier_id || \"\")  })()}}",
       "currencyCode": "USD",
@@ -1210,7 +1240,7 @@
       "isVisible": true,
       "label": "Supplier",
       "notation": "standard",
-      "onOptionChange": "{{ jsIngList.saveSupplierInline(currentRow.id, currentRow.supplier_name) }}",
+      "onOptionChange": "{{ jsIngList.stageSupplier(currentRow.id, currentRow.supplier_id) }}",
       "originalId": "supplier_name",
       "selectOptions": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\n[\n\t{ label: \"\", value: \"\" },\n\t...(apiIngGetSuppliers.data?.helper_items || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n)) : \n[\n\t{ label: \"\", value: \"\" },\n\t...(apiIngGetSuppliers.data?.helper_items || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n })()}}",
       "sticky": "",
@@ -1225,6 +1255,7 @@
       "alias": "total_cost",
       "allowCellWrapping": false,
       "allowSameOptionsInNewRow": true,
+      "cellBackground": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\njsIngBatch.isCellPending(\n\tcurrentRow.id,\n\t\"total_cost\"\n)\n? \"#E8F2FF\"\n: \"\"\n)) : \njsIngBatch.isCellPending(\n\tcurrentRow.id,\n\t\"total_cost\"\n)\n? \"#E8F2FF\"\n: \"\"\n })()}}",
       "columnType": "number",
       "computedValue": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => ( jsFmt.currency(currentRow.total_cost) )) :  jsFmt.currency(currentRow.total_cost)  })()}}",
       "currencyCode": "USD",
@@ -1244,7 +1275,7 @@
       "isVisible": true,
       "label": "Cost",
       "notation": "standard",
-      "onSubmit": "{{ jsIngList.saveInline() }}",
+      "onSubmit": "{{ jsIngList.stageCost() }}",
       "originalId": "total_cost",
       "sticky": "",
       "textSize": "0.875rem",

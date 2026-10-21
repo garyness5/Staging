@@ -251,9 +251,14 @@ export default {
 
 			const savedId = Number(result?.ingredient_id || 0);
 
-			if (!savedId) {
-				showAlert("Ingredient was not saved.", "error");
-				return false;
+			if (
+				result?.authenticated !== true ||
+				!savedId ||
+				(ingredientId !== null && savedId !== ingredientId)
+			) {
+				throw new Error(
+					"Ingredient Save returned an invalid or unexpected response."
+				);
 			}
 
 			await storeValue("IngForm_saved_id", savedId);
@@ -452,9 +457,13 @@ export default {
 
 			const deletedId = Number(result?.ingredient_id || 0);
 
-			if (!deletedId) {
-				showAlert("Ingredient was not deleted.", "error");
-				return false;
+			if (
+				result?.authenticated !== true ||
+				deletedId !== id
+			) {
+				throw new Error(
+					"Ingredient Delete returned an invalid or unexpected response."
+				);
 			}
 
 			await apiGetMyIngredients.run();
