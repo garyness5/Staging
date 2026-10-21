@@ -52,7 +52,7 @@
     ],
     "name": "apiIngGetImpactCount",
     "pageId": "Ingredients",
-    "runBehaviour": "AUTOMATIC",
-    "userSetOnLoad": false
+    "runBehaviour": "MANUAL",
+    "userSetOnLoad": true
   }
 }

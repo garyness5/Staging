@@ -52,7 +52,7 @@
     ],
     "name": "apiIngGetAllergens",
     "pageId": "Ingredients",
-    "runBehaviour": "AUTOMATIC",
-    "userSetOnLoad": false
+    "runBehaviour": "MANUAL",
+    "userSetOnLoad": true
   }
 }

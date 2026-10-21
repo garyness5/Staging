@@ -50,6 +50,6 @@
     "name": "apiGetMyIngredients",
     "pageId": "Ingredients",
     "runBehaviour": "MANUAL",
-    "userSetOnLoad": false
+    "userSetOnLoad": true
   }
 }

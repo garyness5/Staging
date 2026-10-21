@@ -1,7 +1,7 @@
 {
   "animateLoading": true,
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
-  "bottomRow": 31,
+  "bottomRow": 33,
   "dynamicBindingPathList": [
     {
       "key": "truncateButtonColor"
@@ -40,7 +40,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 19,
   "shouldTruncate": false,
-  "text": "tenant-a@example.invalid\ntenant-b@example.invalid",
+  "text": "tenant-a@example.invalid\ntenant-b@example.invalid\nmarriott@abc.abc",
   "textAlign": "LEFT",
   "textColor": "#231F20",
   "topRow": 26,

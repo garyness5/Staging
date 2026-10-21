@@ -1,5 +1,21 @@
 export default {
+	async clearIdentity() {
+		const keys = [
+			"current_client_id",
+			"current_client_name",
+			"current_user_id",
+			"current_user_name"
+		];
+
+		for (const key of keys) {
+			await removeValue(key);
+		}
+	},
+
 	async init() {
+		// Clear any identity left from a previous session.
+		await this.clearIdentity();
+
 		try {
 			const sessionValid = await jsAuthSession.ensureValid();
 
@@ -31,11 +47,15 @@ export default {
 			await storeValue("current_user_name", identity.user_name);
 
 			return true;
+
 		} catch (error) {
+			await this.clearIdentity();
+
 			showAlert(
 				"Unable to verify your Savveyra session.",
 				"error"
 			);
+
 			return false;
 		}
 	}

@@ -1,5 +1,7 @@
 export default {
 	async clearSession() {
+		await storeValue("ingPageReady", false);
+		
 		await storeValue("savveyra_access_token", "", true);
 		await storeValue("savveyra_refresh_token", "", true);
 		await storeValue("savveyra_token_expires_at", 0, true);
@@ -11,6 +13,7 @@ export default {
 			"current_client_name",
 			"current_user_id",
 			"current_user_name",
+			"IngBatchPending",
 			"impSourceHeaders",
 			"impSourceRows",
 			"impHeaderSignature",
@@ -32,6 +35,7 @@ export default {
 
 	async login() {
 		await this.clearSession();
+		await this.clearPreviousTenantWorkspace();
 
 		try {
 			const result = await apiLoginAuth.run();
@@ -40,9 +44,6 @@ export default {
 				showAlert("Supabase login failed.", "error");
 				return { success: false };
 			}
-
-			// Successful login establishes a new user workspace.
-			await this.clearPreviousTenantWorkspace();
 
 			const expiresAt =
 						Date.now() + Number(result.expires_in || 3600) * 1000;
@@ -71,7 +72,13 @@ export default {
 			};
 		} catch (error) {
 			await this.clearSession();
-			showAlert("Unable to establish Supabase session.", "error");
+			await this.clearPreviousTenantWorkspace();
+
+			showAlert(
+				"Unable to establish Supabase session.",
+				"error"
+			);
+
 			return { success: false };
 		}
 	},

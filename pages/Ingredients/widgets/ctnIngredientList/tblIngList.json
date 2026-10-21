@@ -249,6 +249,9 @@
     },
     {
       "key": "primaryColumns.supplier_name.cellBackground"
+    },
+    {
+      "key": "isVisible"
     }
   ],
   "dynamicPropertyPathList": [
@@ -299,6 +302,9 @@
     },
     {
       "key": "primaryColumns.supplier_name.cellBackground"
+    },
+    {
+      "key": "isVisible"
     }
   ],
   "dynamicTriggerPathList": [
@@ -340,7 +346,7 @@
   "inlineEditingSaveOption": "CUSTOM",
   "isLoading": false,
   "isSortable": true,
-  "isVisible": true,
+  "isVisible": "{{ appsmith.store.ingPageReady === true }}",
   "isVisibleDownload": false,
   "isVisibleFilters": true,
   "isVisiblePagination": false,
@@ -1425,7 +1431,7 @@
   "searchKey": "",
   "serverSidePaginationEnabled": true,
   "showInlineEditingOptionDropdown": true,
-  "tableData": "{{ jsIngList.filteredRows() }}",
+  "tableData": "{{ jsIngPageLoad.isReady() ? jsIngList.filteredRows() : [] }}",
   "textSize": "0.875rem",
   "topRow": 0,
   "totalRecordsCount": "300",
