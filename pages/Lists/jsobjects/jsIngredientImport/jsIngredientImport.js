@@ -738,14 +738,16 @@ export default {
 	},
 
 	buildImportImpact() {
-		const rows =
-					this.buildMappedImportRows();
+		const rows = this.buildMappedImportRows();
 
 		const existingIngredients =
 					apiImpGetReview.data?.ingredients || [];
 
 		const existingSupplierItems =
 					apiImpGetReview.data?.supplier_items || [];
+
+		const units =
+					apiImpGetLookups.data?.units || [];
 
 		const supplierValue =
 					selImportListSupplier.selectedOptionValue || "";
@@ -767,6 +769,7 @@ export default {
 		let missingIngredientCategory = 0;
 		let unmappedUnits = 0;
 		let missingIngredientName = 0;
+		let unitTypeConflicts = 0;
 
 		rows.forEach(row => {
 			const ingredientName =
@@ -777,56 +780,70 @@ export default {
 				return;
 			}
 
-			if (
-				!row.category_id &&
-				!row.add_category
-			) {
+			if (!row.category_id && !row.add_category) {
 				missingIngredientCategory++;
 			}
 
-			if (
-				row.unit_source &&
-				!row.unit_id
-			) {
+			if (row.unit_source && !row.unit_id) {
 				unmappedUnits++;
 			}
 
-			const nameNorm =
-						normalise(ingredientName);
+			const nameNorm = normalise(ingredientName);
 
 			let recurrenceMatch = null;
 
 			if (hasSupplier) {
 				if (row.item_number) {
 					recurrenceMatch =
-						existingSupplierItems.find(
-						item =>
-						String(item.item_code || "").trim().toLowerCase() ===
-						String(row.item_number || "").trim().toLowerCase()
-					);
+						existingSupplierItems.find(item =>
+																			 String(item.item_code || "")
+																			 .trim().toLowerCase() ===
+																			 String(row.item_number || "")
+																			 .trim().toLowerCase()
+																			);
 				} else {
 					recurrenceMatch =
-						existingSupplierItems.find(
-						item =>
-						String(item.name_norm || "") ===
-						nameNorm
-					);
+						existingSupplierItems.find(item =>
+																			 String(item.name_norm || "") ===
+																			 nameNorm
+																			);
 				}
 			}
 
 			if (recurrenceMatch) {
 				updatedIngredients++;
+
+				const existing =
+							existingIngredients.find(item =>
+																			 Number(item.id) ===
+																			 Number(recurrenceMatch.ingredient_id)
+																			);
+
+				const importedUnit =
+							units.find(unit =>
+												 Number(unit.id) === Number(row.unit_id)
+												);
+
+				if (
+					existing &&
+					existing.purchase_unit_type &&
+					importedUnit?.unit_type &&
+					existing.purchase_unit_type !==
+					importedUnit.unit_type &&
+					Number(existing.downstream_count || 0) > 0
+				) {
+					unitTypeConflicts++;
+				}
+
 				return;
 			}
 
 			newIngredients++;
 
 			const sameNameExists =
-						existingIngredients.some(
-							item =>
-							normalise(item.name) ===
-							nameNorm
-						);
+						existingIngredients.some(item =>
+																		 normalise(item.name) === nameNorm
+																		);
 
 			if (sameNameExists) {
 				duplicateNames++;
@@ -840,7 +857,8 @@ export default {
 			duplicateNames,
 			missingIngredientCategory,
 			unmappedUnits,
-			missingIngredientName
+			missingIngredientName,
+			unitTypeConflicts
 		};
 	},
 

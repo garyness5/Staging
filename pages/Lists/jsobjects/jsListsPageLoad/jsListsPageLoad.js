@@ -1,66 +1,49 @@
 export default {
-	ready: false,
-
-	isReady() {
-		return this.ready === true;
-	},
-
 	async load() {
-		this.ready = false;
+		await storeValue("listsPageReady", false);
 
 		try {
-			const previousUser = String(
-				appsmith.store.current_user_id || ""
-			);
-			const previousClient = String(
-				appsmith.store.current_client_id || ""
-			);
-
 			const initialized = await jsAppInit.init();
 
 			if (!initialized) {
 				await jsIngredientImport.clearImportWorkspace();
-				showAlert("Lists authentication failed.", "error");
 				return false;
 			}
 
-			const userChanged =
-						previousUser &&
-						previousUser !== String(appsmith.store.current_user_id || "");
+			const results = await Promise.all([
+				apiGetHelperLists.run(),
+				apiImpGetSuppliers.run(),
+				apiImpGetLookups.run()
+			]);
 
-			const clientChanged =
-						previousClient &&
-						previousClient !== String(appsmith.store.current_client_id || "");
-
-			if (userChanged || clientChanged) {
-				await jsIngredientImport.clearImportWorkspace();
+			if (results.some(r => r?.authenticated !== true)) {
+				throw new Error("Lists data request failed.");
 			}
-
-			await apiGetHelperLists.run();
-			await apiImpGetSuppliers.run();
-			await apiImpGetLookups.run();
 
 			const listId = selListsType.selectedOptionValue;
 
 			if (listId) {
-				await apiGetHelperItems.run({ list_id: listId });
+				const items = await apiGetHelperItems.run({
+					list_id: listId
+				});
+
+				if (items?.authenticated !== true) {
+					throw new Error("Helper items request failed.");
+				}
 			}
 
-			this.ready = true;
+			await storeValue("listsPageReady", true);
 			return true;
 
 		} catch (error) {
-			this.ready = false;
-
-			console.error("Lists load failed:", error);
-
-			showAlert(
-				"Unable to load Lists: " +
-				(error?.message || String(error)),
-				"error"
-			);
-
+			await storeValue("listsPageReady", false);
+			console.error("Lists initialization failed:", error);
+			showAlert("Unable to load Lists data.", "error");
 			return false;
 		}
+	},
+
+	isReady() {
+		return appsmith.store.listsPageReady === true;
 	}
 };

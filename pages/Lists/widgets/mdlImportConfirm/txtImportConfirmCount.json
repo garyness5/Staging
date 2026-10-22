@@ -1,7 +1,7 @@
 {
   "animateLoading": true,
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
-  "bottomRow": 39,
+  "bottomRow": 41,
   "dynamicBindingPathList": [
     {
       "key": "truncateButtonColor"
@@ -43,7 +43,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 9,
   "shouldTruncate": false,
-  "text": "{{ appsmith.store.impImpact?.duplicateNames || 0 }}\n{{ appsmith.store.impImpact?.missingIngredientCategory || 0 }}\n{{ appsmith.store.impImpact?.unmappedUnits || 0 }}\n{{ appsmith.store.impImpact?.missingIngredientName || 0 }}",
+  "text": "{{ appsmith.store.impImpact?.duplicateNames || 0 }}\n{{ appsmith.store.impImpact?.missingIngredientCategory || 0 }}\n{{ appsmith.store.impImpact?.unmappedUnits || 0 }}\n{{ appsmith.store.impImpact?.missingIngredientName || 0 }}\n{{ appsmith.store.impImpact?.unitTypeConflicts || 0 }}",
   "textAlign": "RIGHT",
   "textColor": "#231F20",
   "topRow": 30,

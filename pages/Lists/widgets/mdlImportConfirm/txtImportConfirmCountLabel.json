@@ -1,7 +1,7 @@
 {
   "animateLoading": true,
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
-  "bottomRow": 39,
+  "bottomRow": 41,
   "dynamicBindingPathList": [
     {
       "key": "truncateButtonColor"
@@ -40,7 +40,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 62,
   "shouldTruncate": false,
-  "text": "Duplicate Names - Will Be Flagged\nIngredients Missing a Category    \nUnmapped Units - Unit Will Be Blank\nMissing Ingredient Name - Will Not Be Imported",
+  "text": "Duplicate Names - Will Be Flagged\nIngredients Missing a Category    \nUnmapped Units - Unit Will Be Blank\nMissing Ingredient Name - Will Not Be Imported\nUnitType Conflicts - Unit Will Be Blank and Flagged",
   "textAlign": "LEFT",
   "textColor": "#231F20",
   "topRow": 30,

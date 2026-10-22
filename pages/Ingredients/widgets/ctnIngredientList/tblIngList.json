@@ -63,9 +63,10 @@
     "yield_base_qty",
     "base_unit",
     "deleted",
-    "created_at"
+    "created_at",
+    "import_unit_conflict"
   ],
-  "columnUpdatedAt": 1792530603583,
+  "columnUpdatedAt": 1792626808894,
   "columnWidthMap": {
     "active": 100,
     "allergen_names": 98,
@@ -252,6 +253,9 @@
     },
     {
       "key": "isVisible"
+    },
+    {
+      "key": "primaryColumns.import_unit_conflict.computedValue"
     }
   ],
   "dynamicPropertyPathList": [
@@ -805,6 +809,41 @@
       "verticalAlignment": "CENTER",
       "width": 150
     },
+    "import_unit_conflict": {
+      "alias": "import_unit_conflict",
+      "allowCellWrapping": false,
+      "allowHeaderWrapping": false,
+      "allowSameOptionsInNewRow": true,
+      "cellBackground": "",
+      "columnType": "checkbox",
+      "computedValue": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (currentRow[\"import_unit_conflict\"])) : import_unit_conflict })()}}",
+      "currencyCode": "USD",
+      "decimals": 0,
+      "enableFilter": true,
+      "enableSort": true,
+      "fontStyle": "",
+      "horizontalAlignment": "RIGHT",
+      "id": "import_unit_conflict",
+      "index": 31,
+      "isCellEditable": false,
+      "isCellVisible": true,
+      "isDerived": false,
+      "isDisabled": false,
+      "isDiscardVisible": true,
+      "isEditable": false,
+      "isSaveVisible": true,
+      "isVisible": true,
+      "label": "import_unit_conflict",
+      "notation": "standard",
+      "originalId": "import_unit_conflict",
+      "sticky": "",
+      "textColor": "",
+      "textSize": "0.875rem",
+      "thousandSeparator": true,
+      "validation": {},
+      "verticalAlignment": "CENTER",
+      "width": 150
+    },
     "item_code": {
       "alias": "item_code",
       "allowCellWrapping": false,
@@ -844,7 +883,7 @@
       "alias": "name",
       "allowCellWrapping": false,
       "allowSameOptionsInNewRow": true,
-      "cellBackground": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\njsIngBatch.isCellPending(currentRow.id, \"name\")\n? \"#E8F2FF\"\n: currentRow.duplicate_name === true\n? \"#FFE6E6\"\n: \"\"\n)) : \njsIngBatch.isCellPending(currentRow.id, \"name\")\n? \"#E8F2FF\"\n: currentRow.duplicate_name === true\n? \"#FFE6E6\"\n: \"\"\n })()}}",
+      "cellBackground": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\njsIngBatch.isCellPending(currentRow.id, \"name\")\n? \"#E8F2FF\"\n: (\n\tcurrentRow.duplicate_name === true ||\n\tcurrentRow.import_unit_conflict === true\n)\n? \"#FFE6E6\"\n: \"\"\n)) : \njsIngBatch.isCellPending(currentRow.id, \"name\")\n? \"#E8F2FF\"\n: (\n\tcurrentRow.duplicate_name === true ||\n\tcurrentRow.import_unit_conflict === true\n)\n? \"#FFE6E6\"\n: \"\"\n })()}}",
       "columnType": "text",
       "computedValue": "{{(() => { const tableData = tblIngList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (currentRow[\"name\"])) : name })()}}",
       "currencyCode": "USD",

@@ -23,6 +23,9 @@
   "dynamicPropertyPathList": [
     {
       "key": "sourceData"
+    },
+    {
+      "key": "isVisible"
     }
   ],
   "dynamicTriggerPathList": [
@@ -34,7 +37,7 @@
   "isFilterable": true,
   "isLoading": false,
   "isRequired": false,
-  "isVisible": true,
+  "isVisible": "true",
   "key": "cmtdb7uwp7",
   "labelAlignment": "left",
   "labelPosition": "Top",
