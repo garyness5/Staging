@@ -34,21 +34,21 @@
   },
   "columnOrder": [
     "name",
-    "category_name",
+    "category_id",
     "yield_qty",
     "yield_unit",
     "extra_percent",
     "cost_per_unit",
     "total_cost",
-    "derived_allergens",
     "diet_tag_names",
     "active",
     "id",
+    "derived_allergens",
+    "category_name",
     "cost_per_base_unit",
     "derived_diet_tags",
     "client_id",
     "name_norm",
-    "category_id",
     "yield_unit_id",
     "yield_unit_type",
     "notes",
@@ -56,7 +56,7 @@
     "updated_at",
     "deleted"
   ],
-  "columnUpdatedAt": 1787687977308,
+  "columnUpdatedAt": 1792707521352,
   "columnWidthMap": {
     "active": 88,
     "category_id": 118,
@@ -148,9 +148,6 @@
       "key": "primaryColumns.deleted.computedValue"
     },
     {
-      "key": "primaryColumns.category_name.selectOptions"
-    },
-    {
       "key": "primaryColumns.total_cost.computedValue"
     },
     {
@@ -164,6 +161,12 @@
     },
     {
       "key": "primaryColumns.derived_diet_tags.computedValue"
+    },
+    {
+      "key": "primaryColumns.category_id.selectOptions"
+    },
+    {
+      "key": "isVisible"
     }
   ],
   "dynamicPropertyPathList": [
@@ -177,7 +180,10 @@
       "key": "primaryColumns.active.onCheckChange"
     },
     {
-      "key": "primaryColumns.category_name.onOptionChange"
+      "key": "primaryColumns.category_id.onOptionChange"
+    },
+    {
+      "key": "isVisible"
     }
   ],
   "dynamicTriggerPathList": [
@@ -185,7 +191,7 @@
       "key": "primaryColumns.active.onCheckChange"
     },
     {
-      "key": "primaryColumns.category_name.onOptionChange"
+      "key": "primaryColumns.category_id.onOptionChange"
     }
   ],
   "enableClientSideSearch": true,
@@ -197,7 +203,7 @@
   "inlineEditingSaveOption": "CUSTOM",
   "isLoading": false,
   "isSortable": true,
-  "isVisible": true,
+  "isVisible": "{{ appsmith.store.recListPageReady === true }}",
   "isVisibleDownload": true,
   "isVisibleFilters": true,
   "isVisiblePagination": false,
@@ -241,7 +247,7 @@
       "isVisible": true,
       "label": "Active",
       "notation": "standard",
-      "onCheckChange": "{{ jsRecListActions.setActive(tblRecipeList.triggeredRow, tblRecipeList.triggeredRow.active !== true) }}",
+      "onCheckChange": "{{\njsRecListActions.setActive(\n\ttblRecipeList.updatedRow,\n\ttblRecipeList.updatedRow.active\n)\n}}",
       "originalId": "active",
       "sticky": "",
       "textSize": "0.875rem",
@@ -254,8 +260,8 @@
       "alias": "category_id",
       "allowCellWrapping": false,
       "allowSameOptionsInNewRow": true,
-      "columnType": "number",
-      "computedValue": "{{(() => { const tableData = tblRecipeList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (currentRow[\"category_id\"])) : category_id })()}}",
+      "columnType": "select",
+      "computedValue": "{{(() => { const tableData = tblRecipeList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => ( currentRow.category_id == null ? \"\" : String(currentRow.category_id) )) :  currentRow.category_id == null ? \"\" : String(currentRow.category_id)  })()}}",
       "currencyCode": "USD",
       "decimals": 0,
       "enableFilter": true,
@@ -270,11 +276,13 @@
       "isDiscardVisible": true,
       "isEditable": true,
       "isSaveVisible": true,
-      "isVisible": false,
-      "label": "category_id",
+      "isVisible": true,
+      "label": "Category",
       "notation": "standard",
+      "onOptionChange": "{{ jsRecListActions.setCategoryFromTable() }}",
       "originalId": "category_id",
-      "sticky": "",
+      "selectOptions": "{{(() => { const tableData = tblRecipeList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\n(apiRecLstGetCategories.data?.categories || []).map(c => ({\n\tlabel: c.name,\n\tvalue: String(c.id)\n}))\n)) : \n(apiRecLstGetCategories.data?.categories || []).map(c => ({\n\tlabel: c.name,\n\tvalue: String(c.id)\n}))\n })()}}",
+      "sticky": "left",
       "textSize": "0.875rem",
       "thousandSeparator": true,
       "validation": {},
@@ -286,7 +294,7 @@
       "allowCellWrapping": false,
       "allowSameOptionsInNewRow": true,
       "columnType": "select",
-      "computedValue": "{{(() => { const tableData = tblRecipeList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => ( currentRow.category_id ? String(currentRow.category_id) : \"\" )) :  currentRow.category_id ? String(currentRow.category_id) : \"\"  })()}}",
+      "computedValue": "{{(() => { const tableData = tblRecipeList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => ( currentRow.category_id == null ? \"\" : String(currentRow.category_id) )) :  currentRow.category_id == null ? \"\" : String(currentRow.category_id)  })()}}",
       "currencyCode": "USD",
       "decimals": 0,
       "enableFilter": true,
@@ -294,20 +302,20 @@
       "horizontalAlignment": "LEFT",
       "id": "category_name",
       "index": 5,
-      "isCellEditable": true,
+      "isCellEditable": false,
       "isCellVisible": true,
       "isDerived": false,
       "isDisabled": false,
       "isDiscardVisible": true,
-      "isEditable": true,
+      "isEditable": false,
       "isSaveVisible": true,
-      "isVisible": true,
-      "label": "Category",
+      "isVisible": false,
+      "label": "Category_name",
       "notation": "standard",
-      "onOptionChange": "{{ qryRecListSetCategory.run().then(() => qryRecListGetRecipes.run()) }}",
+      "onOptionChange": "",
       "originalId": "category_name",
-      "selectOptions": "{{(() => { const tableData = tblRecipeList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\n[\n  { label: \"\", value: \"\" },\n  ...(qryRecListGetCategories.data || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n)) : \n[\n  { label: \"\", value: \"\" },\n  ...(qryRecListGetCategories.data || []).map(x => ({\n\t\tlabel: x.name,\n\t\tvalue: String(x.id)\n\t}))\n]\n })()}}",
-      "sticky": "left",
+      "selectOptions": "",
+      "sticky": "",
       "textSize": "0.875rem",
       "thousandSeparator": true,
       "validation": {},

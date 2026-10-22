@@ -52,7 +52,7 @@
   "renderMode": "CANVAS",
   "resetFormOnClick": false,
   "responsiveBehavior": "hug",
-  "rightColumn": 18,
+  "rightColumn": 19,
   "text": "Duplicate",
   "tooltip": "Duplicate selected recipe",
   "topRow": 2,

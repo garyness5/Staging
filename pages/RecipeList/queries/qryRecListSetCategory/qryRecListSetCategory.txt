@@ -1,7 +1,0 @@
-select *
-from public.set_recipe_category(
-	'{{ appsmith.user.email }}'::text,
-	{{ Number(tblRecipeList.updatedRow?.id || 0) }},
-	'{{ appsmith.store.current_client_id }}'::uuid,
-	{{ Number(tblRecipeList.updatedRow?.category_name || 0) || null }}
-);

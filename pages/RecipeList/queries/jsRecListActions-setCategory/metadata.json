@@ -8,10 +8,10 @@
       "encodeParamsToggle": true,
       "jsArguments": [
         {
-          "name": "recipeId"
+          "name": "row"
         },
         {
-          "name": "newCategoryId"
+          "name": "categoryId"
         }
       ],
       "paginationType": "NONE",

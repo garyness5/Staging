@@ -137,103 +137,102 @@ export default {
 
 	async deleteSelectedRecipeStart() {
 		if (!this.hasSelection()) {
-			showAlert(
-				"Select a Recipe first.",
-				"warning"
-			);
-
+			showAlert("Select a Recipe first.", "warning");
 			return false;
 		}
 
-		await qryRecListGetImpactCount.run();
-
-		showModal(
-			mdlRecLstDelete.name
-		);
-
-		return true;
-	},
-
-	async deleteSelectedRecipeConfirm() {
-		if (!this.hasSelection()) {
-			showAlert(
-				"Select a Recipe first.",
-				"warning"
-			);
-
-			return false;
-		}
+		const recipeId = this.selectedRecipeId();
 
 		try {
-			const result =
-						await qryRecListDelete.run();
-
-			const deletedId =
-						Number(
-							result?.[0]?.id || 0
-						);
+			const result = await apiRecLstGetImpactCount.run({
+				recipe_id: recipeId
+			});
 
 			if (
-				!deletedId ||
-				deletedId !== this.selectedRecipeId()
+				result?.authenticated !== true ||
+				!result?.impact
 			) {
-				showAlert(
-					"Recipe was not deleted.",
-					"error"
-				);
-
-				return false;
+				throw new Error("Unable to check Recipe impact.");
 			}
 
-			await removeValue(
-				"current_recipe_id"
-			);
-
-			closeModal(
-				mdlRecLstDelete.name
-			);
-
-			await apiRecLstGetRecipes.run();
-
-			showAlert(
-				"Recipe deleted.",
-				"success"
-			);
-
+			showModal(mdlRecLstDelete.name);
 			return true;
 
 		} catch (error) {
 			showAlert(
-				error?.message ||
-				"Recipe could not be deleted.",
+				"Unable to check Recipe impact. No changes were made.",
 				"error"
 			);
+			return false;
+		}
+	},
 
+	async deleteSelectedRecipeConfirm() {
+		if (!this.hasSelection()) {
+			showAlert("Select a Recipe first.", "warning");
+			return false;
+		}
+
+		const recipeId = this.selectedRecipeId();
+
+		try {
+			const result = await apiRecLstDelete.run({
+				recipe_id: recipeId
+			});
+
+			if (
+				result?.authenticated !== true ||
+				Number(result.recipe_id) !== recipeId
+			) {
+				throw new Error("Recipe deletion was not confirmed.");
+			}
+
+			await removeValue("current_recipe_id");
+
+			closeModal(mdlRecLstDelete.name);
+
+			const refreshed = await apiRecLstGetRecipes.run();
+
+			if (
+				refreshed?.authenticated !== true ||
+				!Array.isArray(refreshed?.recipes)
+			) {
+				throw new Error("Recipe deleted, but the list could not be refreshed.");
+			}
+
+			showAlert("Recipe deleted.", "success");
+			return true;
+
+		} catch (error) {
+			showAlert(
+				error?.message || "Recipe could not be deleted.",
+				"error"
+			);
 			return false;
 		}
 	},
 
 	impactRecipeCount() {
 		return Number(
-			qryRecListGetImpactCount.data?.[0]?.recipe_count || 0
+			apiRecLstGetImpactCount.data?.impact?.recipe_count || 0
 		);
 	},
 
 	impactDishCount() {
 		return Number(
-			qryRecListGetImpactCount.data?.[0]?.dish_count || 0
+			apiRecLstGetImpactCount.data?.impact?.dish_count || 0
 		);
 	},
 
 	impactMenuCount() {
 		return Number(
-			qryRecListGetImpactCount.data?.[0]?.menu_count || 0
+			apiRecLstGetImpactCount.data?.impact?.menu_count || 0
 		);
 	},
 
 	impactEventCount() {
 		return Number(
-			qryRecListGetImpactCount.data?.[0]?.event_count || 0
+			apiRecLstGetImpactCount.data?.impact?.event_count || 0
 		);
 	},
 
@@ -252,62 +251,60 @@ export default {
 		) > 0;
 	},
 
+
 	async setActive(row, active) {
 		const recipeId = Number(row?.id || 0);
-		if (!recipeId) return false;
 
-		try {
-			await apiRecLstSetActive.run({
-				recipe_id: recipeId,
-				active: active === true
-			});
-
-			await apiRecLstGetRecipes.run();
-			return true;
-
-		} catch (error) {
-			showAlert(
-				error?.message || "Recipe Active status could not be changed.",
-				"error"
-			);
-
-			await apiRecLstGetRecipes.run();
+		if (!Number.isSafeInteger(recipeId) || recipeId <= 0) {
+			showAlert("Invalid Recipe ID.", "error");
 			return false;
 		}
+
+		return await jsRecListBatch.stage(recipeId, {
+			active: active === true
+		});
 	},
 
-	async setCategory(recipeId, newCategoryId) {
-		const id =
-					Number(recipeId || 0);
+	setCategoryFromTable() {
+		const row = tblRecipeList.updatedRow;
 
-		const categoryId =
-					Number(newCategoryId || 0) || null;
+		if (!row || row.id == null) return;
 
-		if (!id) {
+		return this.setCategory(
+			row,
+			row.category_id === "" || row.category_id == null
+			? null
+			: Number(row.category_id)
+		);
+	},
+
+	async setCategory(row, categoryId) {
+		const recipeId = Number(row?.id);
+
+		if (!Number.isSafeInteger(recipeId) || recipeId <= 0) {
+			showAlert("Invalid Recipe ID.", "error");
 			return false;
 		}
 
-		try {
-			await qryRecListSetCategory.run({
-				recipe_id: id,
-				category_id: categoryId
-			});
+		const normalizedCategoryId =
+					categoryId === null ||
+					categoryId === undefined ||
+					categoryId === ""
+		? null
+		: Number(categoryId);
 
-			await apiRecLstGetRecipes.run();
-
-			return true;
-
-		} catch (error) {
-			showAlert(
-				error?.message ||
-				"Recipe Category could not be changed.",
-				"error"
-			);
-
-			await apiRecLstGetRecipes.run();
-
+		if (
+			normalizedCategoryId !== null &&
+			(!Number.isSafeInteger(normalizedCategoryId) ||
+			 normalizedCategoryId <= 0)
+		) {
+			showAlert("Invalid Recipe Category.", "error");
 			return false;
 		}
+
+		return await jsRecListBatch.stage(recipeId, {
+			category_id: normalizedCategoryId
+		});
 	},
 
 	searchText() {
@@ -324,35 +321,19 @@ export default {
 		).toLowerCase();
 	},
 
+
 	filteredRows() {
-		const search =
-					this.searchText();
+		const search = this.searchText();
+		const status = this.statusFilter();
 
-		const status =
-					this.statusFilter();
-
-		return (apiRecLstGetRecipes.data?.recipes || [])
+		return jsRecListBatch.workingRows()
 			.filter(row => {
-			if (
-				status === "active" &&
-				row.active !== true
-			) {
-				return false;
-			}
-
-			if (
-				status === "inactive" &&
-				row.active !== false
-			) {
-				return false;
-			}
-
+			if (status === "active" && row.active !== true) return false;
+			if (status === "inactive" && row.active !== false) return false;
 			return true;
 		})
 			.filter(row => {
-			if (!search) {
-				return true;
-			}
+			if (!search) return true;
 
 			const haystack = [
 				row.name,
@@ -361,10 +342,7 @@ export default {
 				row.diet_tag_names,
 				row.derived_allergens
 			]
-			.map(x =>
-					 String(x || "")
-					 .toLowerCase()
-					)
+			.map(x => String(x || "").toLowerCase())
 			.join(" ");
 
 			return haystack.includes(search);

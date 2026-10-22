@@ -1,7 +1,0 @@
-select *
-from public.set_recipe_active(
-	'{{ appsmith.user.email }}',
-	{{ Number(this.params.recipe_id || 0) }},
-	'{{ appsmith.store.current_client_id }}'::uuid,
-	{{ this.params.active === true }}
-);

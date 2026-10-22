@@ -22,21 +22,25 @@
       "key": "isDisabled"
     }
   ],
-  "dynamicTriggerPathList": [],
+  "dynamicTriggerPathList": [
+    {
+      "key": "onClick"
+    }
+  ],
   "iconAlign": "left",
   "isDefaultClickDisabled": true,
-  "isDisabled": "{{ !jsIngBatch.hasChanges() }}",
+  "isDisabled": "{{!jsRecListBatch.hasChanges() || apiRecLstBatchSave.isLoading}}",
   "isLoading": false,
   "isVisible": true,
   "key": "o01hoigeqy",
-  "leftColumn": 31,
+  "leftColumn": 32,
   "minWidth": 120,
   "mobileBottomRow": 8,
   "mobileLeftColumn": 6,
   "mobileRightColumn": 22,
   "mobileTopRow": 4,
   "needsErrorInfo": false,
-  "onClick": "",
+  "onClick": "{{jsRecListBatch.discard()}}",
   "originalBottomRow": 14,
   "originalTopRow": 10,
   "parentColumnSpace": 10.609375,
@@ -47,7 +51,7 @@
   "renderMode": "CANVAS",
   "resetFormOnClick": false,
   "responsiveBehavior": "hug",
-  "rightColumn": 36,
+  "rightColumn": 37,
   "text": "Discard",
   "tooltip": "Discard changes",
   "topRow": 2,

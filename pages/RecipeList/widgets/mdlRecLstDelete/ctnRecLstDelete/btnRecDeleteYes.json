@@ -32,7 +32,7 @@
     }
   ],
   "isDefaultClickDisabled": true,
-  "isDisabled": "{{ qryRecListDelete.isLoading }}",
+  "isDisabled": "{{apiRecLstDelete.isLoading}}",
   "isLoading": false,
   "isVisible": true,
   "key": "db5p08m351",
@@ -43,7 +43,7 @@
   "mobileRightColumn": 63,
   "mobileTopRow": 18,
   "needsErrorInfo": false,
-  "onClick": "{{ jsRecListActions.deleteSelectedRecipeConfirm() }}",
+  "onClick": "{{jsRecListActions.deleteSelectedRecipeConfirm()}}",
   "originalBottomRow": 41,
   "originalTopRow": 37,
   "parentId": "vk3d15d0wr",
