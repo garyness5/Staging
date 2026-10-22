@@ -8,7 +8,7 @@ export default {
 
 		await Promise.all([
 			qryRecListGetCategories.run(),
-			qryRecListGetRecipes.run()
+			apiRecLstGetRecipes.run()
 		]);
 
 		return true;

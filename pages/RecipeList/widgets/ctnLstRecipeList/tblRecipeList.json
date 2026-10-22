@@ -241,7 +241,7 @@
       "isVisible": true,
       "label": "Active",
       "notation": "standard",
-      "onCheckChange": "{{ qryRecListSetActive.run().then(() => qryRecListGetRecipes.run()) }}",
+      "onCheckChange": "{{ jsRecListActions.setActive(tblRecipeList.triggeredRow, tblRecipeList.triggeredRow.active !== true) }}",
       "originalId": "active",
       "sticky": "",
       "textSize": "0.875rem",

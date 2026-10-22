@@ -193,7 +193,7 @@ export default {
 				mdlRecLstDelete.name
 			);
 
-			await qryRecListGetRecipes.run();
+			await apiRecLstGetRecipes.run();
 
 			showAlert(
 				"Recipe deleted.",
@@ -253,32 +253,25 @@ export default {
 	},
 
 	async setActive(row, active) {
-		const recipeId =
-					Number(row?.id || 0);
-
-		if (!recipeId) {
-			return false;
-		}
+		const recipeId = Number(row?.id || 0);
+		if (!recipeId) return false;
 
 		try {
-			await qryRecListSetActive.run({
+			await apiRecLstSetActive.run({
 				recipe_id: recipeId,
 				active: active === true
 			});
 
-			await qryRecListGetRecipes.run();
-
+			await apiRecLstGetRecipes.run();
 			return true;
 
 		} catch (error) {
 			showAlert(
-				error?.message ||
-				"Recipe Active status could not be changed.",
+				error?.message || "Recipe Active status could not be changed.",
 				"error"
 			);
 
-			await qryRecListGetRecipes.run();
-
+			await apiRecLstGetRecipes.run();
 			return false;
 		}
 	},
@@ -300,7 +293,7 @@ export default {
 				category_id: categoryId
 			});
 
-			await qryRecListGetRecipes.run();
+			await apiRecLstGetRecipes.run();
 
 			return true;
 
@@ -311,7 +304,7 @@ export default {
 				"error"
 			);
 
-			await qryRecListGetRecipes.run();
+			await apiRecLstGetRecipes.run();
 
 			return false;
 		}
@@ -338,7 +331,7 @@ export default {
 		const status =
 					this.statusFilter();
 
-		return (qryRecListGetRecipes.data || [])
+		return (apiRecLstGetRecipes.data?.recipes || [])
 			.filter(row => {
 			if (
 				status === "active" &&

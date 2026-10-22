@@ -34,7 +34,7 @@
   "labelTextSize": "0.875rem",
   "labelTooltip": "Recipes Active/Inactive Filter",
   "labelWidth": "3",
-  "leftColumn": 43,
+  "leftColumn": 42,
   "maxDynamicHeight": 9000,
   "minDynamicHeight": 4,
   "minWidth": 450,

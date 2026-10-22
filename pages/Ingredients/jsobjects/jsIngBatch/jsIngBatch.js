@@ -84,6 +84,16 @@ export default {
 		return true;
 	},
 
+	async handleUnitChange(row) {
+		if (row.purchase_unit === "__SET__") {
+			return this.openSetUnit(row);
+		}
+
+		return await jsIngBatch.stage(row.id, {
+			purchase_unit_id: row.purchase_unit
+		});
+	},
+
 	isCellPending(id, field) {
 		return Object.prototype.hasOwnProperty.call(
 			this.pending()[String(id)] || {},

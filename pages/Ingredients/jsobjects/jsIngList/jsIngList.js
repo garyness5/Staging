@@ -97,6 +97,16 @@ export default {
 		);
 	},
 
+	async handleUnitChange(row) {
+		if (row.purchase_unit === "__SET__") {
+			return await this.openSetUnit(row);
+		}
+
+		return await jsIngBatch.stage(row.id, {
+			purchase_unit_id: row.purchase_unit
+		});
+	},
+
 	async stageSupplier(id, value) {
 		return this.stageField(
 			id,

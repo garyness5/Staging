@@ -3,8 +3,8 @@
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
   "bottomRow": 6,
   "boxShadow": "none",
-  "buttonColor": "{{appsmith.theme.colors.primaryColor}}",
-  "buttonVariant": "PRIMARY",
+  "buttonColor": "#7f1d1d",
+  "buttonVariant": "SECONDARY",
   "disabledWhenInvalid": false,
   "dynamicBindingPathList": [
     {
@@ -12,9 +12,6 @@
     },
     {
       "key": "isDisabled"
-    },
-    {
-      "key": "buttonColor"
     }
   ],
   "dynamicPropertyPathList": [
