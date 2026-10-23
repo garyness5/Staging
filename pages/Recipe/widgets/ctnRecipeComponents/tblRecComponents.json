@@ -36,7 +36,7 @@
     "component_category",
     "component_name",
     "qty",
-    "unit_abbreviation",
+    "unit_id",
     "wastage_percent",
     "apply_wastage",
     "customColumn2",
@@ -51,7 +51,6 @@
     "recipe_id",
     "ingredient_id",
     "child_recipe_id",
-    "unit_id",
     "unit_type",
     "child_active",
     "child_deleted",
@@ -62,13 +61,14 @@
     "created_at",
     "updated_at",
     "factor_to_base",
+    "unit_abbreviation",
     "cost_per_base_unit"
   ],
-  "columnUpdatedAt": 1792783107141,
+  "columnUpdatedAt": 1792793968808,
   "columnWidthMap": {
     "active": 104,
     "allergen_names": 110,
-    "apply_wastage": 81,
+    "apply_wastage": 121,
     "component_category": 108,
     "component_name": 195,
     "customColumn1": 101,
@@ -80,6 +80,7 @@
     "price_per_unit": 128,
     "qty": 77,
     "unit_abbreviation": 60,
+    "unit_id": 86,
     "wastage_percent": 95
   },
   "compactMode": "SHORT",
@@ -223,6 +224,9 @@
     },
     {
       "key": "primaryColumns.line_cost.computedValue"
+    },
+    {
+      "key": "primaryColumns.unit_id.selectOptions"
     }
   ],
   "dynamicPropertyPathList": [
@@ -258,6 +262,9 @@
     },
     {
       "key": "primaryColumns.component_name.cellBackground"
+    },
+    {
+      "key": "primaryColumns.unit_id.onOptionChange"
     }
   ],
   "dynamicTriggerPathList": [
@@ -275,6 +282,9 @@
     },
     {
       "key": "primaryColumns.unit_abbreviation.onOptionChange"
+    },
+    {
+      "key": "primaryColumns.unit_id.onOptionChange"
     }
   ],
   "enableClientSideSearch": true,
@@ -386,7 +396,7 @@
       "id": "apply_wastage",
       "index": 13,
       "isCellEditable": true,
-      "isCellVisible": "{{(() => { const tableData = tblRecComponents.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => ( jsRecCompTable.showUseWaste(currentRow) )) :  jsRecCompTable.showUseWaste(currentRow)  })()}}",
+      "isCellVisible": "{{(() => { const tableData = tblRecComponents.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\n  currentRow.item_type === \"ingredient\" &&\n  Number(currentRow.wastage_percent || 0) > 0\n)) : \n  currentRow.item_type === \"ingredient\" &&\n  Number(currentRow.wastage_percent || 0) > 0\n })()}}",
       "isDerived": false,
       "isDisabled": false,
       "isDiscardVisible": true,
@@ -1203,15 +1213,15 @@
       "horizontalAlignment": "LEFT",
       "id": "unit_abbreviation",
       "index": 11,
-      "isCellEditable": true,
+      "isCellEditable": false,
       "isCellVisible": true,
       "isDerived": false,
       "isDisabled": false,
       "isDiscardVisible": true,
-      "isEditable": true,
+      "isEditable": false,
       "isSaveVisible": true,
-      "isVisible": true,
-      "label": "Unit",
+      "isVisible": false,
+      "label": "Unit_abbreviation",
       "notation": "standard",
       "onOptionChange": "{{\njsRecCompTable.syncFromTable()\n}}",
       "originalId": "unit_abbreviation",
@@ -1229,8 +1239,8 @@
       "allowCellWrapping": false,
       "allowSameOptionsInNewRow": true,
       "cellBackground": "",
-      "columnType": "text",
-      "computedValue": "{{(() => { const tableData = tblRecComponents.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (currentRow[\"unit_id\"])) : unit_id })()}}",
+      "columnType": "select",
+      "computedValue": "{{(() => { const tableData = tblRecComponents.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\njsRecCompTable.unitOptions(currentRow)\n.find(u => String(u.value) === String(currentRow.unit_id))\n?.label ?? \"\"\n)) : \njsRecCompTable.unitOptions(currentRow)\n.find(u => String(u.value) === String(currentRow.unit_id))\n?.label ?? \"\"\n })()}}",
       "currencyCode": "USD",
       "decimals": 0,
       "enableFilter": true,
@@ -1239,17 +1249,20 @@
       "horizontalAlignment": "LEFT",
       "id": "unit_id",
       "index": 10,
-      "isCellEditable": false,
+      "isCellEditable": true,
       "isCellVisible": true,
       "isDerived": false,
       "isDisabled": false,
       "isDiscardVisible": true,
-      "isEditable": false,
+      "isEditable": true,
       "isSaveVisible": true,
-      "isVisible": false,
-      "label": "unit_id",
+      "isVisible": true,
+      "label": "Unit",
       "notation": "standard",
+      "onOptionChange": "{{ jsRecCompTable.syncFromTable() }}",
       "originalId": "unit_id",
+      "selectOptions": "{{(() => { const tableData = tblRecComponents.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => ( jsRecCompTable.unitOptions(currentRow) )) :  jsRecCompTable.unitOptions(currentRow)  })()}}",
+      "sortBy": "label",
       "sticky": "",
       "textColor": "",
       "textSize": "0.875rem",
