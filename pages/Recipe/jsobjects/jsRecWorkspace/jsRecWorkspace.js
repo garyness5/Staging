@@ -280,48 +280,24 @@ export default {
 	},
 
 	savedHeaderFromQuery() {
-		const row =
-					Array.isArray(qryRecGetItemById.data)
-		? qryRecGetItemById.data[0]
-		: qryRecGetItemById.data;
+		const row = apiRecGetDetail.data?.recipe;
 
 		if (!row) {
 			return this.emptyHeader();
 		}
 
-		return this.normalizeHeader({
-			name:
-			row.name,
-
-			category_id:
-			row.category_id,
-
-			active:
-			row.active,
-
-			yield_qty:
-			row.yield_qty,
-
-			yield_unit_id:
-			row.yield_unit_id,
-
-			extra_percent:
-			row.extra_percent,
-
-			notes:
-			row.notes
-		});
+		return this.normalizeHeader(row);
 	},
 
 	savedDietTagsFromQuery() {
 		return this.normalizeDietTags(
-			qryRecGetSelectedDietTags.data || []
+			apiRecGetDetail.data?.diet_tags || []
 		);
 	},
 
 	savedComponentsFromQuery() {
 		return this.normalizeComponents(
-			qryRecGetComponents.data || []
+			apiRecGetDetail.data?.components || []
 		);
 	},
 

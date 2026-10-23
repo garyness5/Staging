@@ -126,8 +126,8 @@ export default {
 	},
 
 	async loadFromQuery() {
-		const queryRows = qryRecGetComponents.data || [];
-		return await this.setRows(queryRows);
+		const rows = apiRecGetDetail.data?.components || [];
+		return await this.setRows(rows);
 	},
 
 	mergeUpdatedRows() {

@@ -12,12 +12,11 @@ export default {
 			qryRecGetComponentItems.run()
 		]);
 
-		const mode =
-					String(
-						appsmith.store.Recipe_open_mode ||
-						appsmith.store.Recipe_mode ||
-						"edit"
-					);
+		const mode = String(
+			appsmith.store.Recipe_open_mode ||
+			appsmith.store.Recipe_mode ||
+			"edit"
+		);
 
 		await jsRecWorkspace.clear();
 
@@ -25,43 +24,38 @@ export default {
 			await jsRecWorkspace.initializeNew();
 			await jsRecCompTable.clearRows();
 
-			await removeValue(
-				"Recipe_open_mode"
-			);
-
+			await removeValue("Recipe_open_mode");
 			return true;
 		}
 
-		const recipeId =
-					Number(
-						appsmith.store.current_recipe_id || 0
-					);
+		const recipeId = Number(
+			appsmith.store.current_recipe_id || 0
+		);
 
 		if (!recipeId) {
 			await jsRecWorkspace.initializeNew();
 			await jsRecCompTable.clearRows();
 
-			await removeValue(
-				"Recipe_open_mode"
-			);
-
+			await removeValue("Recipe_open_mode");
 			return true;
 		}
 
-		await Promise.all([
-			qryRecGetItemById.run(),
-			qryRecGetSelectedDietTags.run(),
-			qryRecGetComponents.run()
-		]);
+		const detail = await apiRecGetDetail.run();
+
+		if (
+			!detail?.authenticated ||
+			!detail?.recipe ||
+			Number(detail.recipe.id) !== recipeId
+		) {
+			showAlert("Recipe could not be loaded.", "error");
+			return false;
+		}
 
 		await jsRecWorkspace.initializeFromSaved();
-
 		await jsRecCompTable.loadFromQuery();
 
 		if (mode === "duplicate") {
-			await removeValue(
-				"Recipe_open_mode"
-			);
+			await removeValue("Recipe_open_mode");
 
 			await resetWidget("inpRecName", true);
 			await resetWidget("selRecCategory", true);
@@ -75,14 +69,8 @@ export default {
 			return await jsRecSave.duplicateRecipe();
 		}
 
-		await removeValue(
-			"Recipe_open_mode"
-		);
-
-		await storeValue(
-			"Recipe_mode",
-			"edit"
-		);
+		await removeValue("Recipe_open_mode");
+		await storeValue("Recipe_mode", "edit");
 
 		return true;
 	}

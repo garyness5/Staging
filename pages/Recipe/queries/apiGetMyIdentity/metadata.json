@@ -1,6 +1,6 @@
 {
-  "gitSyncId": "6ad02e5d7089041c6d575f1b_5da18859-2617-4157-b963-c714a34e9bdf",
-  "id": "RecipeList_apiRecLstSetActive",
+  "gitSyncId": "6ad02e5d7089041c6d575f1b_228041f5-2943-47f0-9209-e14b24e8dc57",
+  "id": "Recipe_apiGetMyIdentity",
   "pluginId": "restapi-plugin",
   "pluginType": "API",
   "unpublishedAction": {
@@ -11,7 +11,7 @@
           "value": "application/json"
         }
       ],
-      "body": "{{\nJSON.stringify({\n\toperation: \"set_recipe_active\",\n\trecipe_id: this.params.recipe_id,\n\tactive: this.params.active\n})\n}}",
+      "body": "{\n  \"operation\": \"my_identity\"\n}",
       "bodyFormData": [],
       "encodeParamsToggle": true,
       "formData": {
@@ -45,13 +45,10 @@
     "dynamicBindingPathList": [
       {
         "key": "headers[0].value"
-      },
-      {
-        "key": "body"
       }
     ],
-    "name": "apiRecLstSetActive",
-    "pageId": "RecipeList",
+    "name": "apiGetMyIdentity",
+    "pageId": "Recipe",
     "runBehaviour": "MANUAL",
     "userSetOnLoad": false
   }
