@@ -1,4 +1,28 @@
 export default {
+	componentItems() {
+		return (apiRecGetComponentItems.data?.component_items || [])
+			.map(item => ({
+			...item,
+			id: Number(item.item_id),
+			default_unit_id: Number(item.unit_id) || null,
+			default_unit: item.unit_abbreviation,
+			cost_per_base_unit:
+			item.cost_per_base_unit == null
+			? null
+			: Number(item.cost_per_base_unit),
+			wastage_percent: Number(item.wastage_percent || 0)
+		}));
+	},
+
+	componentUnits() {
+		return (apiRecGetUnits.data?.units || [])
+			.map(unit => ({
+			...unit,
+			id: Number(unit.id),
+			factor_to_base: Number(unit.factor_to_base)
+		}));
+	},
+
 	minRows: 10,
 
 	makeDraftId() {
@@ -134,18 +158,41 @@ export default {
 		const rows = this.getRows();
 		const updates = tblRecComponents.updatedRows || [];
 
-		if (!updates.length) return rows;
+		if (!updates.length) {
+			return rows;
+		}
 
 		return rows.map((row, index) => {
-			const update = updates.find(u =>
-																	u.index === index ||
-																	u.rowIndex === index ||
-																	u.draft_row_id === row.draft_row_id ||
-																	u.allFields?.draft_row_id === row.draft_row_id ||
-																	u.updatedFields?.draft_row_id === row.draft_row_id
-																 );
+			const update = updates.find(u => {
+				const fields = {
+					...(u.allFields || {}),
+					...(u.updatedFields || {})
+				};
 
-			if (!update) return row;
+				if (
+					fields.draft_row_id &&
+					fields.draft_row_id === row.draft_row_id
+				) {
+					return true;
+				}
+
+				if (
+					fields.id != null &&
+					row.id != null &&
+					Number(fields.id) === Number(row.id)
+				) {
+					return true;
+				}
+
+				return (
+					u.index === index ||
+					u.rowIndex === index
+				);
+			});
+
+			if (!update) {
+				return row;
+			}
 
 			return {
 				...row,
@@ -156,13 +203,13 @@ export default {
 	},
 
 	async syncFromTable() {
-		await jsRecWorkspace.capture();
-
 		const merged = this.mergeUpdatedRows();
 
-		return await this.setRows(
-			merged
-		);
+		await this.setRows(merged);
+
+		await jsRecWorkspace.capture();
+
+		return this.getRows();
 	},
 
 	async patchRow(row, patch) {
@@ -297,7 +344,7 @@ export default {
 		if (!itemType) return [];
 
 		const categories =
-					(qryRecGetComponentItems.data || [])
+					this.componentItems()
 		.filter(i =>
 						i.item_type === itemType
 					 )
@@ -320,7 +367,7 @@ export default {
 
 		const used = this.usedItemKeys(row);
 
-		return (qryRecGetComponentItems.data || [])
+		return this.componentItems()
 			.filter(i =>
 							i.item_type === itemType
 						 )
@@ -361,7 +408,7 @@ export default {
 														 ) || editRow;
 
 		const item =
-					(qryRecGetComponentItems.data || [])
+					this.componentItems()
 		.find(i =>
 					i.item_type ===
 					freshRow.item_type &&
@@ -541,14 +588,14 @@ export default {
 			}
 
 			const item =
-						(qryRecGetComponentItems.data || [])
+						this.componentItems()
 			.find(i =>
 						i.item_type === r.item_type &&
 						i.name === r.component_name
 					 );
 
 			const unit =
-						(qryRecGetComponentUnits.data || [])
+						this.componentUnits()
 			.find(u =>
 						u.abbreviation ===
 						r.unit_abbreviation
@@ -608,7 +655,7 @@ export default {
 		const unitType = row?.unit_type;
 		if (!unitType) return [];
 
-		return (qryRecGetComponentUnits.data || [])
+		return this.componentUnits()
 			.filter(u =>
 							u.unit_type === unitType
 						 )
@@ -646,14 +693,14 @@ export default {
 		}
 
 		const item =
-					(qryRecGetComponentItems.data || [])
+					this.componentItems()
 		.find(i =>
 					i.item_type === row.item_type &&
 					Number(i.id) === itemId
 				 );
 
 		const unit =
-					(qryRecGetComponentUnits.data || [])
+					this.componentUnits()
 		.find(u =>
 					u.abbreviation === row.unit_abbreviation
 				 );

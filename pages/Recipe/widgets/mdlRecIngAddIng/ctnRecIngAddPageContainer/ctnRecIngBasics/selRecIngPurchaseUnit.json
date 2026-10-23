@@ -58,7 +58,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 62,
   "serverSideFiltering": false,
-  "sourceData": "{{\n  (qryRecGetUnits.data || []).map(x => ({\n    label: x.abbreviation,\n    value: String(x.id)\n  }))\n}}",
+  "sourceData": "{{\n(apiRecGetUnits.data?.units || []).map(x => ({\n\tlabel: x.abbreviation,\n\tvalue: String(x.id)\n}))\n}}",
   "topRow": 16,
   "type": "SELECT_WIDGET",
   "version": 1,

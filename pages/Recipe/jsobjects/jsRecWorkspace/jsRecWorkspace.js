@@ -359,31 +359,23 @@ export default {
 		return value;
 	},
 
+	isSnapshotDirty(snapshot) {
+		const current = this.normalizeSnapshot(snapshot);
+		const baseline = this.baseline();
+
+		return JSON.stringify({
+			header: current.header,
+			diet_tags: current.diet_tags,
+			components: this.componentsForCompare(current.components)
+		}) !== JSON.stringify({
+			header: baseline.header,
+			diet_tags: baseline.diet_tags,
+			components: this.componentsForCompare(baseline.components)
+		});
+	},
+
 	isDirty() {
-		const current =
-					this.current();
-
-		const baseline =
-					this.baseline();
-
-		return (
-			JSON.stringify({
-				header: current.header,
-				diet_tags: current.diet_tags,
-				components:
-				this.componentsForCompare(
-					current.components
-				)
-			}) !==
-			JSON.stringify({
-				header: baseline.header,
-				diet_tags: baseline.diet_tags,
-				components:
-				this.componentsForCompare(
-					baseline.components
-				)
-			})
-		);
+		return this.isSnapshotDirty(this.current());
 	},
 
 	async discard() {

@@ -5,8 +5,6 @@ export default {
 			true
 		);
 
-		await qryRecGetIngCategories.run();
-
 		showModal(
 			mdlRecIngAddIng.name
 		);
@@ -37,41 +35,85 @@ export default {
 			return false;
 		}
 
+		const optionalId = value => {
+			const id = Number(value);
+			return Number.isFinite(id) && id > 0 ? id : null;
+		};
+
+		const payload = {
+			name: String(inpRecIngIngredient.text || "").trim(),
+
+			category_id: optionalId(
+				selRecIngCategory.selectedOptionValue
+			),
+
+			purchase_unit_id: optionalId(
+				selRecIngPurchaseUnit.selectedOptionValue
+			),
+
+			purchase_qty: inpRecIngQuantity.text || null,
+			total_cost: inpRecIngPurchaseCost.text || null,
+			wastage_percent: inpRecIngWastage.text || 0,
+
+			supplier_id: optionalId(
+				selRecIngSupplier.selectedOptionValue
+			),
+
+			packaging_id: optionalId(
+				selRecIngPackaging.selectedOptionValue
+			),
+
+			item_code:
+			inpRecIngSupplierCode.text?.trim() || null,
+
+			notes: rteRecIngAddRecNotes.text || null,
+
+			active: chkRecIngActive.isChecked !== false,
+
+			allergen_ids:
+			(msRecIngAllergens.selectedOptionValues || [])
+			.map(Number),
+
+			diet_tag_ids:
+			(msRecIngDietTags.selectedOptionValues || [])
+			.map(Number)
+		};
+
 		try {
-			const result =
-						await qryRecSaveIngredient.run();
+			const result = await apiRecSaveIngredient.run({
+				ingredient_id: null,
+				payload
+			});
 
-			const savedId =
-						Number(
-							result?.[0]?.ingredient_id || 0
-						);
+			const savedId = Number(result?.ingredient_id || 0);
 
-			if (!savedId) {
-				showAlert(
-					"Ingredient was not saved.",
-					"error"
+			if (
+				result?.authenticated !== true ||
+				!savedId
+			) {
+				throw new Error(
+					"Ingredient Save returned an invalid response."
 				);
-
-				return false;
 			}
 
-			await qryRecGetComponentItems.run();
+			const refreshed = await apiRecGetComponentItems.run();
+
+			if (
+				refreshed?.authenticated !== true ||
+				!Array.isArray(refreshed.component_items)
+			) {
+				throw new Error(
+					"Ingredient saved, but component refresh failed."
+				);
+			}
 
 			if (closeAfter) {
-				closeModal(
-					mdlRecIngAddIng.name
-				);
+				closeModal(mdlRecIngAddIng.name);
 			} else {
-				await resetWidget(
-					mdlRecIngAddIng.name,
-					true
-				);
+				await resetWidget(mdlRecIngAddIng.name, true);
 			}
 
-			showAlert(
-				"Ingredient saved.",
-				"success"
-			);
+			showAlert("Ingredient saved.", "success");
 
 			return true;
 

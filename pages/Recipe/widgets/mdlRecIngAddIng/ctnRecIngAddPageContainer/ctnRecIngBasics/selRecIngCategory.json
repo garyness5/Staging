@@ -58,7 +58,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 62,
   "serverSideFiltering": false,
-  "sourceData": "{{\n\t(qryRecGetIngCategories.data || []).length\n\t\t? qryRecGetIngCategories.data.map(x => ({\n\t\t\tlabel: x.name,\n\t\t\tvalue: String(x.id)\n\t\t}))\n\t\t: [{ label: \"\", value: \"\" }]\n}}",
+  "sourceData": "{{ (appsmith.store.rec_ing_categories || []).map(x => ({ label: x.name, value: String(x.id) })) }}",
   "topRow": 12,
   "type": "SELECT_WIDGET",
   "version": 1,

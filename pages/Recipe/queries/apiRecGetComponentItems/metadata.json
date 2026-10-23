@@ -53,6 +53,6 @@
     "name": "apiRecGetComponentItems",
     "pageId": "Recipe",
     "runBehaviour": "MANUAL",
-    "userSetOnLoad": false
+    "userSetOnLoad": true
   }
 }

@@ -1,6 +1,0 @@
-select *
-from public.delete_recipe(
-	'{{ appsmith.user.email }}',
-	{{ Number(appsmith.store.current_recipe_id || 0) }},
-	'{{ appsmith.store.current_client_id }}'::uuid
-);

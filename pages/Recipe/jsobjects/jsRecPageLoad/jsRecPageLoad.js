@@ -1,4 +1,66 @@
 export default {
+	async getHelperItems(listCode) {
+		const lists = apiRecGetHelperLists.data?.helper_lists || [];
+
+		const list = lists.find(
+			row => row.list_code === listCode
+		);
+
+		if (!list) {
+			throw new Error(`Missing helper list: ${listCode}`);
+		}
+
+		const response = await apiRecGetHelperItems.run({
+			list_id: Number(list.id)
+		});
+
+		if (
+			response?.authenticated !== true ||
+			!Array.isArray(response.helper_items)
+		) {
+			throw new Error(`Unable to load ${listCode}`);
+		}
+
+		return response.helper_items
+			.filter(row => row.active === true)
+			.map(row => ({
+			id: Number(row.id),
+			name: row.name
+		}));
+	},
+
+	async loadSecureHelpers() {
+		const lists = await apiRecGetHelperLists.run();
+
+		if (
+			lists?.authenticated !== true ||
+			!Array.isArray(lists.helper_lists)
+		) {
+			throw new Error("Unable to load Recipe helper lists");
+		}
+
+		const categories = await this.getHelperItems("recipe_category");
+		const dietTags = await this.getHelperItems("diet_tag");
+
+		const ingCategories = await this.getHelperItems("ingredient_category");
+		const ingAllergens = await this.getHelperItems("allergen");
+		const ingDietTags = await this.getHelperItems("diet_tag");
+		const ingSuppliers = await this.getHelperItems("supplier");
+		const ingPackaging = await this.getHelperItems("packaging");
+
+		await Promise.all([
+			storeValue("rec_categories", categories),
+			storeValue("rec_diet_tags", dietTags),
+			storeValue("rec_ing_categories", ingCategories),
+			storeValue("rec_ing_allergens", ingAllergens),
+			storeValue("rec_ing_diet_tags", ingDietTags),
+			storeValue("rec_ing_suppliers", ingSuppliers),
+			storeValue("rec_ing_packaging", ingPackaging)
+		]);
+
+		return true;
+	},
+
 	async load() {
 		const ok = await jsAppInit.init();
 
@@ -6,11 +68,30 @@ export default {
 			return false;
 		}
 
-		await Promise.all([
-			qryRecGetCategories.run(),
-			qryRecGetDietTagsHeader.run(),
-			qryRecGetComponentItems.run()
-		]);
+		try {
+			await this.loadSecureHelpers();
+
+			const [components, units] = await Promise.all([
+				apiRecGetComponentItems.run(),
+				apiRecGetUnits.run()
+			]);
+
+			if (
+				components?.authenticated !== true ||
+				!Array.isArray(components.component_items) ||
+				units?.authenticated !== true ||
+				!Array.isArray(units.units)
+			) {
+				throw new Error("Invalid Recipe reference data");
+			}
+
+		} catch (error) {
+			showAlert(
+				"Unable to load Recipe reference data.",
+				"error"
+			);
+			return false;
+		}
 
 		const mode = String(
 			appsmith.store.Recipe_open_mode ||

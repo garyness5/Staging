@@ -28,7 +28,7 @@
   "label": "Active",
   "labelPosition": "Left",
   "labelStyle": "",
-  "labelTextSize": "1rem",
+  "labelTextSize": "0.875rem",
   "labelTooltip": "",
   "leftColumn": 1,
   "maxDynamicHeight": 9000,

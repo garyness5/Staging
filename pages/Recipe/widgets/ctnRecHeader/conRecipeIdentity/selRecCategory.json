@@ -4,7 +4,7 @@
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
   "bottomRow": 12,
   "boxShadow": "none",
-  "defaultOptionValue": "{{ ((options, serverSideFiltering) => ( \n\tjsRecWorkspace.get().header.category_id == null\n\t\t? \"\"\n\t\t: String(jsRecWorkspace.get().header.category_id)\n))(selRecCategory.options, selRecCategory.serverSideFiltering) }}",
+  "defaultOptionValue": "{{ ((options, serverSideFiltering) => ( \njsRecWorkspace.get().header.category_id == null\n? \"\"\n: String(jsRecWorkspace.get().header.category_id)\n))(selRecCategory.options, selRecCategory.serverSideFiltering) }}",
   "dynamicBindingPathList": [
     {
       "key": "accentColor"
@@ -58,7 +58,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 62,
   "serverSideFiltering": false,
-  "sourceData": "{{\n(qryRecGetCategories.data || []).map(x => ({\n\tlabel: x.name,\n\tvalue: String(x.id)\n}))\n}}",
+  "sourceData": "{{\n(appsmith.store.rec_categories || []).map(x => ({\n\tlabel: x.name,\n\tvalue: String(x.id)\n}))\n}}",
   "topRow": 8,
   "type": "SELECT_WIDGET",
   "version": 1,

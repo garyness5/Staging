@@ -1,0 +1,9 @@
+{{ {
+	operation: "my_recipe_save",
+	recipe_id: Number(appsmith.store.current_recipe_id || 0) || null,
+	header: jsRecSave.headerPayload(),
+	diet_tags: jsRecSave.dietTagsPayload(),
+	components: jsRecSave.componentsPayload(),
+	clear_downstream_units:
+	appsmith.store.recipe_unit_change_confirmed === true
+} }}

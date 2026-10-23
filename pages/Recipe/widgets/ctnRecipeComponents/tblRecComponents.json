@@ -64,7 +64,7 @@
     "factor_to_base",
     "cost_per_base_unit"
   ],
-  "columnUpdatedAt": 1787790586236,
+  "columnUpdatedAt": 1792783107141,
   "columnWidthMap": {
     "active": 104,
     "allergen_names": 110,
@@ -287,7 +287,7 @@
   "isVisible": true,
   "isVisibleDownload": true,
   "isVisibleFilters": false,
-  "isVisiblePagination": true,
+  "isVisiblePagination": false,
   "isVisibleSearch": true,
   "key": "b4l35n3gev",
   "label": "Data",
@@ -1365,6 +1365,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 64,
   "searchKey": "",
+  "serverSidePaginationEnabled": true,
   "showInlineEditingOptionDropdown": true,
   "tableData": "{{ jsRecCompTable.getRows() }}",
   "textSize": "0.875rem",

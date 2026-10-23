@@ -114,8 +114,7 @@ export default {
 	},
 
 	impactCount() {
-		const impact =
-					qryRecGetImpactCount.data?.[0] || {};
+		const impact = apiRecGetImpactCount.data?.impact || {};
 
 		return (
 			Number(impact.recipe_count || 0) +
@@ -154,7 +153,7 @@ export default {
 			snapshot
 		);
 
-		await qryRecGetImpactCount.run();
+		await apiRecGetImpactCount.run();
 
 		if (this.impactCount() === 0) {
 			return false;
@@ -214,12 +213,13 @@ export default {
 			);
 
 			const result =
-						await qryRecSaveRecipe.run();
+						await apiRecSaveRecipe.run();
 
-			const savedId =
-						Number(
-							result?.[0]?.recipe_id || 0
-						);
+			if (!result?.authenticated) {
+				throw new Error("Recipe Save authentication failed.");
+			}
+
+			const savedId = Number(result.recipe_id || 0);
 
 			if (!savedId) {
 				showAlert(
@@ -236,7 +236,7 @@ export default {
 			);
 
 			if (wasNew) {
-				await qryRecGetComponentItems.run();
+				await apiRecGetComponentItems.run();
 			}
 
 			const detail = await apiRecGetDetail.run();
@@ -307,19 +307,18 @@ export default {
 	},
 
 	async closeRecipe() {
-		await jsRecWorkspace.capture();
+		const snapshot = await jsRecWorkspace.capture();
 
-		if (this.isDirty()) {
+		if (jsRecWorkspace.isSnapshotDirty(snapshot)) {
 			this.pendingAction = "close";
 
-			showModal(
-				mdlRecUnsavedChanges.name
-			);
+			showModal(mdlRecUnsavedChanges.name);
 
 			return false;
 		}
 
 		navigateTo("RecipeList");
+
 		return true;
 	},
 
@@ -423,32 +422,28 @@ export default {
 	},
 
 	async nextDuplicateName(sourceName) {
-		const baseName =
-					String(sourceName || "").trim();
+		const baseName = String(sourceName || "").trim();
 
-		await qryRecGetNames.run();
+		const result = await apiRecGetNames.run();
 
-		const existing =
-					new Set(
-						(qryRecGetNames.data || [])
-						.map(x =>
-								 String(x.name || "")
-								 .trim()
-								 .toLowerCase()
-								)
-					);
+		if (!result?.authenticated || !Array.isArray(result.recipes)) {
+			throw new Error("Could not retrieve existing Recipe names.");
+		}
 
-		let candidate =
-				`${baseName} - copy`;
+		const existing = new Set(
+			result.recipes
+			.map(row =>
+					 String(row.name || "")
+					 .trim()
+					 .toLowerCase()
+					)
+		);
 
+		let candidate = `${baseName} - copy`;
 		let number = 2;
 
-		while (
-			existing.has(candidate.toLowerCase())
-		) {
-			candidate =
-				`${baseName} - copy ${number}`;
-
+		while (existing.has(candidate.toLowerCase())) {
+			candidate = `${baseName} - copy ${number}`;
 			number++;
 		}
 
@@ -557,7 +552,7 @@ export default {
 			"delete"
 		);
 
-		await qryRecGetImpactCount.run();
+		await apiRecGetImpactCount.run();
 
 		showModal(mdlRecDeleteConfirm.name);
 
@@ -589,12 +584,13 @@ export default {
 	async deleteRecipeConfirm() {
 		try {
 			const result =
-						await qryRecDeleteRecipe.run();
+						await apiRecDeleteRecipe.run();
 
-			const deletedId =
-						Number(
-							result?.[0]?.id || 0
-						);
+			if (!result?.authenticated) {
+				throw new Error("Recipe Delete authentication failed.");
+			}
+
+			const deletedId = Number(result.recipe_id || 0);
 
 			const currentId =
 						Number(
@@ -648,19 +644,19 @@ export default {
 
 	impactRecipeCount() {
 		return Number(
-			qryRecGetImpactCount.data?.[0]?.recipe_count || 0
+			apiRecGetImpactCount.data?.impact?.recipe_count || 0
 		);
 	},
 
 	impactDishCount() {
 		return Number(
-			qryRecGetImpactCount.data?.[0]?.dish_count || 0
+			apiRecGetImpactCount.data?.impact?.dish_count || 0
 		);
 	},
 
 	impactMenuCount() {
 		return Number(
-			qryRecGetImpactCount.data?.[0]?.menu_count || 0
+			apiRecGetImpactCount.data?.impact?.menu_count || 0
 		);
 	},
 
