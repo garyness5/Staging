@@ -1,0 +1,16 @@
+{
+  "operation": "my_recipe_save",
+  "recipe_id": 16,
+  "header": {
+    "name": "SECURITY TEST - Recipe Save Updated",
+    "category_id": 81,
+    "yield_qty": 12,
+    "yield_unit_id": 52,
+    "extra_percent": 0,
+    "notes": "Temporary staging update verification",
+    "active": true
+  },
+  "diet_tags": [],
+  "components": [],
+  "clear_downstream_units": false
+}
