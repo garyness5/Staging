@@ -39,21 +39,28 @@ export default {
 			throw new Error("Unable to load Recipe helper lists");
 		}
 
-		const categories = await this.getHelperItems("recipe_category");
-		const dietTags = await this.getHelperItems("diet_tag");
-
-		const ingCategories = await this.getHelperItems("ingredient_category");
-		const ingAllergens = await this.getHelperItems("allergen");
-		const ingDietTags = await this.getHelperItems("diet_tag");
-		const ingSuppliers = await this.getHelperItems("supplier");
-		const ingPackaging = await this.getHelperItems("packaging");
+		const [
+			categories,
+			dietTags,
+			ingCategories,
+			ingAllergens,
+			ingSuppliers,
+			ingPackaging
+		] = await Promise.all([
+			this.getHelperItems("recipe_category"),
+			this.getHelperItems("diet_tag"),
+			this.getHelperItems("ingredient_category"),
+			this.getHelperItems("allergen"),
+			this.getHelperItems("supplier"),
+			this.getHelperItems("packaging")
+		]);
 
 		await Promise.all([
 			storeValue("rec_categories", categories),
 			storeValue("rec_diet_tags", dietTags),
 			storeValue("rec_ing_categories", ingCategories),
 			storeValue("rec_ing_allergens", ingAllergens),
-			storeValue("rec_ing_diet_tags", ingDietTags),
+			storeValue("rec_ing_diet_tags", dietTags),
 			storeValue("rec_ing_suppliers", ingSuppliers),
 			storeValue("rec_ing_packaging", ingPackaging)
 		]);
@@ -86,10 +93,16 @@ export default {
 			}
 
 		} catch (error) {
+			console.error(
+				"Recipe reference data loading failed:",
+				error
+			);
+
 			showAlert(
 				"Unable to load Recipe reference data.",
 				"error"
 			);
+
 			return false;
 		}
 

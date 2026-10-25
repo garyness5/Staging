@@ -1,57 +1,60 @@
 export default {
-  async load() {
-    await storeValue("recListPageReady", false);
+	async load() {
+		await storeValue("recListPageReady", false);
 
-    try {
-      const ok = await jsAppInit.init();
+		try {
+			const ok = await jsAppInit.init();
 
-      if (!ok) {
-        console.error("RecipeList: jsAppInit.init() returned false.");
-        return false;
-      }
+			if (!ok) {
+				console.error("RecipeList: initialization failed.");
+				return false;
+			}
 
-      const [result, categoryResult] = await Promise.all([
-        apiRecLstGetRecipes.run(),
-        apiRecLstGetCategories.run()
-      ]);
+			const result = await apiRecLstGetRecipes.run();
 
-      if (
-        result?.authenticated !== true ||
-        !Array.isArray(result?.recipes)
-      ) {
-        console.error("RecipeList: Recipes response invalid.", result);
-        throw new Error("RecipeList data request failed.");
-      }
+			if (
+				result?.authenticated !== true ||
+				!Array.isArray(result?.recipes)
+			) {
+				throw new Error("RecipeList records could not be loaded.");
+			}
 
-      if (
-        categoryResult?.authenticated !== true ||
-        !Array.isArray(categoryResult?.categories)
-      ) {
-        console.error(
-          "RecipeList: Categories response invalid.",
-          categoryResult
-        );
-        throw new Error("RecipeList categories request failed.");
-      }
+			// Core records are available: the list can be displayed.
+			await storeValue("recListPageReady", true);
 
-      await storeValue("recListPageReady", true);
-      return true;
+			// Categories are optional supporting data.
+			try {
+				const categoryResult = await apiRecLstGetCategories.run();
 
-    } catch (error) {
-      await storeValue("recListPageReady", false);
+				if (
+					categoryResult?.authenticated !== true ||
+					!Array.isArray(categoryResult?.categories)
+				) {
+					console.warn(
+						"RecipeList: Category reference data unavailable.",
+						categoryResult
+					);
+				}
+			} catch (categoryError) {
+				console.warn(
+					"RecipeList: Category loading failed.",
+					categoryError
+				);
+			}
 
-      console.error("RecipeList initialization failed:", error);
+			return true;
 
-      showAlert(
-        "Unable to load RecipeList data. Please try again.",
-        "error"
-      );
+		} catch (error) {
+			await storeValue("recListPageReady", false);
 
-      return false;
-    }
-  },
+			console.error("RecipeList initialization failed:", error);
 
-  isReady() {
-    return appsmith.store.recListPageReady === true;
-  }
+			showAlert(
+				"Unable to load RecipeList data. Please try again.",
+				"error"
+			);
+
+			return false;
+		}
+	},
 };

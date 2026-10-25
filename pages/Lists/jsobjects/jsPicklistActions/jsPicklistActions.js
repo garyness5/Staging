@@ -197,7 +197,9 @@ export default {
 				return false;
 			}
 
-			const result = await apiGetHelperItemImpact.run();
+			const result = await apiGetHelperItemImpact.run({
+				helper_item_id: Number(tblListsItems.selectedRow.id)
+			});
 
 			if (!result?.authenticated || !result?.impact) {
 				showAlert("Unable to check item usage.", "error");
