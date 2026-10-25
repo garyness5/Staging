@@ -33,9 +33,9 @@ export default {
 			await storeValue("ingPageReady", false);
 			console.error("Ingredients initialization failed:", error);
 
-			showAlert(
-				"Unable to load Ingredients data. Please try again.",
-				"error"
+			jsUserErrors.show(
+				error,
+				"Unable to load Ingredients data. Please try again."
 			);
 
 			return false;

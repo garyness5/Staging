@@ -1,6 +1,0 @@
-{{
-{
-	operation: "batch_update_my_recipes",
-	rows: this.params.rows
-}
-}}

@@ -86,10 +86,10 @@ export default {
 
 	async handleUnitChange(row) {
 		if (row.purchase_unit === "__SET__") {
-			return this.openSetUnit(row);
+			return jsIngList.openSetUnit(row);
 		}
 
-		return await jsIngBatch.stage(row.id, {
+		return jsIngBatch.stage(row.id, {
 			purchase_unit_id: row.purchase_unit
 		});
 	},

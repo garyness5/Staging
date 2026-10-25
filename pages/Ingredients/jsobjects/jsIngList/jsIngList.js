@@ -87,11 +87,13 @@ export default {
 		);
 	},
 
-	async stageCategory(id, value) {
+	async stageCategory(value) {
+		const row = tblIngList.updatedRow || {};
+
 		return this.stageField(
-			id,
+			row.id,
 			"category_id",
-			value == null || value === ""
+			value === "" || value == null
 			? null
 			: Number(value)
 		);
@@ -170,16 +172,50 @@ export default {
 		return jsIngForm.openEditFromIngredients(row);
 	},
 
+	previewNetCost(row) {
+		const qty = Number(row.purchase_qty);
+		const cost = Number(row.total_cost);
+		const waste = Number(row.wastage_percent ?? 0);
+
+		if (
+			!Number.isFinite(qty) ||
+			!Number.isFinite(cost) ||
+			!Number.isFinite(waste) ||
+			qty <= 0 ||
+			cost < 0 ||
+			waste < 0 ||
+			waste >= 100
+		) {
+			return null;
+		}
+
+		return cost / (qty * (1 - waste / 100));
+	},
+
 	filteredRows() {
 		const rows =
 					apiGetMyIngredients.data?.ingredients ?? [];
 
 		const pending = jsIngBatch.pending();
 
-		const workingRows = rows.map(row => ({
-			...row,
-			...(pending[String(row.id)] || {})
-		}));
+		const workingRows = rows.map(row => {
+			const changes = pending[String(row.id)] || {};
+			const working = { ...row, ...changes };
+
+			const costChanged = [
+				"purchase_qty",
+				"total_cost",
+				"wastage_percent"
+			].some(field =>
+						 Object.prototype.hasOwnProperty.call(changes, field)
+						);
+
+			if (costChanged) {
+				working.net_cost = this.previewNetCost(working);
+			}
+
+			return working;
+		});
 
 		const status =
 					selIngListFilter.selectedOptionValue || "all";

@@ -177,12 +177,39 @@ export default {
 		);
 	},
 
+	unitTypeChanged(ingredientId, newUnitId) {
+		if (!ingredientId || !newUnitId) return false;
+
+		const saved = (apiGetMyIngredients.data?.ingredients || [])
+		.find(r => Number(r.id) === Number(ingredientId));
+
+		if (!saved?.purchase_unit_id) return false;
+
+		const units = apiIngGetUnits.data?.units || [];
+
+		const oldUnit = units.find(
+			u => Number(u.id) === Number(saved.purchase_unit_id)
+		);
+
+		const newUnit = units.find(
+			u => Number(u.id) === Number(newUnitId)
+		);
+
+		if (!oldUnit || !newUnit) return false;
+
+		return oldUnit.unit_type !== newUnit.unit_type;
+	},
+
 	// ============================================================
 	// SAVE
 	// Name is the only required field.
 	// ============================================================
 
-	async save(closeAfterSave = true, stateOverride = null) {
+	async save(
+		closeAfterSave = true,
+		stateOverride = null,
+		unitTypeConfirmed = false
+	) {
 		const state = stateOverride || this.currentState();
 
 		if (!state.name) {
@@ -238,10 +265,93 @@ export default {
 			diet_tag_ids: state.diet_tags.map(Number)
 		};
 
+		if (unitTypeConfirmed) {
+			const confirmation = appsmith.store.IngUnitPendingSave;
+
+			if (!confirmation) {
+				showAlert("Unit Type confirmation is missing.", "error");
+				return false;
+			}
+
+			payload.confirm_unit_type_change = true;
+			payload.expected_old_purchase_unit_id =
+				confirmation.oldPurchaseUnitId;
+			payload.expected_new_purchase_unit_id =
+				confirmation.newPurchaseUnitId;
+		}
+
 		const ingredientId =
 					appsmith.store.IngForm_mode === "edit"
 		? Number(appsmith.store.IngForm_edit_id) || null
 		: null;
+
+		if (
+			ingredientId &&
+			!unitTypeConfirmed &&
+			this.unitTypeChanged(ingredientId, state.purchase_unit_id)
+		) {
+			try {
+				const response = await apiIngGetImpactCount.run({
+					ingredient_id: ingredientId
+				});
+
+				if (
+					response?.authenticated !== true ||
+					!response?.impact
+				) {
+					throw new Error("Ingredient impact could not be checked.");
+				}
+
+				const impact = response.impact;
+
+				const recipeCount = Number(impact.recipe_count || 0);
+				const dishCount = Number(impact.dish_count || 0);
+				const menuCount = Number(impact.menu_count || 0);
+
+				if (recipeCount + dishCount + menuCount > 0) {
+					const units = apiIngGetUnits.data?.units || [];
+
+					const saved = (
+						apiGetMyIngredients.data?.ingredients || []
+					).find(r => Number(r.id) === ingredientId);
+
+					const oldUnit = units.find(
+						u => Number(u.id) === Number(saved?.purchase_unit_id)
+					);
+
+					const newUnit = units.find(
+						u => Number(u.id) === Number(state.purchase_unit_id)
+					);
+
+					await storeValue("IngUnitWarning", {
+						ingredientName: state.name,
+						oldUnitType: oldUnit?.unit_type || "",
+						newUnitType: newUnit?.unit_type || "",
+						recipeCount,
+						dishCount,
+						menuCount
+					});
+
+					await storeValue("IngUnitPendingSave", {
+						state,
+						closeAfterSave,
+						ingredientId,
+						oldPurchaseUnitId: Number(saved.purchase_unit_id),
+						newPurchaseUnitId: Number(state.purchase_unit_id)
+					});
+
+					showModal(mdlIngUnitTypeWarning.name);
+					return false;
+				}
+
+			} catch (error) {
+				jsUserErrors.show(
+					error,
+					"Ingredient impact could not be checked."
+				);
+				return false;
+			}
+		}
 
 		try {
 			const result = await apiIngSave.run({
@@ -295,6 +405,37 @@ export default {
 			);
 			return false;
 		}
+	},
+
+	async confirmUnitTypeChange() {
+		const pending = appsmith.store.IngUnitPendingSave;
+
+		if (!pending) {
+			showAlert("Unit Type confirmation is no longer available.", "warning");
+			return false;
+		}
+
+		const currentId = Number(appsmith.store.IngForm_edit_id || 0);
+
+		if (currentId !== Number(pending.ingredientId)) {
+			showAlert("The Ingredient has changed. Please review it again.", "warning");
+			return false;
+		}
+
+		const saved = await this.save(
+			pending.closeAfterSave,
+			pending.state,
+			true
+		);
+
+		if (!saved) return false;
+
+		closeModal(mdlIngUnitTypeWarning.name);
+
+		await removeValue("IngUnitPendingSave");
+		await removeValue("IngUnitWarning");
+
+		return true;
 	},
 
 	async saveAndNew() {
