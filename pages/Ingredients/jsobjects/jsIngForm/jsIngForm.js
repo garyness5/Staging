@@ -33,9 +33,11 @@ export default {
 
 	async openEditFromIngredients(row = null) {
 		const id = Number(
-			row?.id || tblIngList.selectedRow?.id || 0
+			row?.id ??
+			appsmith.store.IngList_selected_id ??
+			tblIngList.selectedRow?.id ??
+			0
 		);
-
 		if (!id) {
 			showAlert("Select an ingredient to edit.", "warning");
 			return false;
@@ -102,8 +104,11 @@ export default {
 	},
 
 	editRow() {
-		if (appsmith.store.IngForm_restoring) {
-			return appsmith.store.IngForm_pending_state || {};
+		if (
+			appsmith.store.IngForm_restoring === true &&
+			appsmith.store.IngForm_pending_state
+		) {
+			return appsmith.store.IngForm_pending_state;
 		}
 
 		if (appsmith.store.IngForm_mode === "duplicate") {
@@ -637,6 +642,7 @@ export default {
 				);
 			}
 
+			await jsIngBatch.clearOne(id);
 			await apiGetMyIngredients.run();
 
 			closeModal(mdlIngDelete.name);
@@ -660,13 +666,13 @@ export default {
 	},
 
 	async deleteFromList() {
-		const row = tblIngList.selectedRow;
+		const id = Number(appsmith.store.IngList_selected_id || 0);
 
-		if (!row?.id) {
-			showAlert(
-				"Select an ingredient to delete.",
-				"warning"
-			);
+		const row = (apiGetMyIngredients.data?.ingredients || [])
+		.find(r => Number(r.id) === id);
+
+		if (!row) {
+			showAlert("Select an ingredient to delete.", "warning");
 			return false;
 		}
 
@@ -680,7 +686,6 @@ export default {
 
 		return this.openDeleteConfirm();
 	},
-
 	// ============================================================
 	// DUPLICATE NAME
 	// ============================================================
@@ -688,42 +693,29 @@ export default {
 	duplicateName(sourceName) {
 		const baseName = String(sourceName || "").trim();
 
-		if (!baseName) {
-			return "";
+		if (!baseName) return "";
+
+		const existingNames = new Set(
+			(apiGetMyIngredients.data?.ingredients || [])
+			.filter(r => r.deleted !== true)
+			.map(r => String(r.name || "").trim().toLowerCase())
+		);
+
+		// If the working name is unique, keep it unchanged.
+		if (!existingNames.has(baseName.toLowerCase())) {
+			return baseName;
 		}
 
-		const escapedName = baseName.replace(
-			/[.*+?^${}()|[\]\\]/g,
-			"\\$&"
-		);
+		// Otherwise, generate the next available copy name.
+		let candidate = `${baseName} - copy`;
+		let number = 2;
 
-		const copyRegex = new RegExp(
-			`^${escapedName} - copy(?: (\\d+))?$`,
-			"i"
-		);
+		while (existingNames.has(candidate.toLowerCase())) {
+			candidate = `${baseName} - copy ${number}`;
+			number++;
+		}
 
-		const usedNumbers = (
-			apiGetMyIngredients.data?.ingredients || []
-		)
-		.map(r => String(r.name || ""))
-		.map(name => {
-			const match = name.match(copyRegex);
-
-			if (!match) {
-				return 0;
-			}
-
-			return match[1] ? Number(match[1]) : 1;
-		})
-		.filter(n => n > 0);
-
-		const nextNumber = usedNumbers.length === 0
-		? 1
-		: Math.max(...usedNumbers) + 1;
-
-		return nextNumber === 1
-			? `${baseName} - copy`
-		: `${baseName} - copy ${nextNumber}`;
+		return candidate;
 	},
 
 	// ============================================================
@@ -742,6 +734,10 @@ export default {
 			);
 			return false;
 		}
+
+		const sourceId = Number(
+			sourceRow.id || appsmith.store.IngForm_edit_id || 0
+		);
 
 		const duplicateRow = {
 			...sourceRow,
@@ -776,7 +772,21 @@ export default {
 		await removeValue("IngForm_saved_id");
 		await removeValue("IngForm_pending_action");
 
+		await removeValue("IngForm_restoring");
+		await removeValue("IngForm_pending_state");
+
 		await resetWidget("mdlAddIng", true);
+
+		// The new copy now owns the working values.
+		// Clear only the original Ingredient's pending inline changes.
+		if (sourceId) {
+			await jsIngBatch.clearOne(sourceId);
+		}
+
+		showAlert(
+			"Ingredient copied. Click Save to create the new Ingredient.",
+			"info"
+		);
 		return true;
 	},
 
@@ -817,7 +827,10 @@ export default {
 	// ============================================================
 
 	async duplicateFromList() {
-		const row = tblIngList.selectedRow;
+		const id = Number(appsmith.store.IngList_selected_id || 0);
+
+		const row = (apiGetMyIngredients.data?.ingredients || [])
+		.find(r => Number(r.id) === id);
 
 		if (!row?.id) {
 			showAlert(

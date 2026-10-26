@@ -19,17 +19,15 @@ export default {
 
 	async stageField(id, field, value) {
 		if (!id) {
-			showAlert(
-				"Ingredient could not be identified.",
-				"error"
-			);
+			showAlert("Ingredient could not be identified.", "error");
 			return false;
 		}
 
-		return jsIngBatch.stage(
-			Number(id),
-			{ [field]: value }
-		);
+		await storeValue("IngList_selected_id", Number(id), false);
+
+		return jsIngBatch.stage(Number(id), {
+			[field]: value
+		});
 	},
 
 	async stageName() {
@@ -79,6 +77,10 @@ export default {
 
 	async stageActive() {
 		const row = tblIngList.updatedRow || {};
+
+		if (!row.id) return false;
+
+		await storeValue("IngList_selected_id", Number(row.id), false);
 
 		return this.stageField(
 			row.id,

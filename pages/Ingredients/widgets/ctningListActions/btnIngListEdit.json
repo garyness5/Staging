@@ -43,7 +43,7 @@
   "mobileRightColumn": 22,
   "mobileTopRow": 4,
   "needsErrorInfo": false,
-  "onClick": "{{ jsIngForm.openEditFromIngredients() }}",
+  "onClick": "{{ jsIngForm.openEditFromIngredients({ id: appsmith.store.IngList_selected_id }) }}",
   "originalBottomRow": 18,
   "originalTopRow": 14,
   "parentColumnSpace": 10.609375,

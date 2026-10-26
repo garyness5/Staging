@@ -107,7 +107,7 @@
   "customIsLoading": false,
   "customIsLoadingValue": "",
   "defaultPageSize": 0,
-  "defaultSelectedRowIndex": 0,
+  "defaultSelectedRowIndex": "{{\njsIngList.filteredRows().findIndex(\n\trow => Number(row.id) === Number(appsmith.store.IngList_selected_id)\n)\n}}",
   "defaultSelectedRowIndices": [
     0
   ],
@@ -256,6 +256,9 @@
     },
     {
       "key": "primaryColumns.packaging_id.selectOptions"
+    },
+    {
+      "key": "defaultSelectedRowIndex"
     }
   ],
   "dynamicPropertyPathList": [
@@ -309,6 +312,9 @@
     },
     {
       "key": "primaryColumns.packaging_id.onOptionChange"
+    },
+    {
+      "key": "onRowSelected"
     }
   ],
   "dynamicTriggerPathList": [
@@ -341,6 +347,9 @@
     },
     {
       "key": "primaryColumns.packaging_id.onOptionChange"
+    },
+    {
+      "key": "onRowSelected"
     }
   ],
   "enableClientSideSearch": true,
@@ -368,7 +377,7 @@
   "mobileTopRow": 13,
   "needsErrorInfo": false,
   "oddRowColor": "{{appsmith.theme.colors.backgroundColor}}",
-  "onRowSelected": "{{}}",
+  "onRowSelected": "{{ storeValue(\"IngList_selected_id\", tblIngList.selectedRow?.id ?? null) }}",
   "originalBottomRow": 81,
   "originalTopRow": 9,
   "parentColumnSpace": 16.109375,
