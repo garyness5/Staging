@@ -22,7 +22,11 @@
       "key": "isDisabled"
     }
   ],
-  "dynamicTriggerPathList": [],
+  "dynamicTriggerPathList": [
+    {
+      "key": "onClick"
+    }
+  ],
   "iconAlign": "left",
   "isDefaultClickDisabled": true,
   "isDisabled": "{{ !jsIngBatch.hasChanges() }}",
@@ -36,7 +40,7 @@
   "mobileRightColumn": 22,
   "mobileTopRow": 4,
   "needsErrorInfo": false,
-  "onClick": "",
+  "onClick": "{{ jsIngBatch.discard() }}",
   "originalBottomRow": 14,
   "originalTopRow": 10,
   "parentColumnSpace": 10.609375,

@@ -1,7 +1,0 @@
-{{
-{
-	operation: "update_my_ingredient_inline",
-	ingredient_id: this.params.ingredient_id,
-	changes: this.params.changes
-}
-}}

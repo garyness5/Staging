@@ -17,8 +17,10 @@ export default {
 		await removeValue("IngForm_duplicate_row");
 		await removeValue("IngForm_saved_id");
 		await removeValue("IngForm_pending_action");
-
+		await removeValue("IngForm_restoring");
+		await removeValue("IngForm_pending_state");
 		await resetWidget("mdlAddIng", true);
+
 		showModal(mdlAddIng.name);
 		await this.captureBaseline();
 
@@ -93,12 +95,17 @@ export default {
 
 	isEdit() {
 		return (
+			!!appsmith.store.IngForm_restoring ||
 			appsmith.store.IngForm_mode === "edit" ||
 			appsmith.store.IngForm_mode === "duplicate"
 		);
 	},
 
 	editRow() {
+		if (appsmith.store.IngForm_restoring) {
+			return appsmith.store.IngForm_pending_state || {};
+		}
+
 		if (appsmith.store.IngForm_mode === "duplicate") {
 			return appsmith.store.IngForm_duplicate_row || {};
 		}
@@ -505,21 +512,6 @@ export default {
 		return true;
 	},
 
-	async requestAdd() {
-		if (this.isDirty()) {
-			const snapshot = this.currentState();
-
-			await storeValue("IngForm_pending_state", snapshot);
-			await storeValue("IngForm_pending_action", "add");
-
-			showModal(mdlIngUnsaved.name);
-			return false;
-		}
-
-		await this.openAddFromIngredients();
-		return true;
-	},
-
 	async saveFromUnsaved() {
 		const action =
 					appsmith.store.IngForm_pending_action || "close";
@@ -572,14 +564,15 @@ export default {
 	},
 
 	async cancelDiscard() {
+		await storeValue("IngForm_restoring", true);
+
 		closeModal(mdlIngUnsaved.name);
 
-		await removeValue("IngForm_pending_state");
-		await removeValue("IngForm_pending_action");
+		await resetWidget("mdlAddIng", true);
+		showModal(mdlAddIng.name);
 
 		return true;
 	},
-
 	// ============================================================
 	// DELETE
 	// ============================================================
@@ -894,6 +887,10 @@ export default {
 	// ============================================================
 
 	allergenDefaultValues() {
+		if (appsmith.store.IngForm_restoring) {
+			return appsmith.store.IngForm_pending_state?.allergens || [];
+		}
+
 		if (appsmith.store.IngForm_mode === "duplicate") {
 			return appsmith.store.IngForm_duplicate_allergens || [];
 		}
@@ -910,6 +907,10 @@ export default {
 	},
 
 	dietTagDefaultValues() {
+		if (appsmith.store.IngForm_restoring) {
+			return appsmith.store.IngForm_pending_state?.diet_tags || [];
+		}
+
 		if (appsmith.store.IngForm_mode === "duplicate") {
 			return appsmith.store.IngForm_duplicate_diet_tags || [];
 		}

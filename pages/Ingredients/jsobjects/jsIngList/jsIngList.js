@@ -129,20 +129,6 @@ export default {
 		);
 	},
 
-	async stageUnit(id, value, row) {
-		if (String(value) === "__SET__") {
-			return this.openSetUnit(row);
-		}
-
-		return this.stageField(
-			id,
-			"purchase_unit_id",
-			value == null || value === ""
-			? null
-			: Number(value)
-		);
-	},
-
 	unitOptions(unitType) {
 		const type = String(unitType || "")
 		.trim()
