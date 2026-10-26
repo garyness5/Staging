@@ -92,9 +92,25 @@ export default {
 	},
 
 	prepareRow(row, lineNo) {
+		const itemId =
+					row?.item_type === "ingredient"
+		? row?.ingredient_id
+		: row?.child_recipe_id;
+
+		const upstream = this.componentItems().find(item =>
+																								item.item_type === row?.item_type &&
+																								Number(item.id) === Number(itemId) &&
+																								itemId != null
+																							 );
+
 		return {
 			...this.blankRow(lineNo),
 			...row,
+
+			// Refresh compatibility from the current upstream item.
+			// Never restore a deliberately cleared selected Unit.
+			unit_type: upstream?.unit_type ?? row?.unit_type ?? null,
+
 			draft_row_id: row?.draft_row_id || this.makeDraftId(),
 			line_no: lineNo,
 			recipe_id: Number(appsmith.store.current_recipe_id || 0),

@@ -435,16 +435,27 @@ export default {
 		await removeValue("IngUnitPendingSave");
 		await removeValue("IngUnitWarning");
 
+		if (appsmith.store.IngForm_save_and_new) {
+			await removeValue("IngForm_save_and_new");
+			await this.openAddFromIngredients();
+		}
+
 		return true;
 	},
 
 	async saveAndNew() {
+		await storeValue("IngForm_save_and_new", true);
+
 		const saved = await this.save(false);
 
 		if (!saved) {
+			if (!appsmith.store.IngUnitPendingSave) {
+				await removeValue("IngForm_save_and_new");
+			}
 			return false;
 		}
 
+		await removeValue("IngForm_save_and_new");
 		await this.openAddFromIngredients();
 		return true;
 	},

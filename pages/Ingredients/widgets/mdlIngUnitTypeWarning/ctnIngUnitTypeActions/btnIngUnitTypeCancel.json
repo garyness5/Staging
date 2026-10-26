@@ -40,7 +40,7 @@
   "mobileRightColumn": 63,
   "mobileTopRow": 18,
   "needsErrorInfo": false,
-  "onClick": "{{\ncloseModal(mdlIngUnitTypeWarning.name);\nremoveValue(\"IngUnitPendingSave\");\nremoveValue(\"IngUnitWarning\");\n}}",
+  "onClick": "{{\n(async () => {\n\tcloseModal(mdlIngUnitTypeWarning.name);\n\tawait removeValue(\"IngUnitPendingSave\");\n\tawait removeValue(\"IngUnitWarning\");\n\tawait removeValue(\"IngForm_save_and_new\");\n})()\n}}",
   "originalBottomRow": 60,
   "originalTopRow": 56,
   "parentId": "qqk5gsn7m7",
