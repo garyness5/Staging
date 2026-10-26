@@ -39,9 +39,16 @@ export default {
 			return false;
 		}
 
-		const editRow = (
+		const savedRow = (
 			apiGetMyIngredients.data?.ingredients || []
 		).find(r => Number(r.id) === id);
+
+		const pendingChanges =
+					jsIngBatch.pending()[String(id)] || {};
+
+		const editRow = savedRow
+		? { ...savedRow, ...pendingChanges }
+		: null;
 
 		if (!editRow?.id) {
 			showAlert("Ingredient could not be identified.", "error");
@@ -172,9 +179,23 @@ export default {
 	},
 
 	canSave() {
-		return Boolean(
-			inpIngIngredient.text?.trim() && this.isDirty()
+		const hasName = Boolean(inpIngIngredient.text?.trim());
+
+		const ingredientId = Number(
+			appsmith.store.IngForm_edit_id || 0
 		);
+
+		const hasPendingInlineChanges =
+					appsmith.store.IngForm_mode === "edit" &&
+					ingredientId > 0 &&
+					Boolean(
+						Object.keys(
+							jsIngBatch.pending()[String(ingredientId)] || {}
+						).length
+					);
+
+		return hasName &&
+			(this.isDirty() || hasPendingInlineChanges);
 	},
 
 	unitTypeChanged(ingredientId, newUnitId) {
@@ -372,6 +393,11 @@ export default {
 			}
 
 			await storeValue("IngForm_saved_id", savedId);
+
+			if (ingredientId !== null) {
+				await jsIngBatch.clearOne(savedId);
+			}
+
 			await apiGetMyIngredients.run();
 
 			if (!closeAfterSave) {

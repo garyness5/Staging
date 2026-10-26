@@ -101,6 +101,20 @@ export default {
 		);
 	},
 
+	async clearOne(id) {
+		const pending = { ...this.pending() };
+
+		delete pending[String(id)];
+
+		await storeValue(
+			"IngBatchPending",
+			pending,
+			false
+		);
+
+		return true;
+	},
+
 	async discard() {
 		await storeValue("IngBatchPending", {}, false);
 		return true;
