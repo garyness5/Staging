@@ -251,7 +251,6 @@ export default {
 		) > 0;
 	},
 
-
 	async setActive(row, active) {
 		const recipeId = Number(row?.id || 0);
 
@@ -320,7 +319,6 @@ export default {
 			selRecLstFilter.selectedOptionValue || "all"
 		).toLowerCase();
 	},
-
 
 	filteredRows() {
 		const search = this.searchText();

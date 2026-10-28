@@ -41,6 +41,7 @@
   "renderMode": "CANVAS",
   "responsiveBehavior": "hug",
   "rightColumn": 64,
+  "tooltip": "Cancel or close window",
   "topRow": 2,
   "type": "ICON_BUTTON_WIDGET",
   "version": 1,

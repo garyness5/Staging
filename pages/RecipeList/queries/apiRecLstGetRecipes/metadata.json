@@ -49,7 +49,7 @@
     ],
     "name": "apiRecLstGetRecipes",
     "pageId": "RecipeList",
-    "runBehaviour": "AUTOMATIC",
+    "runBehaviour": "MANUAL",
     "userSetOnLoad": false
   }
 }

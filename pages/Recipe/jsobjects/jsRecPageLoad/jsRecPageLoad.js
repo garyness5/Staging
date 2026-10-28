@@ -1,13 +1,17 @@
 export default {
+
 	async getHelperItems(listCode) {
-		const lists = apiRecGetHelperLists.data?.helper_lists || [];
+		const lists =
+					apiRecGetHelperLists.data?.helper_lists || [];
 
 		const list = lists.find(
 			row => row.list_code === listCode
 		);
 
 		if (!list) {
-			throw new Error(`Missing helper list: ${listCode}`);
+			throw new Error(
+				`Missing helper list: ${listCode}`
+			);
 		}
 
 		const response = await apiRecGetHelperItems.run({
@@ -18,7 +22,9 @@ export default {
 			response?.authenticated !== true ||
 			!Array.isArray(response.helper_items)
 		) {
-			throw new Error(`Unable to load ${listCode}`);
+			throw new Error(
+				`Unable to load ${listCode}`
+			);
 		}
 
 		return response.helper_items
@@ -36,7 +42,9 @@ export default {
 			lists?.authenticated !== true ||
 			!Array.isArray(lists.helper_lists)
 		) {
-			throw new Error("Unable to load Recipe helper lists");
+			throw new Error(
+				"Unable to load Recipe helper lists"
+			);
 		}
 
 		const [
@@ -75,22 +83,49 @@ export default {
 			return false;
 		}
 
-		try {
-			await this.loadSecureHelpers();
+		const mode = String(
+			appsmith.store.Recipe_open_mode ||
+			appsmith.store.Recipe_mode ||
+			"edit"
+		);
 
-			const [components, units] = await Promise.all([
+		const recipeId = Number(
+			appsmith.store.current_recipe_id || 0
+		);
+
+		const needsDetail =
+					mode !== "add" && recipeId > 0;
+
+		let detail = null;
+
+		try {
+			const [
+				helpersLoaded,
+				components,
+				units,
+				recipeDetail
+			] = await Promise.all([
+				this.loadSecureHelpers(),
 				apiRecGetComponentItems.run(),
-				apiRecGetUnits.run()
+				apiRecGetUnits.run(),
+				needsDetail
+				? apiRecGetDetail.run()
+				: Promise.resolve(null)
 			]);
 
 			if (
+				helpersLoaded !== true ||
 				components?.authenticated !== true ||
 				!Array.isArray(components.component_items) ||
 				units?.authenticated !== true ||
 				!Array.isArray(units.units)
 			) {
-				throw new Error("Invalid Recipe reference data");
+				throw new Error(
+					"Invalid Recipe reference data"
+				);
 			}
+
+			detail = recipeDetail;
 
 		} catch (error) {
 			console.error(
@@ -106,12 +141,6 @@ export default {
 			return false;
 		}
 
-		const mode = String(
-			appsmith.store.Recipe_open_mode ||
-			appsmith.store.Recipe_mode ||
-			"edit"
-		);
-
 		await jsRecWorkspace.clear();
 
 		if (mode === "add") {
@@ -122,10 +151,6 @@ export default {
 			return true;
 		}
 
-		const recipeId = Number(
-			appsmith.store.current_recipe_id || 0
-		);
-
 		if (!recipeId) {
 			await jsRecWorkspace.initializeNew();
 			await jsRecCompTable.clearRows();
@@ -134,14 +159,16 @@ export default {
 			return true;
 		}
 
-		const detail = await apiRecGetDetail.run();
-
 		if (
-			!detail?.authenticated ||
+			detail?.authenticated !== true ||
 			!detail?.recipe ||
 			Number(detail.recipe.id) !== recipeId
 		) {
-			showAlert("Recipe could not be loaded.", "error");
+			showAlert(
+				"Recipe could not be loaded.",
+				"error"
+			);
+
 			return false;
 		}
 

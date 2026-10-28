@@ -53,6 +53,7 @@
   "responsiveBehavior": "hug",
   "rightColumn": 28,
   "text": "Duplicate",
+  "tooltip": "Duplicate ingredient",
   "topRow": 2,
   "type": "BUTTON_WIDGET",
   "version": 1,

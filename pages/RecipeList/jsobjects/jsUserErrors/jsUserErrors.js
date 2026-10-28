@@ -71,5 +71,32 @@ export default {
 		);
 
 		return false;
-	}
+	},
+
+	loginMessage(error) {
+		const raw = String(
+			error?.message ||
+			error?.error ||
+			error ||
+			""
+		).toLowerCase();
+
+		if (
+			raw.includes("invalid login credentials") ||
+			raw.includes("invalid credentials") ||
+			raw.includes("invalid email or password")
+		) {
+			return "Unable to sign in. Please check your email and password, then try again.";
+		}
+
+		if (raw.includes("email not confirmed")) {
+			return "Please confirm your email address before signing in.";
+		}
+
+		if (raw.includes("too many requests") || raw.includes("rate limit")) {
+			return "Too many sign-in attempts. Please wait a few minutes and try again.";
+		}
+
+		return "Unable to connect to the sign-in service. Please try again shortly.";
+	},
 };

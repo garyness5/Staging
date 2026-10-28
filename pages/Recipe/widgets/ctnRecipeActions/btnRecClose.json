@@ -4,7 +4,7 @@
   "bottomRow": 6,
   "boxShadow": "none",
   "buttonColor": "{{appsmith.theme.colors.primaryColor}}",
-  "buttonVariant": "PRIMARY",
+  "buttonVariant": "SECONDARY",
   "disabledWhenInvalid": false,
   "dynamicBindingPathList": [
     {
@@ -29,7 +29,7 @@
   "isLoading": false,
   "isVisible": true,
   "key": "bv6gv3416k",
-  "leftColumn": 14,
+  "leftColumn": 30,
   "minWidth": 120,
   "mobileBottomRow": 5,
   "mobileLeftColumn": 2,
@@ -45,7 +45,7 @@
   "renderMode": "CANVAS",
   "resetFormOnClick": false,
   "responsiveBehavior": "hug",
-  "rightColumn": 19,
+  "rightColumn": 35,
   "text": "Close",
   "tooltip": "Return to Recipe List",
   "topRow": 2,

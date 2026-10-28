@@ -66,7 +66,7 @@
     "diet_tag_names": 106,
     "extra_percent": 92,
     "id": 78,
-    "name": 246,
+    "name": 235,
     "name_norm": 142,
     "total_cost": 108,
     "yield_qty": 64,
@@ -163,10 +163,10 @@
       "key": "primaryColumns.derived_diet_tags.computedValue"
     },
     {
-      "key": "primaryColumns.category_id.selectOptions"
+      "key": "isVisible"
     },
     {
-      "key": "isVisible"
+      "key": "primaryColumns.category_id.selectOptions"
     }
   ],
   "dynamicPropertyPathList": [
@@ -180,18 +180,12 @@
       "key": "primaryColumns.active.onCheckChange"
     },
     {
-      "key": "primaryColumns.category_id.onOptionChange"
-    },
-    {
       "key": "isVisible"
     }
   ],
   "dynamicTriggerPathList": [
     {
       "key": "primaryColumns.active.onCheckChange"
-    },
-    {
-      "key": "primaryColumns.category_id.onOptionChange"
     }
   ],
   "enableClientSideSearch": true,
@@ -269,17 +263,17 @@
       "horizontalAlignment": "LEFT",
       "id": "category_id",
       "index": 4,
-      "isCellEditable": true,
+      "isCellEditable": false,
       "isCellVisible": true,
       "isDerived": false,
       "isDisabled": false,
       "isDiscardVisible": true,
-      "isEditable": true,
+      "isEditable": false,
       "isSaveVisible": true,
       "isVisible": true,
       "label": "Category",
       "notation": "standard",
-      "onOptionChange": "{{ jsRecListActions.setCategoryFromTable() }}",
+      "onOptionChange": "",
       "originalId": "category_id",
       "selectOptions": "{{(() => { const tableData = tblRecipeList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\n(apiRecLstGetCategories.data?.categories || []).map(c => ({\n\tlabel: c.name,\n\tvalue: String(c.id)\n}))\n)) : \n(apiRecLstGetCategories.data?.categories || []).map(c => ({\n\tlabel: c.name,\n\tvalue: String(c.id)\n}))\n })()}}",
       "sticky": "left",
@@ -656,7 +650,7 @@
       "allowCellWrapping": false,
       "allowSameOptionsInNewRow": true,
       "columnType": "text",
-      "computedValue": "{{(() => { const tableData = tblRecipeList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (currentRow[\"name\"])) : name })()}}",
+      "computedValue": "{{(() => { const tableData = tblRecipeList.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => ( currentRow.name )) :  currentRow.name  })()}}",
       "currencyCode": "USD",
       "decimals": 0,
       "enableFilter": true,

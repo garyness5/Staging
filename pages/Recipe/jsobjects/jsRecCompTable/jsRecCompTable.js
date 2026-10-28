@@ -553,65 +553,6 @@ export default {
 		return true;
 	},
 
-	rowsForSave() {
-		const rows = this.mergeUpdatedRows();
-
-		return this.normalizeRows(rows)
-			.filter(r => this.hasContent(r))
-			.map((r, index) => {
-			const isDeletedChild =
-						r.component_status === "child_deleted" ||
-						r.child_deleted === true;
-
-			return {
-				recipe_id:
-				Number(appsmith.store.current_recipe_id || 0),
-
-				line_no:
-				index + 1,
-
-				item_type:
-				r.item_type || null,
-
-				ingredient_id:
-				r.item_type === "ingredient"
-				? Number(r.ingredient_id || 0) || null
-				: null,
-
-				child_recipe_id:
-				r.item_type === "recipe"
-				? Number(r.child_recipe_id || 0) || null
-				: null,
-
-				qty:
-				isDeletedChild
-				? (
-					r.saved_qty === "" ||
-					r.saved_qty == null
-					? null
-					: Number(r.saved_qty)
-				)
-				: (
-					r.qty === "" ||
-					r.qty == null
-					? null
-					: Number(r.qty)
-				),
-
-				unit_id:
-				isDeletedChild
-				? Number(r.saved_unit_id || 0) || null
-				: Number(r.unit_id || 0) || null,
-
-				apply_wastage:
-				r.apply_wastage !== false,
-
-				active:
-				r.active !== false
-			};
-		});
-	},
-
 	unitOptions(row) {
 		const unitType = row?.unit_type;
 

@@ -424,6 +424,8 @@ export default {
 	async nextDuplicateName(sourceName) {
 		const baseName = String(sourceName || "").trim();
 
+		if (!baseName) return "";
+
 		const result = await apiRecGetNames.run();
 
 		if (!result?.authenticated || !Array.isArray(result.recipes)) {
@@ -431,14 +433,17 @@ export default {
 		}
 
 		const existing = new Set(
-			result.recipes
-			.map(row =>
-					 String(row.name || "")
-					 .trim()
-					 .toLowerCase()
-					)
+			result.recipes.map(row =>
+												 String(row.name || "").trim().toLowerCase()
+												)
 		);
 
+		// Match Ingredients: keep a unique working name.
+		if (!existing.has(baseName.toLowerCase())) {
+			return baseName;
+		}
+
+		// Only generate a copy name when the name already exists.
 		let candidate = `${baseName} - copy`;
 		let number = 2;
 
