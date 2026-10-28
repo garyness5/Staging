@@ -2,6 +2,8 @@ export default {
 	async load() {
 		await storeValue("recListPageReady", false);
 
+		await removeValue("RecListBatchPending");
+
 		try {
 			const ok = await jsAppInit.init();
 
@@ -18,6 +20,11 @@ export default {
 			) {
 				throw new Error("RecipeList records could not be loaded.");
 			}
+
+			// Server data is now authoritative.
+			// Remove locally confirmed Status overrides from the previous dataset.
+			await storeValue("RecListConfirmedActive", {}, false);
+			await storeValue("RecListStatusSaving", {}, false);
 
 			// Core records are available: the list can be displayed.
 			await storeValue("recListPageReady", true);

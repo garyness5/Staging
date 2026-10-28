@@ -50,6 +50,6 @@
     "name": "apiRecLstGetRecipes",
     "pageId": "RecipeList",
     "runBehaviour": "MANUAL",
-    "userSetOnLoad": false
+    "userSetOnLoad": true
   }
 }

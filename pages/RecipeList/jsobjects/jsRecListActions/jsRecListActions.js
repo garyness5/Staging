@@ -252,32 +252,6 @@ export default {
 	},
 
 	async setActive(row, active) {
-		const recipeId = Number(row?.id || 0);
-
-		if (!Number.isSafeInteger(recipeId) || recipeId <= 0) {
-			showAlert("Invalid Recipe ID.", "error");
-			return false;
-		}
-
-		return await jsRecListBatch.stage(recipeId, {
-			active: active === true
-		});
-	},
-
-	setCategoryFromTable() {
-		const row = tblRecipeList.updatedRow;
-
-		if (!row || row.id == null) return;
-
-		return this.setCategory(
-			row,
-			row.category_id === "" || row.category_id == null
-			? null
-			: Number(row.category_id)
-		);
-	},
-
-	async setCategory(row, categoryId) {
 		const recipeId = Number(row?.id);
 
 		if (!Number.isSafeInteger(recipeId) || recipeId <= 0) {
@@ -285,25 +259,146 @@ export default {
 			return false;
 		}
 
-		const normalizedCategoryId =
-					categoryId === null ||
-					categoryId === undefined ||
-					categoryId === ""
-		? null
-		: Number(categoryId);
+		const savedRow = (apiRecLstGetRecipes.data?.recipes || [])
+		.find(r => Number(r.id) === recipeId);
 
-		if (
-			normalizedCategoryId !== null &&
-			(!Number.isSafeInteger(normalizedCategoryId) ||
-			 normalizedCategoryId <= 0)
-		) {
-			showAlert("Invalid Recipe Category.", "error");
+		if (!savedRow) {
+			showAlert("Recipe could not be identified.", "error");
 			return false;
 		}
 
-		return await jsRecListBatch.stage(recipeId, {
-			category_id: normalizedCategoryId
-		});
+		const requestedActive = active === true;
+
+		if (typeof active !== "boolean") {
+			showAlert("Invalid Recipe Status.", "error");
+			return false;
+		}
+
+		const key = String(recipeId);
+		const confirmed = appsmith.store.RecListConfirmedActive || {};
+		const previousActive =
+					Object.prototype.hasOwnProperty.call(confirmed, key)
+		? confirmed[key]
+		: savedRow.active;
+
+		if (requestedActive === previousActive) {
+			return true;
+		}
+
+		if (appsmith.store.RecListRefreshing === true) {
+			showAlert(
+				"Please wait for RecipeList to finish refreshing.",
+				"warning"
+			);
+			return false;
+		}
+
+		const pending = appsmith.store.RecListStatusSaving || {};
+
+		if (pending[key]) {
+			showAlert("This Recipe is already being updated.", "warning");
+			return false;
+		}
+
+		await storeValue(
+			"RecListStatusSaving",
+			{ ...pending, [key]: true },
+			false
+		);
+
+		try {
+			const result = await apiRecLstSetActive.run({
+				recipe_id: recipeId,
+				active: requestedActive
+			});
+
+			if (
+				result?.authenticated !== true ||
+				Number(result.recipe_id) !== recipeId ||
+				typeof result.active !== "boolean"
+			) {
+				throw new Error("Recipe Status was not confirmed.");
+			}
+
+			await storeValue(
+				"RecListConfirmedActive",
+				{
+					...(appsmith.store.RecListConfirmedActive || {}),
+					[key]: result.active
+				},
+				false
+			);
+
+			return true;
+
+		} catch (error) {
+			showAlert(
+				"Recipe Status could not be saved. The previous Status has been restored.",
+				"error"
+			);
+
+			return false;
+
+		} finally {
+			const current = {
+				...(appsmith.store.RecListStatusSaving || {})
+			};
+
+			delete current[key];
+
+			await storeValue(
+				"RecListStatusSaving",
+				current,
+				false
+			);
+		}
+	},
+
+	async refresh() {
+		const saving = appsmith.store.RecListStatusSaving || {};
+
+		if (Object.values(saving).some(value => value === true)) {
+			showAlert(
+				"Please wait for the Recipe Status update to finish.",
+				"warning"
+			);
+			return false;
+		}
+
+		if (appsmith.store.RecListRefreshing === true) {
+			return false;
+		}
+
+		await storeValue("RecListRefreshing", true, false);
+
+		try {
+			const result = await apiRecLstGetRecipes.run();
+
+			if (
+				result?.authenticated !== true ||
+				!Array.isArray(result?.recipes)
+			) {
+				throw new Error("RecipeList refresh failed.");
+			}
+
+			await storeValue("RecListConfirmedActive", {}, false);
+
+			showAlert("RecipeList refreshed.", "success");
+			return true;
+
+		} catch (error) {
+			console.error("RecipeList refresh failed:", error);
+
+			showAlert(
+				"Unable to refresh RecipeList. Please try again.",
+				"error"
+			);
+
+			return false;
+
+		} finally {
+			await storeValue("RecListRefreshing", false, false);
+		}
 	},
 
 	searchText() {
@@ -324,7 +419,23 @@ export default {
 		const search = this.searchText();
 		const status = this.statusFilter();
 
-		return jsRecListBatch.workingRows()
+		return (apiRecLstGetRecipes.data?.recipes || [])
+			.map(row => {
+			const confirmed =
+						appsmith.store.RecListConfirmedActive || {};
+
+			const key = String(row.id);
+
+			return {
+				...row,
+				active: Object.prototype.hasOwnProperty.call(
+					confirmed,
+					key
+				)
+				? confirmed[key]
+				: row.active
+			};
+		})
 			.filter(row => {
 			if (status === "active" && row.active !== true) return false;
 			if (status === "inactive" && row.active !== false) return false;
