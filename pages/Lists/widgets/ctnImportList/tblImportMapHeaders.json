@@ -83,6 +83,9 @@
     },
     {
       "key": "primaryColumns.map_to.selectOptions"
+    },
+    {
+      "key": "isVisible"
     }
   ],
   "dynamicPropertyPathList": [
@@ -94,6 +97,9 @@
     },
     {
       "key": "primaryColumns.map_to.onOptionChange"
+    },
+    {
+      "key": "isVisible"
     }
   ],
   "dynamicTriggerPathList": [
@@ -108,14 +114,14 @@
   "inlineEditingSaveOption": "CUSTOM",
   "isLoading": false,
   "isSortable": true,
-  "isVisible": true,
+  "isVisible": "{{ appsmith.store.listsPageReady === true }}",
   "isVisibleDownload": true,
   "isVisibleFilters": false,
   "isVisiblePagination": false,
   "isVisibleSearch": true,
   "key": "j66biknh1w",
   "label": "Data",
-  "leftColumn": 1,
+  "leftColumn": 0,
   "minWidth": 450,
   "mobileBottomRow": 27,
   "mobileLeftColumn": 0,

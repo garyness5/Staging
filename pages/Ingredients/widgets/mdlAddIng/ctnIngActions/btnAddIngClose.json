@@ -47,7 +47,7 @@
   "resetFormOnClick": false,
   "responsiveBehavior": "hug",
   "rightColumn": 36,
-  "text": "Close",
+  "text": "Cancel",
   "tooltip": "Return to Ingredient List",
   "topRow": 2,
   "type": "BUTTON_WIDGET",

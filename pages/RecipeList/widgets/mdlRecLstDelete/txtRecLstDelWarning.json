@@ -2,7 +2,7 @@
   "animateLoading": true,
   "borderColor": "#d4d4d8",
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
-  "bottomRow": 40,
+  "bottomRow": 16,
   "dynamicBindingPathList": [
     {
       "key": "truncateButtonColor"
@@ -34,8 +34,8 @@
   "mobileRightColumn": 20,
   "mobileTopRow": 6,
   "needsErrorInfo": false,
-  "originalBottomRow": 16,
-  "originalTopRow": 8,
+  "originalBottomRow": 40,
+  "originalTopRow": 32,
   "overflow": "NONE",
   "parentColumnSpace": 6.9375,
   "parentId": "8uevqmxa6a",
@@ -47,7 +47,7 @@
   "text": "{{\n  \"This Recipe will no longer be available for use. This action cannot be undone.\\n\\nDo you want to delete the Recipe?\"\n}}",
   "textAlign": "LEFT",
   "textColor": "#231F20",
-  "topRow": 32,
+  "topRow": 8,
   "truncateButtonColor": "{{appsmith.theme.colors.primaryColor}}",
   "type": "TEXT_WIDGET",
   "version": 1,

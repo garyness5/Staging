@@ -218,7 +218,7 @@ export default {
 
 		if (!saved?.purchase_unit_id) return false;
 
-		const units = apiIngGetUnits.data?.units || [];
+		const units = apiIngGetIngredientLookups.data?.units || [];
 
 		const oldUnit = units.find(
 			u => Number(u.id) === Number(saved.purchase_unit_id)
@@ -342,7 +342,7 @@ export default {
 				const menuCount = Number(impact.menu_count || 0);
 
 				if (recipeCount + dishCount + menuCount > 0) {
-					const units = apiIngGetUnits.data?.units || [];
+					const units = apiIngGetIngredientLookups.data?.units || [];
 
 					const saved = (
 						apiGetMyIngredients.data?.ingredients || []
@@ -990,7 +990,7 @@ export default {
 
 	purchaseUnitOptions() {
 		return (
-			apiIngGetUnits.data?.units || []
+			apiIngGetIngredientLookups.data?.units || []
 		).map(u => ({
 			label: u.abbreviation,
 			value: String(u.id)

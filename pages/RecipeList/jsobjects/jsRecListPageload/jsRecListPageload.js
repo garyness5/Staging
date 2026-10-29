@@ -1,7 +1,6 @@
 export default {
 	async load() {
 		await storeValue("recListPageReady", false);
-
 		await removeValue("RecListBatchPending");
 
 		try {
@@ -12,42 +11,34 @@ export default {
 				return false;
 			}
 
-			const result = await apiRecLstGetRecipes.run();
+			const [recipesResult, categoriesResult] = await Promise.allSettled([
+				apiRecLstGetRecipes.run(),
+				apiRecLstGetCategories.run()
+			]);
 
 			if (
-				result?.authenticated !== true ||
-				!Array.isArray(result?.recipes)
+				recipesResult.status !== "fulfilled" ||
+				recipesResult.value?.authenticated !== true ||
+				!Array.isArray(recipesResult.value?.recipes)
 			) {
 				throw new Error("RecipeList records could not be loaded.");
 			}
 
-			// Server data is now authoritative.
-			// Remove locally confirmed Status overrides from the previous dataset.
 			await storeValue("RecListConfirmedActive", {}, false);
 			await storeValue("RecListStatusSaving", {}, false);
 
-			// Core records are available: the list can be displayed.
-			await storeValue("recListPageReady", true);
-
-			// Categories are optional supporting data.
-			try {
-				const categoryResult = await apiRecLstGetCategories.run();
-
-				if (
-					categoryResult?.authenticated !== true ||
-					!Array.isArray(categoryResult?.categories)
-				) {
-					console.warn(
-						"RecipeList: Category reference data unavailable.",
-						categoryResult
-					);
-				}
-			} catch (categoryError) {
+			if (
+				categoriesResult.status !== "fulfilled" ||
+				categoriesResult.value?.authenticated !== true ||
+				!Array.isArray(categoriesResult.value?.categories)
+			) {
 				console.warn(
-					"RecipeList: Category loading failed.",
-					categoryError
+					"RecipeList: Category reference data unavailable.",
+					categoriesResult
 				);
 			}
+
+			await storeValue("recListPageReady", true);
 
 			return true;
 
@@ -63,5 +54,5 @@ export default {
 
 			return false;
 		}
-	},
+	}
 };

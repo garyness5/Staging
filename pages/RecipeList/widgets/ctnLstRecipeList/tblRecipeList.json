@@ -78,7 +78,7 @@
   "customIsLoading": false,
   "customIsLoadingValue": "",
   "defaultPageSize": 0,
-  "defaultSelectedRowIndex": 0,
+  "defaultSelectedRowIndex": "{{\njsRecListActions.filteredRows().findIndex(\n\trow => Number(row.id) === Number(appsmith.store.RecList_selected_id)\n)\n}}",
   "defaultSelectedRowIndices": [
     0
   ],
@@ -167,6 +167,9 @@
     },
     {
       "key": "primaryColumns.category_id.selectOptions"
+    },
+    {
+      "key": "defaultSelectedRowIndex"
     }
   ],
   "dynamicPropertyPathList": [
@@ -186,6 +189,9 @@
   "dynamicTriggerPathList": [
     {
       "key": "primaryColumns.active.onCheckChange"
+    },
+    {
+      "key": "onRowSelected"
     }
   ],
   "enableClientSideSearch": true,
@@ -213,7 +219,7 @@
   "multiRowSelection": false,
   "needsErrorInfo": false,
   "oddRowColor": "#f8fafc",
-  "onRowSelected": "{{}}",
+  "onRowSelected": "{{ storeValue(\"RecList_selected_id\", tblRecipeList.selectedRow?.id ?? null) }}",
   "parentColumnSpace": 19.8125,
   "parentId": "3aja4g2vvi",
   "parentRowSpace": 10,

@@ -59,7 +59,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 60,
   "serverSideFiltering": false,
-  "sourceData": "{{\n(apiIngGetSuppliers.data?.helper_items || []).length\n? apiIngGetSuppliers.data.helper_items.map(x => ({\n\tlabel: x.name,\n\tvalue: String(x.id)\n}))\n: [{ label: \"\", value: \"\" }]\n}}",
+  "sourceData": "{{\n(apiIngGetIngredientLookups.data?.suppliers || []).length\n? apiIngGetIngredientLookups.data.suppliers.map(x => ({\n\tlabel: x.name,\n\tvalue: String(x.id)\n}))\n: [{ label: \"\", value: \"\" }]\n}}",
   "topRow": 13,
   "type": "SELECT_WIDGET",
   "version": 1,

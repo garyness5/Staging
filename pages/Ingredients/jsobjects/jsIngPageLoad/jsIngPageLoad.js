@@ -6,24 +6,29 @@ export default {
 			const ok = await jsAppInit.init();
 			if (!ok) return false;
 
-			const lists = await apiIngGetHelperLists.run();
-
-			if (lists?.authenticated !== true) {
-				throw new Error("Unable to load helper lists.");
-			}
-
 			const results = await Promise.all([
 				apiGetMyIngredients.run(),
-				apiIngGetCategories.run(),
-				apiIngGetSuppliers.run(),
-				apiIngGetPackaging.run(),
-				apiIngGetAllergens.run(),
-				apiIngGetDietTags.run(),
-				apiIngGetUnits.run()
+				apiIngGetIngredientLookups.run()
 			]);
 
 			if (results.some(result => result?.authenticated !== true)) {
 				throw new Error("Ingredients data request failed.");
+			}
+
+			const lookups = results[1];
+
+			const required = [
+				"helper_lists",
+				"categories",
+				"suppliers",
+				"packaging",
+				"allergens",
+				"diet_tags",
+				"units"
+			];
+
+			if (required.some(key => !Array.isArray(lookups[key]))) {
+				throw new Error("Ingredients lookup response is incomplete.");
 			}
 
 			await storeValue("ingPageReady", true);
@@ -44,5 +49,22 @@ export default {
 
 	isReady() {
 		return appsmith.store.ingPageReady === true;
+	},
+
+	async measureLoad() {
+		const start = performance.now();
+
+		const success = await this.load();
+
+		const elapsed = Math.round(performance.now() - start);
+
+		console.log(`Ingredients load: ${elapsed} ms (${(elapsed / 1000).toFixed(2)} seconds)`);
+
+		showAlert(
+			`Ingredients load: ${(elapsed / 1000).toFixed(2)} seconds`,
+			success ? "success" : "error"
+		);
+
+		return elapsed;
 	}
 };

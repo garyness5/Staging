@@ -136,7 +136,7 @@ export default {
 		.trim()
 		.toLowerCase();
 
-		return (apiIngGetUnits.data?.units || [])
+		return (apiIngGetIngredientLookups.data?.units || [])
 			.filter(u =>
 							String(u.unit_type || "")
 							.trim()

@@ -253,6 +253,7 @@ export default {
 
 	async setActive(row, active) {
 		const recipeId = Number(row?.id);
+		await storeValue("RecList_selected_id", recipeId);
 
 		if (!Number.isSafeInteger(recipeId) || recipeId <= 0) {
 			showAlert("Invalid Recipe ID.", "error");
