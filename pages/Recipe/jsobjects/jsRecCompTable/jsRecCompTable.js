@@ -15,7 +15,7 @@ export default {
 	},
 
 	componentUnits() {
-		return (apiRecGetUnits.data?.units || [])
+		return (appsmith.store.rec_units || [])
 			.map(unit => ({
 			...unit,
 			id: Number(unit.id),

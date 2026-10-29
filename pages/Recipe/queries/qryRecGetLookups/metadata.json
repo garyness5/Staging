@@ -1,6 +1,6 @@
 {
-  "gitSyncId": "6ad02e5d7089041c6d575f1b_0427b0de-d2a9-43f0-be04-cbda9e35e585",
-  "id": "Recipe_apiRecGetUnits",
+  "gitSyncId": "6ad02e5d7089041c6d575f1b_78f27ab4-7c66-4c42-b3e5-32412ddf5b52",
+  "id": "Recipe_qryRecGetLookups",
   "pluginId": "restapi-plugin",
   "pluginType": "API",
   "unpublishedAction": {
@@ -11,7 +11,7 @@
           "value": "application/json"
         }
       ],
-      "body": "{{\n{\n\toperation: \"my_units\"\n}\n}}",
+      "body": "{\n\t\"operation\": \"my_recipe_lookups\"\n}",
       "bodyFormData": [],
       "encodeParamsToggle": true,
       "formData": {
@@ -45,14 +45,11 @@
     "dynamicBindingPathList": [
       {
         "key": "headers[0].value"
-      },
-      {
-        "key": "body"
       }
     ],
-    "name": "apiRecGetUnits",
+    "name": "qryRecGetLookups",
     "pageId": "Recipe",
-    "runBehaviour": "MANUAL",
-    "userSetOnLoad": true
+    "runBehaviour": "AUTOMATIC",
+    "userSetOnLoad": false
   }
 }

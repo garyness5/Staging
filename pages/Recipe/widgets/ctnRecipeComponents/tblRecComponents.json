@@ -82,7 +82,7 @@
     "qty": 77,
     "unit_abbreviation": 60,
     "unit_id": 86,
-    "wastage_percent": 95
+    "wastage_percent": 96
   },
   "compactMode": "SHORT",
   "customIsLoading": false,
@@ -1354,7 +1354,7 @@
       "allowSameOptionsInNewRow": true,
       "cellBackground": "",
       "columnType": "text",
-      "computedValue": "{{(() => { const tableData = tblRecComponents.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (currentRow[\"wastage_percent\"])) : wastage_percent })()}}",
+      "computedValue": "{{(() => { const tableData = tblRecComponents.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\n  Number(currentRow.wastage_percent || 0) > 0\n    ? Number(currentRow.wastage_percent)\n    : \"\"\n)) : \n  Number(currentRow.wastage_percent || 0) > 0\n    ? Number(currentRow.wastage_percent)\n    : \"\"\n })()}}",
       "currencyCode": "USD",
       "decimals": 0,
       "enableFilter": true,

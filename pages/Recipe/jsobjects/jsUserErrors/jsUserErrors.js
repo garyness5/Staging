@@ -1,5 +1,44 @@
 export default {
-	mappings: [],
+	mappings: [
+		{
+			match: "action execution timed out",
+			message:
+			"Savveyra could not confirm whether the action was completed. " +
+			"This may be caused by an interrupted internet connection " +
+			"or a temporary server problem. " +
+			"Please check your connection before trying again."
+		},
+		{
+			match: "network request failed",
+			message:
+			"Unable to connect to Savveyra. " +
+			"Please check your internet connection and try again."
+		},
+		{
+			match: "failed to fetch",
+			message:
+			"Unable to connect to Savveyra. " +
+			"Please check your internet connection and try again."
+		},
+		{
+			match: "networkerror",
+			message:
+			"A connection problem occurred. " +
+			"Please check your internet connection and try again."
+		},
+		{
+			match: "jwt expired",
+			message:
+			"Your session has expired. " +
+			"Please sign in again."
+		},
+		{
+			match: "invalid jwt",
+			message:
+			"Your session is no longer valid. " +
+			"Please sign in again."
+		}
+	],
 
 	rawMessage(error) {
 		return String(

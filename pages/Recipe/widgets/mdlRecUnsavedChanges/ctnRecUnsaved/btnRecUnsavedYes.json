@@ -47,7 +47,7 @@
   "resetFormOnClick": false,
   "responsiveBehavior": "hug",
   "rightColumn": 63,
-  "text": "Yes",
+  "text": "Save",
   "tooltip": "Save then Close",
   "topRow": 2,
   "type": "BUTTON_WIDGET",

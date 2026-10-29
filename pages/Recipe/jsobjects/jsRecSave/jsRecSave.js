@@ -1,6 +1,18 @@
 export default {
 	pendingAction: null,
 
+	async initializeCreateRequest() {
+		const requestId = crypto.randomUUID();
+
+		await storeValue(
+			"rec_create_request_id",
+			requestId,
+			false
+		);
+
+		return requestId;
+	},
+
 	async safeReset(widgetName) {
 		try {
 			await resetWidget(widgetName, true);
@@ -178,6 +190,13 @@ export default {
 							appsmith.store.current_recipe_id || 0
 						) === 0;
 
+			if (
+				wasNew &&
+				!appsmith.store.rec_create_request_id
+			) {
+				await this.initializeCreateRequest();
+			}
+
 			await jsRecCompTable.syncFromTable();
 
 			const snapshot =
@@ -257,9 +276,13 @@ export default {
 				.initializeFromSaved();
 
 			await removeValue(
-				"recipe_save_snapshot"
+				"rec_create_request_id"
 			);
 
+			await removeValue(
+				"recipe_save_snapshot"
+			);
+			
 			/*
 		 * Clear any completed Unit-change
 		 * confirmation state.
@@ -317,6 +340,8 @@ export default {
 			return false;
 		}
 
+		await storeValue("RecList_returning_from_recipe", true, false);
+
 		navigateTo("RecipeList");
 
 		return true;
@@ -334,6 +359,8 @@ export default {
 			mdlRecUnsavedChanges.name
 		);
 
+		await storeValue("RecList_returning_from_recipe", true, false);
+
 		navigateTo(
 			"RecipeList"
 		);
@@ -346,6 +373,8 @@ export default {
 			mdlRecUnsavedChanges.name
 		);
 
+		await storeValue("RecList_returning_from_recipe", true, false);
+
 		navigateTo(
 			"RecipeList"
 		);
@@ -354,6 +383,7 @@ export default {
 	},
 
 	async startNewRecipe() {
+		await this.initializeCreateRequest();
 		await storeValue(
 			"current_recipe_id",
 			0
@@ -511,6 +541,8 @@ export default {
 				jsRecCompTable.makeDraftId()
 			}))
 		};
+
+		await this.initializeCreateRequest();
 
 		await storeValue(
 			"current_recipe_id",

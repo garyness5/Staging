@@ -1,76 +1,41 @@
 export default {
 
-	async getHelperItems(listCode) {
-		const lists =
-			apiRecGetHelperLists.data?.helper_lists || [];
 
-		const list = lists.find(
-			row => row.list_code === listCode
-		);
+	async loadSecureHelpers() {
+		const response = await qryRecGetLookups.run();
 
-		if (!list) {
-			throw new Error(
-				`Missing helper list: ${listCode}`
-			);
-		}
 
-		const response = await apiRecGetHelperItems.run({
-			list_id: Number(list.id)
-		});
 
 		if (
 			response?.authenticated !== true ||
-			!Array.isArray(response.helper_items)
+			!Array.isArray(response.recipe_categories) ||
+			!Array.isArray(response.diet_tags) ||
+			!Array.isArray(response.ingredient_categories) ||
+			!Array.isArray(response.allergens) ||
+			!Array.isArray(response.suppliers) ||
+			!Array.isArray(response.packaging) ||
+			!Array.isArray(response.units)
 		) {
-			throw new Error(
-				`Unable to load ${listCode}`
-			);
+			throw new Error("Unable to load Recipe lookups");
 		}
 
-		return response.helper_items
-			.filter(row => row.active === true)
-			.map(row => ({
-				id: Number(row.id),
-				name: row.name
-			}));
-	},
-
-	async loadSecureHelpers() {
-		const lists = await apiRecGetHelperLists.run();
-
-		if (
-			lists?.authenticated !== true ||
-			!Array.isArray(lists.helper_lists)
-		) {
-			throw new Error(
-				"Unable to load Recipe helper lists"
-			);
-		}
-
-		const [
-			categories,
-			dietTags,
-			ingCategories,
-			ingAllergens,
-			ingSuppliers,
-			ingPackaging
-		] = await Promise.all([
-			this.getHelperItems("recipe_category"),
-			this.getHelperItems("diet_tag"),
-			this.getHelperItems("ingredient_category"),
-			this.getHelperItems("allergen"),
-			this.getHelperItems("supplier"),
-			this.getHelperItems("packaging")
-		]);
+		const activeItems = rows =>
+		rows
+		.filter(row => row.active === true)
+		.map(row => ({
+			id: Number(row.id),
+			name: row.name
+		}));
 
 		await Promise.all([
-			storeValue("rec_categories", categories),
-			storeValue("rec_diet_tags", dietTags),
-			storeValue("rec_ing_categories", ingCategories),
-			storeValue("rec_ing_allergens", ingAllergens),
-			storeValue("rec_ing_diet_tags", dietTags),
-			storeValue("rec_ing_suppliers", ingSuppliers),
-			storeValue("rec_ing_packaging", ingPackaging)
+			storeValue("rec_categories", activeItems(response.recipe_categories)),
+			storeValue("rec_diet_tags", activeItems(response.diet_tags)),
+			storeValue("rec_ing_categories", activeItems(response.ingredient_categories)),
+			storeValue("rec_ing_allergens", activeItems(response.allergens)),
+			storeValue("rec_ing_diet_tags", activeItems(response.diet_tags)),
+			storeValue("rec_ing_suppliers", activeItems(response.suppliers)),
+			storeValue("rec_ing_packaging", activeItems(response.packaging)),
+			storeValue("rec_units", response.units)
 		]);
 
 		return true;
@@ -97,35 +62,23 @@ export default {
 			);
 
 			const needsDetail =
-				mode !== "add" && recipeId > 0;
+						mode !== "add" && recipeId > 0;
 
 			let detail = null;
 
 			try {
-				const [
-					helpersLoaded,
-					components,
-					units,
-					recipeDetail
-				] = await Promise.all([
+				const [helpersLoaded, components, recipeDetail] = await Promise.all([
 					this.loadSecureHelpers(),
 					apiRecGetComponentItems.run(),
-					apiRecGetUnits.run(),
-					needsDetail
-						? apiRecGetDetail.run()
-						: Promise.resolve(null)
+					needsDetail ? apiRecGetDetail.run() : Promise.resolve(null)
 				]);
 
 				if (
 					helpersLoaded !== true ||
 					components?.authenticated !== true ||
-					!Array.isArray(components.component_items) ||
-					units?.authenticated !== true ||
-					!Array.isArray(units.units)
+					!Array.isArray(components.component_items)
 				) {
-					throw new Error(
-						"Invalid Recipe reference data"
-					);
+					throw new Error("Invalid Recipe reference data");
 				}
 
 				detail = recipeDetail;
@@ -195,7 +148,7 @@ export default {
 				await resetWidget("rteRecNotes", true);
 
 				const duplicated =
-					await jsRecSave.duplicateRecipe();
+							await jsRecSave.duplicateRecipe();
 
 				if (duplicated !== true) {
 					return false;

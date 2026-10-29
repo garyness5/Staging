@@ -24,6 +24,23 @@ export default {
 				throw new Error("RecipeList records could not be loaded.");
 			}
 
+			const returningFromRecipe =
+						appsmith.store.RecList_returning_from_recipe === true;
+
+			await removeValue("RecList_returning_from_recipe");
+
+			if (!returningFromRecipe) {
+				const firstRecipeId = Number(
+					recipesResult.value.recipes[0]?.id || 0
+				);
+
+				await storeValue(
+					"RecList_selected_id",
+					firstRecipeId > 0 ? firstRecipeId : null,
+					false
+				);
+			}
+
 			await storeValue("RecListConfirmedActive", {}, false);
 			await storeValue("RecListStatusSaving", {}, false);
 

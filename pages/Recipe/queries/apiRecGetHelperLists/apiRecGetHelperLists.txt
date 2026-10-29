@@ -1,5 +1,0 @@
-{{
-{
-	operation: "my_helper_lists"
-}
-}}

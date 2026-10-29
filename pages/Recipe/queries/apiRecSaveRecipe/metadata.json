@@ -11,7 +11,7 @@
           "value": "application/json"
         }
       ],
-      "body": "{{ {\n\toperation: \"my_recipe_save\",\n\trecipe_id: Number(appsmith.store.current_recipe_id || 0) || null,\n\theader: jsRecSave.headerPayload(),\n\tdiet_tags: jsRecSave.dietTagsPayload(),\n\tcomponents: jsRecSave.componentsPayload(),\n\tclear_downstream_units:\n\tappsmith.store.recipe_unit_change_confirmed === true\n} }}",
+      "body": "{{ {\n\toperation: \"my_recipe_save\",\n\trecipe_id: 11,\n\tcreate_request_id: null,\n\theader: {\n\t\tname: \"UNAUTHORIZED TENANT A UPDATE TEST\"\n\t},\n\tdiet_tags: [],\n\tcomponents: [],\n\tclear_downstream_units: false\n} }}",
       "bodyFormData": [],
       "encodeParamsToggle": true,
       "formData": {

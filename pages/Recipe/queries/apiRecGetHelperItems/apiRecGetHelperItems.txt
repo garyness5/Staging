@@ -1,6 +1,0 @@
-{{
-{
-	operation: "my_helper_items",
-	list_id: Number(this.params.list_id)
-}
-}}
