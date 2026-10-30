@@ -64,6 +64,26 @@ export default {
 			const needsDetail =
 						mode !== "add" && recipeId > 0;
 
+			const workspaceUserId = String(
+				appsmith.store.recipe_workspace_user_id || ""
+			);
+
+			const workspaceRecipeId = Number(
+				appsmith.store.recipe_workspace_recipe_id ?? -1
+			);
+
+			const currentUserId = String(
+				appsmith.store.workspace_owner_user_id || ""
+			);
+
+			const hasMatchingWorkspace =
+						mode === "edit" &&
+						currentUserId !== "" &&
+						workspaceUserId === currentUserId &&
+						workspaceRecipeId === recipeId &&
+						appsmith.store.recipe_workspace != null &&
+						appsmith.store.recipe_baseline != null;
+
 			let detail = null;
 
 			try {
@@ -95,6 +115,21 @@ export default {
 				);
 
 				return false;
+			}
+
+			if (hasMatchingWorkspace) {
+				await storeValue("recPageReady", true);
+
+				await resetWidget("inpRecName", true);
+				await resetWidget("selRecCategory", true);
+				await resetWidget("chkRecActive", true);
+				await resetWidget("inpRecYieldQty", true);
+				await resetWidget("selRecYieldUnit", true);
+				await resetWidget("inpRecExtraPercent", true);
+				await resetWidget("msRecDietTags", true);
+				await resetWidget("rteRecNotes", true);
+
+				return true;
 			}
 
 			await jsRecWorkspace.clear();
@@ -161,6 +196,17 @@ export default {
 
 			await removeValue("Recipe_open_mode");
 			await storeValue("Recipe_mode", "edit");
+
+			await storeValue(
+				"recipe_workspace_user_id",
+				String(appsmith.store.workspace_owner_user_id)
+			);
+
+			await storeValue(
+				"recipe_workspace_recipe_id",
+				recipeId
+			);
+
 			await storeValue("recPageReady", true);
 
 			return true;

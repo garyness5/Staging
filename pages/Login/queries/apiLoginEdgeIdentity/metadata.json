@@ -20,7 +20,7 @@
       "headers": [
         {
           "key": "Authorization",
-          "value": "Bearer {{appsmith.store.savveyra_access_token}}"
+          "value": "Bearer {{this.params?.access_token || appsmith.store.savveyra_access_token}}"
         }
       ],
       "httpMethod": "POST",

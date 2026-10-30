@@ -47,19 +47,66 @@ export default {
 	},
 
 	async login() {
-		await this.clearSession();
-		await this.clearPreviousTenantWorkspace();
-
 		try {
-			const result = await apiLoginAuth.run();
+			// Authenticate without disturbing the existing workspace.
+			const result = await apiLoginAuth.run().catch(error => {
+				const response = apiLoginAuth.data;
+
+				if (
+					response?.error_code === "invalid_credentials" ||
+					response?.error?.error_code === "invalid_credentials"
+				) {
+					throw {
+						error_code: "invalid_credentials",
+						message: "Invalid login credentials"
+					};
+				}
+
+				throw error;
+			});
 
 			if (!result?.access_token || !result?.refresh_token) {
 				jsUserErrors.show(
 					"invalid_credentials",
 					"There is an error in the email and/or password you entered. Please try again."
 				);
-
 				return { success: false };
+			}
+
+			// Verify the incoming identity using its own access token.
+			const identity = await apiLoginEdgeIdentity.run({
+				access_token: result.access_token
+			});
+
+			if (
+				identity?.authenticated !== true ||
+				!identity?.user_id ||
+				!identity?.client_id
+			) {
+				showAlert(
+					"Unable to verify the account. Login was not completed.",
+					"error"
+				);
+				return { success: false };
+			}
+
+			const incomingUserId = String(identity.user_id);
+
+			const previousUserId = String(
+				appsmith.store.workspace_owner_user_id ||
+				appsmith.store.current_user_id ||
+				""
+			);
+
+			// An existing workspace without a verified owner cannot be reused.
+			const sameUser =
+						previousUserId !== "" &&
+						previousUserId === incomingUserId;
+
+			if (!sameUser) {
+				// Different user, or unowned legacy workspace.
+				// Clear ALL Appsmith store data, not just Recipe keys.
+				await clearStore();
 			}
 
 			const expiresAt =
@@ -83,19 +130,28 @@ export default {
 				true
 			);
 
+			// Workspace ownership is the verified Supabase Auth user.
+			await storeValue(
+				"workspace_owner_user_id",
+				incomingUserId,
+				true
+			);
+
+			await storeValue("current_user_id", incomingUserId);
+			await storeValue("current_client_id", identity.client_id);
+			await storeValue("current_user_name", identity.user_name);
+			await storeValue("current_client_name", identity.client_name);
+
 			return {
 				success: true,
+				sameUser,
 				expiresAt: new Date(expiresAt).toISOString()
 			};
 
 		} catch (error) {
-			await this.clearSession();
-			await this.clearPreviousTenantWorkspace();
-
+			// Authentication failure must not destroy existing unsaved work.
 			const rawError = jsUserErrors.rawMessage(error);
 
-			// Invalid credentials may arrive as a rejected Appsmith API call
-			// without exposing the Supabase error body to JavaScript.
 			if (
 				/invalid_credentials|invalid login credentials/i.test(rawError) ||
 				Number(error?.statusCode || error?.status) === 400
@@ -104,7 +160,7 @@ export default {
 			} else {
 				jsUserErrors.show(
 					error,
-					"There is an error in the email and/or password you entered. Please try again."
+					"Unable to complete login. Please try again."
 				);
 			}
 
@@ -113,8 +169,7 @@ export default {
 	},
 
 	async logout() {
-		await this.clearSession();
-		await this.clearPreviousTenantWorkspace();
+		await clearStore();
 
 		showAlert("Logged out successfully.", "success");
 		return true;
@@ -148,10 +203,12 @@ export default {
 				expired: Date.now() >= payload.exp * 1000
 			};
 		} catch (error) {
-			return {
-				accessTokenPresent: false,
-				refreshTokenPresent: !!refreshToken
-			};
+			jsUserErrors.show(
+				error,
+				"Unable to complete login. Please try again."
+			);
+
+			return { success: false };
 		}
 	}
 };
