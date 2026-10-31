@@ -1,8 +1,6 @@
 export default {
-
-
 	async loadSecureHelpers() {
-		const response = await qryRecGetLookups.run();
+		const response = await apiRecGetLookups.run();
 
 
 
@@ -64,34 +62,17 @@ export default {
 			const needsDetail =
 						mode !== "add" && recipeId > 0;
 
-			const workspaceUserId = String(
-				appsmith.store.recipe_workspace_user_id || ""
-			);
-
-			const workspaceRecipeId = Number(
-				appsmith.store.recipe_workspace_recipe_id ?? -1
-			);
-
-			const currentUserId = String(
-				appsmith.store.workspace_owner_user_id || ""
-			);
-
-			const hasMatchingWorkspace =
-						mode === "edit" &&
-						currentUserId !== "" &&
-						workspaceUserId === currentUserId &&
-						workspaceRecipeId === recipeId &&
-						appsmith.store.recipe_workspace != null &&
-						appsmith.store.recipe_baseline != null;
-
 			let detail = null;
 
 			try {
-				const [helpersLoaded, components, recipeDetail] = await Promise.all([
-					this.loadSecureHelpers(),
-					apiRecGetComponentItems.run(),
-					needsDetail ? apiRecGetDetail.run() : Promise.resolve(null)
-				]);
+				const [helpersLoaded, components, recipeDetail] =
+							await Promise.all([
+								this.loadSecureHelpers(),
+								apiRecGetComponentItems.run(),
+								needsDetail
+								? apiRecGetDetail.run()
+								: Promise.resolve(null)
+							]);
 
 				if (
 					helpersLoaded !== true ||
@@ -117,7 +98,16 @@ export default {
 				return false;
 			}
 
-			if (hasMatchingWorkspace) {
+			// A page initialization starts from saved truth.
+			// Ordinary token renewal does not invoke this loader.
+			await jsRecWorkspace.clear();
+
+			if (mode === "add" || !recipeId) {
+				await jsRecWorkspace.initializeNew();
+				await jsRecCompTable.clearRows();
+
+				await removeValue("Recipe_open_mode");
+
 				await storeValue("recPageReady", true);
 
 				await resetWidget("inpRecName", true);
@@ -128,28 +118,6 @@ export default {
 				await resetWidget("inpRecExtraPercent", true);
 				await resetWidget("msRecDietTags", true);
 				await resetWidget("rteRecNotes", true);
-
-				return true;
-			}
-
-			await jsRecWorkspace.clear();
-
-			if (mode === "add") {
-				await jsRecWorkspace.initializeNew();
-				await jsRecCompTable.clearRows();
-
-				await removeValue("Recipe_open_mode");
-				await storeValue("recPageReady", true);
-
-				return true;
-			}
-
-			if (!recipeId) {
-				await jsRecWorkspace.initializeNew();
-				await jsRecCompTable.clearRows();
-
-				await removeValue("Recipe_open_mode");
-				await storeValue("recPageReady", true);
 
 				return true;
 			}
@@ -170,6 +138,7 @@ export default {
 			await jsRecWorkspace.initializeFromSaved();
 			await jsRecCompTable.loadFromQuery();
 
+			// Preserve the existing RecipeList Duplicate workflow.
 			if (mode === "duplicate") {
 				await removeValue("Recipe_open_mode");
 
@@ -208,6 +177,17 @@ export default {
 			);
 
 			await storeValue("recPageReady", true);
+
+			// Restore visible header controls from the newly loaded
+			// saved workspace, not from a previous unsaved workspace.
+			await resetWidget("inpRecName", true);
+			await resetWidget("selRecCategory", true);
+			await resetWidget("chkRecActive", true);
+			await resetWidget("inpRecYieldQty", true);
+			await resetWidget("selRecYieldUnit", true);
+			await resetWidget("inpRecExtraPercent", true);
+			await resetWidget("msRecDietTags", true);
+			await resetWidget("rteRecNotes", true);
 
 			return true;
 

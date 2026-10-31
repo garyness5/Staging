@@ -282,7 +282,7 @@ export default {
 			await removeValue(
 				"recipe_save_snapshot"
 			);
-			
+
 			/*
 		 * Clear any completed Unit-change
 		 * confirmation state.
@@ -322,6 +322,90 @@ export default {
 
 			showAlert(
 				jsUserErrors.friendly(error),
+				"error"
+			);
+
+			return false;
+		}
+	},
+
+	async discardRecipe() {
+		const recipeId = Number(
+			appsmith.store.current_recipe_id || 0
+		);
+
+		const mode = String(
+			appsmith.store.Recipe_mode || ""
+		);
+
+		try {
+			if (recipeId > 0) {
+				// Existing saved Recipe:
+				// restore current saved Supabase data.
+				const detail = await apiRecGetDetail.run();
+
+				if (
+					detail?.authenticated !== true ||
+					!detail.recipe ||
+					Number(detail.recipe.id) !== recipeId
+				) {
+					showAlert(
+						"Unable to reload the saved Recipe.",
+						"error"
+					);
+
+					return false;
+				}
+
+				await jsRecWorkspace.initializeFromSaved();
+				await jsRecCompTable.loadFromQuery();
+
+			} else if (
+				mode === "duplicate" &&
+				appsmith.store.recipe_duplicate_initial
+			) {
+				// Unsaved duplicate:
+				// restore its original duplicated contents.
+				const initial =
+							jsRecWorkspace.normalizeSnapshot(
+								appsmith.store.recipe_duplicate_initial
+							);
+
+				await jsRecWorkspace.setWorkspace(initial);
+
+				await jsRecCompTable.setRows(
+					initial.components
+				);
+
+			} else {
+				// New Recipe created through Add:
+				// restore a blank workspace.
+				await jsRecWorkspace.initializeNew();
+				await jsRecCompTable.clearRows();
+			}
+
+			await this.safeReset("inpRecName");
+			await this.safeReset("selRecCategory");
+			await this.safeReset("chkRecActive");
+			await this.safeReset("inpRecYieldQty");
+			await this.safeReset("selRecYieldUnit");
+			await this.safeReset("inpRecExtraPercent");
+			await this.safeReset("msRecDietTags");
+			await this.safeReset("rteRecNotes");
+			await this.safeReset("tblRecComponents");
+
+			closeModal(mdlRecDiscardConfirm.name);
+
+			return true;
+
+		} catch (error) {
+			console.error(
+				"Recipe Discard failed:",
+				error
+			);
+
+			showAlert(
+				"Unable to discard Recipe changes.",
 				"error"
 			);
 

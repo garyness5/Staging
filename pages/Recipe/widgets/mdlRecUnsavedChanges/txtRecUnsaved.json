@@ -1,7 +1,7 @@
 {
   "animateLoading": true,
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
-  "bottomRow": 13,
+  "bottomRow": 15,
   "dynamicBindingPathList": [
     {
       "key": "truncateButtonColor"
@@ -11,12 +11,15 @@
     },
     {
       "key": "borderRadius"
+    },
+    {
+      "key": "text"
     }
   ],
   "dynamicHeight": "AUTO_HEIGHT",
   "dynamicTriggerPathList": [],
   "fontFamily": "{{appsmith.theme.fontFamily.appFont}}",
-  "fontSize": "1rem",
+  "fontSize": "0.875rem",
   "fontStyle": "",
   "isLoading": false,
   "isVisible": true,
@@ -30,8 +33,8 @@
   "mobileRightColumn": 20,
   "mobileTopRow": 8,
   "needsErrorInfo": false,
-  "originalBottomRow": 13,
-  "originalTopRow": 8,
+  "originalBottomRow": 15,
+  "originalTopRow": 7,
   "overflow": "NONE",
   "parentColumnSpace": 6.9375,
   "parentId": "qtesy6qkrq",
@@ -40,10 +43,10 @@
   "responsiveBehavior": "fill",
   "rightColumn": 59,
   "shouldTruncate": false,
-  "text": "You have unsaved changes. Do you want to save or discard your changes before closing?",
+  "text": "{{\n  Number(appsmith.store.current_recipe_id || 0) > 0\n    ? \"You have unsaved changes. Do you want to save or discard your changes before closing?\"\n    : String(appsmith.store.Recipe_mode || \"\") === \"duplicate\"\n      ? \"This duplicate has not been saved.<br>  Save will create the duplicate before closing.<br>  Discard will abandon it.<br>  Cancel will return you to the duplicate.\"\n      : \"This Recipe has not been saved.<br>  Save will create the Recipe before closing.<br>  Discard will abandon it.<br>  Cancel will return you to the Recipe.\"\n}}",
   "textAlign": "LEFT",
   "textColor": "#231F20",
-  "topRow": 8,
+  "topRow": 7,
   "truncateButtonColor": "{{appsmith.theme.colors.primaryColor}}",
   "type": "TEXT_WIDGET",
   "version": 1,

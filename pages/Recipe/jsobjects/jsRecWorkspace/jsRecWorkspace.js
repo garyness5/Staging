@@ -327,8 +327,9 @@ export default {
 	},
 
 	async initializeFromSaved() {
-		const saved =
-					this.savedTruth();
+		const saved = this.savedTruth();
+
+		await removeValue("recipe_duplicate_initial");
 
 		await this.setBaseline(saved);
 		await this.setWorkspace(saved);
@@ -337,8 +338,9 @@ export default {
 	},
 
 	async initializeNew() {
-		const empty =
-					this.emptySnapshot();
+		const empty = this.emptySnapshot();
+
+		await removeValue("recipe_duplicate_initial");
 
 		await this.setBaseline(empty);
 		await this.setWorkspace(empty);
@@ -347,11 +349,13 @@ export default {
 	},
 
 	async initializeDuplicate(snapshot) {
-		const value =
-					this.normalizeSnapshot(snapshot);
+		const value = this.normalizeSnapshot(snapshot);
 
-		await this.setBaseline(
-			this.emptySnapshot()
+		await this.setBaseline(this.emptySnapshot());
+
+		await storeValue(
+			"recipe_duplicate_initial",
+			value
 		);
 
 		await this.setWorkspace(value);
@@ -385,13 +389,9 @@ export default {
 	},
 
 	async clear() {
-		await removeValue(
-			"recipe_workspace"
-		);
-
-		await removeValue(
-			"recipe_baseline"
-		);
+		await removeValue("recipe_workspace");
+		await removeValue("recipe_baseline");
+		await removeValue("recipe_duplicate_initial");
 
 		return true;
 	}

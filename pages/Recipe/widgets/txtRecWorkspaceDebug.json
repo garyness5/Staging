@@ -1,0 +1,55 @@
+{
+  "animateLoading": true,
+  "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
+  "bottomRow": 148,
+  "dynamicBindingPathList": [
+    {
+      "key": "truncateButtonColor"
+    },
+    {
+      "key": "fontFamily"
+    },
+    {
+      "key": "borderRadius"
+    },
+    {
+      "key": "text"
+    }
+  ],
+  "dynamicHeight": "AUTO_HEIGHT",
+  "dynamicTriggerPathList": [],
+  "fontFamily": "{{appsmith.theme.fontFamily.appFont}}",
+  "fontSize": "1rem",
+  "fontStyle": "BOLD",
+  "isLoading": false,
+  "isVisible": true,
+  "key": "gjp1n9odt2",
+  "leftColumn": 1,
+  "maxDynamicHeight": 9000,
+  "minDynamicHeight": 4,
+  "minWidth": 450,
+  "mobileBottomRow": 116,
+  "mobileLeftColumn": 1,
+  "mobileRightColumn": 17,
+  "mobileTopRow": 112,
+  "needsErrorInfo": false,
+  "originalBottomRow": 132,
+  "originalTopRow": 112,
+  "overflow": "NONE",
+  "parentColumnSpace": 17.9375,
+  "parentId": "0",
+  "parentRowSpace": 10,
+  "renderMode": "CANVAS",
+  "responsiveBehavior": "fill",
+  "rightColumn": 17,
+  "shouldTruncate": false,
+  "text": "{{\n(() => {\n  const token = String(\n    appsmith.store.savveyra_access_token || \"\"\n  );\n\n  let issuedAt = null;\n  let expiresAt = null;\n  let tokenError = null;\n\n  try {\n    if (token) {\n      const payload = JSON.parse(\n        atob(\n          token.split(\".\")[1]\n            .replace(/-/g, \"+\")\n            .replace(/_/g, \"/\")\n        )\n      );\n\n      issuedAt = payload.iat\n        ? new Date(payload.iat * 1000).toISOString()\n        : null;\n\n      expiresAt = payload.exp\n        ? new Date(payload.exp * 1000).toISOString()\n        : null;\n    }\n  } catch (error) {\n    tokenError = String(error.message);\n  }\n\n  const now = Date.now();\n\n  return JSON.stringify({\n    currentTime: new Date(now).toISOString(),\n    accessTokenPresent: !!token,\n    refreshTokenPresent:\n      !!appsmith.store.savveyra_refresh_token,\n    tokenIssuedAt: issuedAt,\n    tokenExpiresAt: expiresAt,\n    tokenExpired: expiresAt\n      ? now >= Date.parse(expiresAt)\n      : null,\n    minutesUntilExpiry: expiresAt\n      ? Math.round((Date.parse(expiresAt) - now) / 60000)\n      : null,\n    sessionRelatedStoreKeys: Object.keys(\n      appsmith.store\n    ).filter(key =>\n      /token|expir|login|session|auth/i.test(key)\n    ),\n    tokenError: tokenError\n  }, null, 2);\n})()\n}}",
+  "textAlign": "LEFT",
+  "textColor": "#231F20",
+  "topRow": 112,
+  "truncateButtonColor": "{{appsmith.theme.colors.primaryColor}}",
+  "type": "TEXT_WIDGET",
+  "version": 1,
+  "widgetId": "13t616xxzt",
+  "widgetName": "txtRecWorkspaceDebug"
+}

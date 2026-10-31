@@ -1,0 +1,16 @@
+{
+  "gitSyncId": "6ad02e5d7089041c6d575f1b_441c19f6-9791-4811-ad91-320fdf60861b",
+  "id": "Recipe_jsRuntimeDebug",
+  "unpublishedCollection": {
+    "name": "jsRuntimeDebug",
+    "pageId": "Recipe",
+    "pluginId": "js-plugin",
+    "pluginType": "JS",
+    "variables": [
+      {
+        "name": "runtimeId",
+        "value": "Math.random().toString(36).slice(2)"
+      }
+    ]
+  }
+}
