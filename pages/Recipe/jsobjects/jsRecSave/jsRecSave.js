@@ -320,9 +320,14 @@ export default {
 				"recipe_unit_change_confirmed"
 			);
 
-			showAlert(
-				jsUserErrors.friendly(error),
-				"error"
+			const message = [
+				JSON.stringify(apiRecSaveRecipe.data || {}),
+				String(error?.message || "")
+			].join(" ");
+
+			jsUserErrors.show(
+				message,
+				"Unable to save Recipe."
 			);
 
 			return false;

@@ -1,6 +1,13 @@
 export default {
 	mappings: [
 		{
+			match: "RECIPE_CIRCULAR_REFERENCE",
+			message:
+			"This Recipe is already used in one of the selected sub-recipes. " +
+			"Saving it would create a loop where Recipes contain each other. " +
+			"Please remove the conflicting sub-recipe and try again."
+		},
+		{
 			match: "action execution timed out",
 			message:
 			"Savveyra could not confirm whether the action was completed. " +

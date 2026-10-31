@@ -141,6 +141,8 @@ export default {
 			await storeValue("current_client_id", identity.client_id);
 			await storeValue("current_user_name", identity.user_name);
 			await storeValue("current_client_name", identity.client_name);
+			await removeValue("savveyra_last_activity_at");
+			await removeValue("savveyra_session_locked");
 
 			return {
 				success: true,
