@@ -1,5 +1,4 @@
 export default {
-
 	norm(value) {
 		return (value || "")
 			.trim()
@@ -14,6 +13,7 @@ export default {
 
 		return true;
 	},
+
 
 	async saveAdd() {
 		const newName = (inpPLAddName.text || "").trim();
@@ -51,29 +51,65 @@ export default {
 		}
 
 		try {
+			const existing = await apiGetHelperItems.run({
+				list_id: listId
+			});
+
+			if (existing?.authenticated !== true) {
+				showAlert("Unable to check existing items.", "error");
+				return false;
+			}
+
+			const normalizedName = newName.toLowerCase();
+
+			const duplicate = (
+				existing.helper_items || []
+			).some(
+				item =>
+				String(item.name || "")
+				.trim()
+				.toLowerCase() === normalizedName
+			);
+
+			if (duplicate) {
+				showAlert(
+					"Name already exists in this list.",
+					"warning"
+				);
+				return false;
+			}
+
 			const addedItem = await apiAddHelperItem.run({
 				list_id: listId,
 				name: newName
 			});
+
+			if (
+				addedItem?.authenticated !== true ||
+				!addedItem.helper_item_id
+			) {
+				throw new Error(
+					JSON.stringify(addedItem || {})
+				);
+			}
 
 			await apiGetHelperItems.run({
 				list_id: listId
 			});
 
 			if (fromImport) {
-				if (addedItem?.helper_item_id) {
-					await storeValue(
-						"impSelectedSupplierId",
-						String(addedItem.helper_item_id)
-					);
-				}
+				await apiImpGetSuppliers.run();
+
+				await storeValue(
+					"impSelectedSupplierId",
+					String(addedItem.helper_item_id)
+				);
 			}
 
 			resetWidget("inpPLAddName");
 			closeModal("mdlPLAdd");
 
 			showAlert("Item added.", "success");
-
 			return true;
 
 		} catch (error) {
@@ -83,19 +119,22 @@ export default {
 
 			if (
 				message.includes("409") ||
-				message.includes("Name already exists")
+				message.toLowerCase().includes("already exists") ||
+				message.toLowerCase().includes("duplicate")
 			) {
 				showAlert(
 					"Name already exists in this list.",
 					"warning"
 				);
 			} else {
+				console.error("Add helper item failed:", error);
 				showAlert("Unable to add item.", "error");
 			}
 
 			return false;
 		}
 	},
+
 
 	async openRename() {
 		if (!jsPicklistRules.hasSelection()) {

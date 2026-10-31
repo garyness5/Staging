@@ -13,9 +13,16 @@ export default {
 	},
 
 	async init() {
-		await this.clearIdentity();
-
 		try {
+			const workspaceOwner = String(
+				appsmith.store.workspace_owner_user_id || ""
+			);
+
+			if (!workspaceOwner) {
+				showAlert("Please sign in to Savveyra.", "warning");
+				return false;
+			}
+
 			const sessionValid = await jsAuthSession.ensureValid();
 
 			if (!sessionValid) {
@@ -34,27 +41,36 @@ export default {
 				!identity.client_id
 			) {
 				showAlert(
-					"Your Savveyra account is not activated. Please contact the administrator.",
+					"Unable to verify your Savveyra account.",
+					"warning"
+				);
+				return false;
+			}
+
+			const verifiedUserId = String(identity.user_id);
+
+			if (verifiedUserId !== workspaceOwner) {
+				await clearStore();
+
+				showAlert(
+					"The authenticated account has changed. Please sign in again.",
 					"warning"
 				);
 				return false;
 			}
 
 			await storeValue("current_client_id", identity.client_id);
-			await storeValue("current_user_id", identity.user_id);
+			await storeValue("current_user_id", verifiedUserId);
 			await storeValue("current_client_name", identity.client_name);
 			await storeValue("current_user_name", identity.user_name);
 
 			return true;
 
 		} catch (error) {
-			await this.clearIdentity();
-
 			showAlert(
 				"Unable to verify your Savveyra session.",
 				"error"
 			);
-
 			return false;
 		}
 	}

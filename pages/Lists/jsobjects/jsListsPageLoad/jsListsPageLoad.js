@@ -6,7 +6,8 @@ export default {
 			const initialized = await jsAppInit.init();
 
 			if (!initialized) {
-				await jsIngredientImport.clearImportWorkspace();
+				// Keep unsaved Import work for same-user reauthentication.
+				// The page remains unavailable until authentication succeeds.
 				return false;
 			}
 

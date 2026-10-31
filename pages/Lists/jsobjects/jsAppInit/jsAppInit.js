@@ -1,19 +1,39 @@
 export default {
-	async clearTenantState() {
-		await removeValue("current_client_id");
-		await removeValue("current_client_name");
-		await removeValue("current_user_id");
-		await removeValue("current_user_name");
+	async clearIdentity() {
+		const keys = [
+			"current_client_id",
+			"current_client_name",
+			"current_user_id",
+			"current_user_name"
+		];
 
-		return true;
+		for (const key of keys) {
+			await removeValue(key);
+		}
 	},
 
 	async init() {
 		try {
-			const sessionValid = await jsAuthSession.ensureValid();
+			const workspaceOwner = String(
+				appsmith.store.workspace_owner_user_id || ""
+			);
+
+			if (!workspaceOwner) {
+				showAlert(
+					"Please sign in to Savveyra.",
+					"warning"
+				);
+				return false;
+			}
+
+			const sessionValid =
+						await jsAuthSession.ensureValid();
 
 			if (!sessionValid) {
-				await this.clearTenantState();
+				showAlert(
+					"Your Savveyra session has expired. Please sign in again.",
+					"warning"
+				);
 				return false;
 			}
 
@@ -24,36 +44,53 @@ export default {
 				!identity.user_id ||
 				!identity.client_id
 			) {
-				await this.clearTenantState();
+				showAlert(
+					"Unable to verify your Savveyra account.",
+					"warning"
+				);
 				return false;
 			}
 
-			const previousUser = String(
-				appsmith.store.current_user_id || ""
-			);
+			const verifiedUserId = String(identity.user_id);
 
-			const previousClient = String(
-				appsmith.store.current_client_id || ""
-			);
+			if (verifiedUserId !== workspaceOwner) {
+				await clearStore();
 
-			if (
-				(previousUser &&
-				 previousUser !== String(identity.user_id)) ||
-				(previousClient &&
-				 previousClient !== String(identity.client_id))
-			) {
-				await this.clearTenantState();
+				showAlert(
+					"The authenticated account has changed. Please sign in again.",
+					"warning"
+				);
+				return false;
 			}
 
-			await storeValue("current_client_id", identity.client_id);
-			await storeValue("current_client_name", identity.client_name || "");
-			await storeValue("current_user_id", identity.user_id);
-			await storeValue("current_user_name", identity.user_name || "");
+			await storeValue(
+				"current_client_id",
+				identity.client_id
+			);
+
+			await storeValue(
+				"current_user_id",
+				verifiedUserId
+			);
+
+			await storeValue(
+				"current_client_name",
+				identity.client_name
+			);
+
+			await storeValue(
+				"current_user_name",
+				identity.user_name
+			);
 
 			return true;
+
 		} catch (error) {
-			await this.clearTenantState();
-			console.error("Savveyra initialization failed:", error);
+			showAlert(
+				"Unable to verify your Savveyra session.",
+				"error"
+			);
+
 			return false;
 		}
 	}

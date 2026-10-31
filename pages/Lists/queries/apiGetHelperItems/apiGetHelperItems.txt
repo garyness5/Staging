@@ -1,4 +1,4 @@
 {
-  "operation": "my_helper_items",
-  "list_id": "{{selListsType.selectedOptionValue}}"
+	"operation": "my_helper_items",
+	"list_id": "{{this.params.list_id || selListsType.selectedOptionValue}}"
 }
