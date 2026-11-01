@@ -19,7 +19,7 @@
       },
       "headers": [
         {
-          "key": "Authorization",
+          "key": "Authorization/",
           "value": "Bearer {{appsmith.store.savveyra_access_token}}"
         }
       ],

@@ -96,14 +96,19 @@ export default {
 				);
 			}
 
-			const refreshed = await apiRecGetComponentItems.run();
+			let refreshSucceeded = false;
 
-			if (
-				refreshed?.authenticated !== true ||
-				!Array.isArray(refreshed.component_items)
-			) {
-				throw new Error(
-					"Ingredient saved, but component refresh failed."
+			try {
+				const refreshed = await apiRecGetComponentItems.run();
+
+				refreshSucceeded =
+					refreshed?.authenticated === true &&
+					Array.isArray(refreshed.component_items);
+
+			} catch (refreshError) {
+				console.error(
+					"Ingredient saved; component refresh failed:",
+					refreshError
 				);
 			}
 
@@ -113,7 +118,14 @@ export default {
 				await resetWidget(mdlRecIngAddIng.name, true);
 			}
 
-			showAlert("Ingredient saved.", "success");
+			if (refreshSucceeded) {
+				showAlert("Ingredient saved.", "success");
+			} else {
+				showAlert(
+					"Ingredient saved, but the Recipe ingredient list could not be refreshed. Reopen Recipe to refresh the list.",
+					"warning"
+				);
+			}
 
 			return true;
 

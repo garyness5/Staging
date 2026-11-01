@@ -183,12 +183,14 @@ export default {
 		return true;
 	},
 
+
 	async saveRecipe() {
+		let databaseSaved = false;
+		let savedId = 0;
+
 		try {
 			const wasNew =
-						Number(
-							appsmith.store.current_recipe_id || 0
-						) === 0;
+						Number(appsmith.store.current_recipe_id || 0) === 0;
 
 			if (
 				wasNew &&
@@ -199,21 +201,12 @@ export default {
 
 			await jsRecCompTable.syncFromTable();
 
-			const snapshot =
-						jsRecWorkspace.current();
+			const snapshot = jsRecWorkspace.current();
 
 			if (!this.validateBeforeSave(snapshot)) {
 				return false;
 			}
 
-			/*
-		 * Before saving an existing Recipe,
-		 * check whether its Yield Unit changed.
-		 *
-		 * If the Recipe has downstream impact,
-		 * checkYieldUnitChange() opens the warning
-		 * modal and pauses this Save.
-		 */
 			if (
 				!appsmith.store.recipe_unit_change_confirmed &&
 				await this.checkYieldUnitChange(snapshot)
@@ -221,104 +214,95 @@ export default {
 				return false;
 			}
 
-			/*
-		 * Freeze ONE exact Recipe snapshot.
-		 * qrySaveRecipe reads all three payloads
-		 * from this same object.
-		 */
 			await storeValue(
 				"recipe_save_snapshot",
 				snapshot
 			);
 
-			const result =
-						await apiRecSaveRecipe.run();
+			const result = await apiRecSaveRecipe.run();
 
 			if (!result?.authenticated) {
-				throw new Error("Recipe Save authentication failed.");
+				throw new Error(
+					"Recipe Save authentication failed."
+				);
 			}
 
-			const savedId = Number(result.recipe_id || 0);
+			savedId = Number(result.recipe_id || 0);
 
 			if (!savedId) {
-				showAlert(
-					"Recipe was not saved.",
-					"error"
+				throw new Error(
+					"Recipe Save did not return a Recipe ID."
 				);
-
-				return false;
 			}
+
+			databaseSaved = true;
 
 			await storeValue(
 				"current_recipe_id",
 				savedId
 			);
 
+			// The Recipe now has a confirmed database identity.
+			await removeValue("rec_create_request_id");
+
 			if (wasNew) {
-				await apiRecGetComponentItems.run();
+				const items = await apiRecGetComponentItems.run();
+
+				if (
+					items?.authenticated !== true ||
+					!Array.isArray(items.component_items)
+				) {
+					throw new Error(
+						"Component options could not be refreshed."
+					);
+				}
 			}
 
 			const detail = await apiRecGetDetail.run();
 
 			if (
-				!detail?.authenticated ||
-				!detail?.recipe ||
+				detail?.authenticated !== true ||
+				!detail.recipe ||
 				Number(detail.recipe.id) !== savedId
 			) {
 				throw new Error(
-					"Recipe was saved, but its saved data could not be reloaded."
+					"Saved Recipe details could not be reloaded."
 				);
 			}
 
 			await jsRecCompTable.loadFromQuery();
 
-			await jsRecWorkspace
-				.initializeFromSaved();
+			await jsRecWorkspace.initializeFromSaved();
 
-			await removeValue(
-				"rec_create_request_id"
-			);
+			await removeValue("recipe_save_snapshot");
+			await removeValue("recipe_unit_change_confirmed");
+			await removeValue("recipe_impact_mode");
 
-			await removeValue(
-				"recipe_save_snapshot"
-			);
+			await storeValue("Recipe_mode", "edit");
+			await removeValue("Recipe_open_mode");
 
-			/*
-		 * Clear any completed Unit-change
-		 * confirmation state.
-		 */
-			await removeValue(
-				"recipe_unit_change_confirmed"
-			);
-
-			await removeValue(
-				"recipe_impact_mode"
-			);
-
-			await storeValue(
-				"Recipe_mode",
-				"edit"
-			);
-
-			await removeValue(
-				"Recipe_open_mode"
-			);
-
-			showAlert(
-				"Recipe saved.",
-				"success"
-			);
+			showAlert("Recipe saved.", "success");
 
 			return true;
 
 		} catch (error) {
-			await removeValue(
-				"recipe_save_snapshot"
-			);
+			console.error("Recipe Save failed:", error);
 
-			await removeValue(
-				"recipe_unit_change_confirmed"
-			);
+			if (databaseSaved) {
+				// Database commit succeeded, but frontend
+				// synchronization did not complete.
+				await removeValue("rec_create_request_id");
+
+				showAlert(
+					"Recipe saved to Supabase, but the page could not refresh completely. Reopen the Recipe to reload its saved data.",
+					"warning"
+				);
+
+				return false;
+			}
+
+			await removeValue("recipe_save_snapshot");
+			await removeValue("recipe_unit_change_confirmed");
 
 			const message = [
 				JSON.stringify(apiRecSaveRecipe.data || {}),
@@ -418,15 +402,53 @@ export default {
 		}
 	},
 
+	getUnsavedPromptText() {
+		const recipeId = Number(appsmith.store.current_recipe_id || 0);
+		const mode = String(appsmith.store.Recipe_mode || "");
+		const action = this.pendingAction;
+
+		if (action === "add") {
+			if (recipeId > 0) {
+				return "You have unsaved changes. Save them before starting a new Recipe, discard them, or cancel to continue editing.";
+			}
+
+			return mode === "duplicate"
+				? "This duplicate has not been saved. Save it before starting a new Recipe, discard it, or cancel to continue editing."
+			: "This Recipe has not been saved. Save it before starting a new Recipe, discard it, or cancel to continue editing.";
+		}
+
+		if (recipeId > 0) {
+			return "You have unsaved changes. Do you want to save or discard your changes before closing?";
+		}
+
+		if (mode === "duplicate") {
+			return "This duplicate has not been saved.<br> Save will create the duplicate before closing.<br> Discard will abandon it.<br> Cancel will return you to the duplicate.";
+		}
+
+		return "This Recipe has not been saved.<br> Save will create the Recipe before closing.<br> Discard will abandon it.<br> Cancel will return you to the Recipe.";
+	},
+
 	async closeRecipe() {
 		const snapshot = await jsRecWorkspace.capture();
 
 		if (jsRecWorkspace.isSnapshotDirty(snapshot)) {
 			this.pendingAction = "close";
 
+			await storeValue(
+				"rec_unsaved_prompt_text",
+				this.getUnsavedPromptText(),
+				false
+			);
+
 			showModal(mdlRecUnsavedChanges.name);
 
 			return false;
+		}
+
+		const recipeId = Number(appsmith.store.current_recipe_id || 0);
+
+		if (recipeId > 0) {
+			await storeValue("RecList_selected_id", recipeId, false);
 		}
 
 		await storeValue("RecList_returning_from_recipe", true, false);
@@ -448,7 +470,17 @@ export default {
 			mdlRecUnsavedChanges.name
 		);
 
-		await storeValue("RecList_returning_from_recipe", true, false);
+		await storeValue(
+			"RecList_selected_id",
+			Number(appsmith.store.current_recipe_id),
+			false
+		);
+
+		await storeValue(
+			"RecList_returning_from_recipe",
+			true,
+			false
+		);		
 
 		navigateTo(
 			"RecipeList"
@@ -506,6 +538,12 @@ export default {
 
 		if (this.isDirty()) {
 			this.pendingAction = "add";
+
+			await storeValue(
+				"rec_unsaved_prompt_text",
+				this.getUnsavedPromptText(),
+				false
+			);
 
 			showModal(
 				mdlRecUnsavedChanges.name
