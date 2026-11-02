@@ -15,6 +15,16 @@ export default {
 		return await this.refresh();
 	},
 
+	async testExpiredToken() {
+		await storeValue(
+			"savveyra_token_expires_at",
+			0,
+			true
+		);
+
+		return await this.ensureValid();
+	},
+
 	async refresh() {
 		try {
 			const result = await apiRecLstRefreshSupaSession.run();

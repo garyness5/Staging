@@ -219,6 +219,13 @@ export default {
 				snapshot
 			);
 
+			const sessionValid = await jsAuthSession.ensureValid();
+
+			if (!sessionValid) {
+				showModal(mdlRecReauth.name);
+				return false;
+			}
+
 			const result = await apiRecSaveRecipe.run();
 
 			if (!result?.authenticated) {

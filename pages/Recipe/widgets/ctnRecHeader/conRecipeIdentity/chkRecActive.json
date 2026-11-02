@@ -41,7 +41,7 @@
   "mobileRightColumn": 13,
   "mobileTopRow": 28,
   "needsErrorInfo": false,
-  "onCheckChange": "",
+  "onCheckChange": "{{}}",
   "originalBottomRow": 29,
   "originalTopRow": 25,
   "parentColumnSpace": 6.6953125,

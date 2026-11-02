@@ -414,6 +414,7 @@
       "isVisible": true,
       "label": "Use Waste",
       "notation": "standard",
+      "onCheckChange": "{{}}",
       "originalId": "apply_wastage",
       "sticky": "",
       "textColor": "",
