@@ -1,12 +1,20 @@
 export default {
+	lastFailure: null,
+	refreshInProgress: null,
+
 	async ensureValid() {
+		this.lastFailure = null;
+
 		const token = appsmith.store.savveyra_access_token;
 		const refreshToken = appsmith.store.savveyra_refresh_token;
 		const expiresAt = Number(
 			appsmith.store.savveyra_token_expires_at || 0
 		);
 
-		if (!refreshToken) return false;
+		if (!refreshToken) {
+			this.lastFailure = "login_required";
+			return false;
+		}
 
 		if (token && expiresAt > Date.now() + 5 * 60 * 1000) {
 			return true;
@@ -16,10 +24,25 @@ export default {
 	},
 
 	async refresh() {
+		if (this.refreshInProgress) {
+			return await this.refreshInProgress;
+		}
+
+		this.refreshInProgress = this.performRefresh();
+
+		try {
+			return await this.refreshInProgress;
+		} finally {
+			this.refreshInProgress = null;
+		}
+	},
+
+	async performRefresh() {
 		try {
 			const result = await apiRefreshSupabaseSession.run();
 
 			if (!result?.access_token || !result?.refresh_token) {
+				this.lastFailure = "service_unavailable";
 				return false;
 			}
 
@@ -41,8 +64,28 @@ export default {
 				true
 			);
 
+			this.lastFailure = null;
 			return true;
+
 		} catch (error) {
+			const status = Number(
+				error?.statusCode ||
+				error?.status ||
+				error?.responseMeta?.statusCode ||
+				0
+			);
+
+			this.lastFailure =
+				[400, 401].includes(status)
+				? "login_required"
+			: "service_unavailable";
+
+			console.error(
+				"Lists session renewal failed:",
+				status,
+				error
+			);
+
 			return false;
 		}
 	}

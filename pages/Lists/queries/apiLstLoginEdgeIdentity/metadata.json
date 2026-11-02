@@ -1,6 +1,6 @@
 {
-  "gitSyncId": "6ad02e5d7089041c6d575f1b_72fa23dc-85ea-4800-851d-89b5843994bb",
-  "id": "Lists_apiGetMyIdentity",
+  "gitSyncId": "6ad02e5d7089041c6d575f1b_cb5b90c9-643e-48dc-8564-f27510bb2cb9",
+  "id": "Lists_apiLstLoginEdgeIdentity",
   "pluginId": "restapi-plugin",
   "pluginType": "API",
   "unpublishedAction": {
@@ -20,7 +20,7 @@
       "headers": [
         {
           "key": "Authorization",
-          "value": "Bearer {{appsmith.store.savveyra_access_token}}"
+          "value": "Bearer {{this.params?.access_token || appsmith.store.savveyra_access_token}}"
         }
       ],
       "httpMethod": "POST",
@@ -47,7 +47,7 @@
         "key": "headers[0].value"
       }
     ],
-    "name": "apiGetMyIdentity",
+    "name": "apiLstLoginEdgeIdentity",
     "pageId": "Lists",
     "runBehaviour": "MANUAL",
     "userSetOnLoad": false
