@@ -1,5 +1,4 @@
 export default {
-
 	async clearIdentity() {
 		const keys = [
 			"current_client_id",
@@ -60,7 +59,7 @@ export default {
 			// Never allow one user's workspace to operate
 			// under another authenticated identity.
 			if (verifiedUserId !== workspaceOwner) {
-				await clearStore();
+				await jsRecWorkspace.clearForDifferentUser();
 
 				showAlert(
 					"The authenticated account has changed. Please sign in again.",

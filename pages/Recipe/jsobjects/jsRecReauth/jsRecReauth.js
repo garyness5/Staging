@@ -62,8 +62,12 @@ export default {
 		);
 
 		if (success) {
-			closeModal("mdlRecReauth");
+			closeModal(mdlRecReauth.name);
+			await resetWidget("inpRecReauthEmail", true);
+			await resetWidget("inpRecReauthPassword", true);
 		}
+
+		return success;
 	},
 
 	cancel() {
