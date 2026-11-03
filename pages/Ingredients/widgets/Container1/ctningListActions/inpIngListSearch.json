@@ -42,7 +42,7 @@
   "needsErrorInfo": false,
   "onTextChanged": "",
   "parentColumnSpace": 17.625,
-  "parentId": "tuqb8ri69l",
+  "parentId": "lo8clrv8fr",
   "parentRowSpace": 10,
   "placeholderText": "Search Ingredients...",
   "renderMode": "CANVAS",
@@ -54,6 +54,6 @@
   "topRow": 2,
   "type": "INPUT_WIDGET_V2",
   "version": 2,
-  "widgetId": "2m5q756cxb",
+  "widgetId": "0833lbp0dz",
   "widgetName": "inpIngListSearch"
 }

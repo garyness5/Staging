@@ -1,6 +1,6 @@
 {
   "gitSyncId": "6ad02e5d7089041c6d575f1b_aab54fbf-a2b4-43bc-bb18-aa62c174b8f6",
-  "id": "Ingredients_apiGetMyIdentity",
+  "id": "Ingredients_apiIngGetMyIdentity",
   "pluginId": "restapi-plugin",
   "pluginType": "API",
   "unpublishedAction": {
@@ -47,7 +47,7 @@
         "key": "headers[0].value"
       }
     ],
-    "name": "apiGetMyIdentity",
+    "name": "apiIngGetMyIdentity",
     "pageId": "Ingredients",
     "runBehaviour": "MANUAL",
     "userSetOnLoad": false

@@ -1,97 +1,78 @@
 export default {
-    async clearIdentity() {
-        const keys = [
-            "current_client_id",
-            "current_client_name",
-            "current_user_id",
-            "current_user_name"
-        ];
+	async clearIdentity() {
+		const keys = [
+			"current_client_id",
+			"current_client_name",
+			"current_user_id",
+			"current_user_name"
+		];
 
-        for (const key of keys) {
-            await removeValue(key);
-        }
-    },
+		for (const key of keys) {
+			await removeValue(key);
+		}
+	},
 
-    async init() {
-        try {
-            const workspaceOwner = String(
-                appsmith.store.workspace_owner_user_id || ""
-            );
+	async init() {
+		try {
+			const workspaceOwner = String(
+				appsmith.store.workspace_owner_user_id || ""
+			);
 
-            if (!workspaceOwner) {
-                showAlert(
-                    "Please sign in to Savveyra.",
-                    "warning"
-                );
-                return false;
-            }
+			if (!workspaceOwner) {
+				showModal(mdlIngLogin.name);
+				return false;
+			}
 
-            const sessionValid =
-                await jsAuthSession.ensureValid();
+			const sessionValid =
+						await jsAuthSession.requireValid();
 
-            if (!sessionValid) {
-                showAlert(
-                    "Your Savveyra session has expired. Please sign in again.",
-                    "warning"
-                );
-                return false;
-            }
+			if (!sessionValid) return false;
 
-            const identity = await apiGetMyIdentity.run();
+			const identity = await apiIngGetMyIdentity.run();
 
-            if (
-                identity?.authenticated !== true ||
-                !identity.user_id ||
-                !identity.client_id
-            ) {
-                showAlert(
-                    "Unable to verify your Savveyra account.",
-                    "warning"
-                );
-                return false;
-            }
+			if (
+				identity?.authenticated !== true ||
+				!identity?.user_id ||
+				!identity?.client_id
+			) {
+				showAlert(
+					"Unable to verify your Savveyra account.",
+					"error"
+				);
+				return false;
+			}
 
-            const verifiedUserId = String(identity.user_id);
+			const verifiedUserId = String(identity.user_id);
 
-            if (verifiedUserId !== workspaceOwner) {
-                await clearStore();
+			if (verifiedUserId !== workspaceOwner) {
+				await clearStore();
 
-                showAlert(
-                    "The authenticated account has changed. Please sign in again.",
-                    "warning"
-                );
-                return false;
-            }
+				showModal(mdlIngLogin.name);
 
-            await storeValue(
-                "current_client_id",
-                identity.client_id
-            );
+				showAlert(
+					"The authenticated account has changed. Please sign in again.",
+					"warning"
+				);
 
-            await storeValue(
-                "current_user_id",
-                verifiedUserId
-            );
+				return false;
+			}
 
-            await storeValue(
-                "current_client_name",
-                identity.client_name
-            );
+			await storeValue("current_client_id", identity.client_id);
+			await storeValue("current_user_id", verifiedUserId);
+			await storeValue("current_client_name", identity.client_name);
+			await storeValue("current_user_name", identity.user_name);
 
-            await storeValue(
-                "current_user_name",
-                identity.user_name
-            );
+			return true;
 
-            return true;
+		} catch (error) {
+			console.error("Ingredients initialization failed:", error);
 
-        } catch (error) {
-            showAlert(
-                "Unable to verify your Savveyra session.",
-                "error"
-            );
+			showAlert(
+				"Unable to verify your Savveyra session.",
+				"error"
+			);
 
-            return false;
-        }
-    }
+			return false;
+		}
+	}
 };

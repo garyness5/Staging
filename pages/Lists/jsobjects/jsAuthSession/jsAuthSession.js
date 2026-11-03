@@ -95,8 +95,10 @@ export default {
 
 		if (valid) return true;
 
+		await storeValue("ingPageReady", false);
+
 		if (this.lastFailure === "login_required") {
-			showModal(mdlLstLogin.name);
+			showModal(mdlIngLogin.name);
 		} else {
 			showAlert(
 				"Unable to connect to Savveyra. Please try again.",
@@ -105,5 +107,5 @@ export default {
 		}
 
 		return false;
-	},
+	}
 };

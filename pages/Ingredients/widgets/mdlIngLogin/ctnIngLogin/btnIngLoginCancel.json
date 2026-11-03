@@ -3,23 +3,21 @@
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
   "bottomRow": 6,
   "boxShadow": "none",
-  "buttonColor": "#16836d",
+  "buttonColor": "{{appsmith.theme.colors.primaryColor}}",
+  "buttonStyle": "PRIMARY_BUTTON",
   "buttonVariant": "SECONDARY",
   "disabledWhenInvalid": false,
   "dynamicBindingPathList": [
     {
-      "key": "borderRadius"
+      "key": "buttonColor"
     },
     {
-      "key": "isDisabled"
+      "key": "borderRadius"
     }
   ],
   "dynamicPropertyPathList": [
     {
       "key": "onClick"
-    },
-    {
-      "key": "isDisabled"
     }
   ],
   "dynamicTriggerPathList": [
@@ -27,36 +25,30 @@
       "key": "onClick"
     }
   ],
-  "iconAlign": "left",
   "isDefaultClickDisabled": true,
-  "isDisabled": "{{ !jsIngBatch.hasChanges() }}",
+  "isDisabled": false,
   "isLoading": false,
-  "isVisible": true,
-  "key": "o01hoigeqy",
-  "leftColumn": 33,
+  "isVisible": false,
+  "key": "4oz35onnoa",
+  "leftColumn": 30,
   "minWidth": 120,
-  "mobileBottomRow": 8,
-  "mobileLeftColumn": 6,
-  "mobileRightColumn": 22,
-  "mobileTopRow": 4,
+  "mobileBottomRow": 22,
+  "mobileLeftColumn": 47,
+  "mobileRightColumn": 63,
+  "mobileTopRow": 18,
   "needsErrorInfo": false,
-  "onClick": "{{ jsIngBatch.discard() }}",
-  "originalBottomRow": 14,
-  "originalTopRow": 10,
-  "parentColumnSpace": 10.609375,
-  "parentId": "tuqb8ri69l",
-  "parentRowSpace": 10,
+  "onClick": "\t{{jsIngLogin.cancel()}}",
+  "parentId": "asx9pnn3z0",
   "placement": "CENTER",
   "recaptchaType": "V3",
   "renderMode": "CANVAS",
   "resetFormOnClick": false,
   "responsiveBehavior": "hug",
-  "rightColumn": 38,
-  "text": "Discard",
-  "tooltip": "Discard changes",
+  "rightColumn": 46,
+  "text": "Cancel",
   "topRow": 2,
   "type": "BUTTON_WIDGET",
   "version": 1,
-  "widgetId": "i49xdttday",
-  "widgetName": "btnIngDiscardChanges"
+  "widgetId": "lh12r18w25",
+  "widgetName": "btnIngLoginCancel"
 }

@@ -52,13 +52,15 @@ export default {
 	},
 
 	async measureLoad() {
-		const start = performance.now();
+		const start = Date.now();
 
 		const success = await this.load();
 
-		const elapsed = Math.round(performance.now() - start);
+		const elapsed = Date.now() - start;
 
-		console.log(`Ingredients load: ${elapsed} ms (${(elapsed / 1000).toFixed(2)} seconds)`);
+		console.log(
+			`Ingredients load: ${elapsed} ms (${(elapsed / 1000).toFixed(2)} seconds)`
+		);
 
 		showAlert(
 			`Ingredients load: ${(elapsed / 1000).toFixed(2)} seconds`,
