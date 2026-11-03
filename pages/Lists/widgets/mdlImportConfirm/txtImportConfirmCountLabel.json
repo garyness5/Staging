@@ -1,7 +1,7 @@
 {
   "animateLoading": true,
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
-  "bottomRow": 41,
+  "bottomRow": 46,
   "dynamicBindingPathList": [
     {
       "key": "truncateButtonColor"
@@ -16,7 +16,7 @@
   "dynamicHeight": "AUTO_HEIGHT",
   "dynamicTriggerPathList": [],
   "fontFamily": "{{appsmith.theme.fontFamily.appFont}}",
-  "fontSize": "1rem",
+  "fontSize": "0.875rem",
   "fontStyle": "",
   "isLoading": false,
   "isVisible": true,
@@ -40,10 +40,10 @@
   "responsiveBehavior": "fill",
   "rightColumn": 62,
   "shouldTruncate": false,
-  "text": "Duplicate Names - Will Be Flagged\nIngredients Missing a Category    \nUnmapped Units - Unit Will Be Blank\nMissing Ingredient Name - Will Not Be Imported\nUnitType Conflicts - Unit Will Be Blank and Flagged",
+  "text": "Duplicate Name(s) - Will Be Flagged\nIngredient(s) Missing a Category\nUnmapped Unit(s) - Unit Will Be Blank\nMissing Ingredient Name(s) - Will Not Be Imported\nUnitType Conflict(s) - Unit Will Be Blank and Flagged",
   "textAlign": "LEFT",
   "textColor": "#231F20",
-  "topRow": 30,
+  "topRow": 36,
   "truncateButtonColor": "{{appsmith.theme.colors.primaryColor}}",
   "type": "TEXT_WIDGET",
   "version": 1,

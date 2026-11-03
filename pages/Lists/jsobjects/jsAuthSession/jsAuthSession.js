@@ -88,5 +88,22 @@ export default {
 
 			return false;
 		}
-	}
+	},
+
+	async requireValid() {
+		const valid = await this.ensureValid();
+
+		if (valid) return true;
+
+		if (this.lastFailure === "login_required") {
+			showModal(mdlLstLogin.name);
+		} else {
+			showAlert(
+				"Unable to connect to Savveyra. Please try again.",
+				"error"
+			);
+		}
+
+		return false;
+	},
 };

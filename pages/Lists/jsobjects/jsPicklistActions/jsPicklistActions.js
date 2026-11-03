@@ -1,6 +1,6 @@
 export default {
 	norm(value) {
-		return (value || "")
+		return String(value || "")
 			.trim()
 			.normalize("NFD")
 			.replace(/[\u0300-\u036f]/g, "")
@@ -10,17 +10,13 @@ export default {
 	async openAdd() {
 		resetWidget("inpPLAddName");
 		showModal(mdlPLAdd.name);
-
 		return true;
 	},
-
 
 	async saveAdd() {
 		const newName = (inpPLAddName.text || "").trim();
 
-		if (!newName) {
-			return false;
-		}
+		if (!newName) return false;
 
 		const fromImport =
 					appsmith.store.plAddContext === "ingredientImport";
@@ -50,6 +46,10 @@ export default {
 			return false;
 		}
 
+		if (!await jsAuthSession.requireValid()) {
+			return false;
+		}
+
 		try {
 			const existing = await apiGetHelperItems.run({
 				list_id: listId
@@ -60,15 +60,8 @@ export default {
 				return false;
 			}
 
-			const normalizedName = newName.toLowerCase();
-
-			const duplicate = (
-				existing.helper_items || []
-			).some(
-				item =>
-				String(item.name || "")
-				.trim()
-				.toLowerCase() === normalizedName
+			const duplicate = (existing.helper_items || []).some(
+				item => this.norm(item.name) === this.norm(newName)
 			);
 
 			if (duplicate) {
@@ -88,34 +81,38 @@ export default {
 				addedItem?.authenticated !== true ||
 				!addedItem.helper_item_id
 			) {
-				throw new Error(
-					JSON.stringify(addedItem || {})
-				);
+				throw new Error(JSON.stringify(addedItem || {}));
 			}
 
-			await apiGetHelperItems.run({
-				list_id: listId
-			});
-
 			if (fromImport) {
-				await apiImpGetSuppliers.run();
+				const suppliers = await apiImpGetSuppliers.run();
+
+				if (suppliers?.authenticated !== true) {
+					throw new Error("Supplier refresh failed.");
+				}
 
 				await storeValue(
 					"impSelectedSupplierId",
 					String(addedItem.helper_item_id)
 				);
+			} else {
+				const refreshed = await apiGetHelperItems.run({
+					list_id: listId
+				});
+
+				if (refreshed?.authenticated !== true) {
+					throw new Error("Helper list refresh failed.");
+				}
 			}
 
 			resetWidget("inpPLAddName");
-			closeModal("mdlPLAdd");
+			closeModal(mdlPLAdd.name);
 
 			showAlert("Item added.", "success");
 			return true;
 
 		} catch (error) {
-			const message = String(
-				error?.message || error || ""
-			);
+			const message = String(error?.message || error || "");
 
 			if (
 				message.includes("409") ||
@@ -135,14 +132,9 @@ export default {
 		}
 	},
 
-
 	async openRename() {
 		if (!jsPicklistRules.hasSelection()) {
-			showAlert(
-				"Select an item first.",
-				"warning"
-			);
-
+			showAlert("Select an item first.", "warning");
 			return false;
 		}
 
@@ -151,9 +143,7 @@ export default {
 		}
 
 		resetWidget("inpPLRenameName");
-
 		showModal(mdlPLRename.name);
-
 		return true;
 	},
 
@@ -164,24 +154,24 @@ export default {
 			tblListsItems.selectedRow?.id || 0
 		);
 
-		if (!newName || !oldId) {
-			return false;
-		}
+		if (!newName || !oldId) return false;
 
 		const exists =
-					(apiGetHelperItems.data?.helper_items || [])
-		.some(
-			item =>
-			Number(item.id) !== oldId &&
-			item.name &&
-			this.norm(item.name) === this.norm(newName)
-		);
+					(apiGetHelperItems.data?.helper_items || []).some(
+						item =>
+						Number(item.id) !== oldId &&
+						this.norm(item.name) === this.norm(newName)
+					);
 
 		if (exists) {
 			showAlert(
 				"Name already exists in this list",
 				"warning"
 			);
+			return false;
+		}
+
+		if (!await jsAuthSession.requireValid()) {
 			return false;
 		}
 
@@ -199,17 +189,24 @@ export default {
 				return false;
 			}
 
-			await apiGetHelperItems.run({
+			const refreshed = await apiGetHelperItems.run({
 				list_id: selListsType.selectedOptionValue
 			});
 
+			if (refreshed?.authenticated !== true) {
+				showAlert(
+					"Item renamed, but the list could not refresh.",
+					"warning"
+				);
+				return false;
+			}
+
 			closeModal(mdlPLRename.name);
-
 			showAlert("Item renamed", "success");
-
 			return true;
 
 		} catch (error) {
+			console.error("Rename helper item failed:", error);
 			showAlert(
 				"Unable to rename item. Check whether the name already exists.",
 				"error"
@@ -228,19 +225,19 @@ export default {
 			return false;
 		}
 
+		if (!await jsAuthSession.requireValid()) {
+			return false;
+		}
+
 		try {
-			const valid = await jsAuthSession.ensureValid();
-
-			if (!valid) {
-				showAlert("Session expired. Please sign in again.", "error");
-				return false;
-			}
-
 			const result = await apiGetHelperItemImpact.run({
 				helper_item_id: Number(tblListsItems.selectedRow.id)
 			});
 
-			if (!result?.authenticated || !result?.impact) {
+			if (
+				result?.authenticated !== true ||
+				!result?.impact
+			) {
 				showAlert("Unable to check item usage.", "error");
 				return false;
 			}
@@ -252,6 +249,7 @@ export default {
 			return true;
 
 		} catch (error) {
+			console.error("Helper impact check failed:", error);
 			showAlert("Unable to check item usage.", "error");
 			return false;
 		}
@@ -325,17 +323,11 @@ export default {
 			return false;
 		}
 
+		if (!await jsAuthSession.requireValid()) {
+			return false;
+		}
+
 		try {
-			const valid = await jsAuthSession.ensureValid();
-
-			if (!valid) {
-				showAlert(
-					"Session expired. Please sign in again.",
-					"error"
-				);
-				return false;
-			}
-
 			const result = await apiReplaceDeleteHelperItem.run({
 				helper_item_id: params.helper_item_id,
 				replace_with_id: params.replace_with_id,
@@ -354,9 +346,17 @@ export default {
 				return false;
 			}
 
-			await apiGetHelperItems.run({
+			const refreshed = await apiGetHelperItems.run({
 				list_id: selListsType.selectedOptionValue
 			});
+
+			if (refreshed?.authenticated !== true) {
+				showAlert(
+					"Action completed, but the list could not refresh.",
+					"warning"
+				);
+				return false;
+			}
 
 			closeModal(mdlPLReplace.name);
 
@@ -368,13 +368,10 @@ export default {
 			: "Item deleted.";
 
 			showAlert(message, "success");
-
 			return true;
 
 		} catch (error) {
-			const message = String(
-				error?.message || error || ""
-			);
+			const message = String(error?.message || error || "");
 
 			if (message.includes("409")) {
 				showAlert(
@@ -382,6 +379,7 @@ export default {
 					"warning"
 				);
 			} else {
+				console.error("Replace/Delete failed:", error);
 				showAlert(
 					"Unable to complete Replace/Delete.",
 					"error"

@@ -297,22 +297,48 @@ export default {
 	},
 
 	async rebuildValueMappings() {
-		await Promise.all([
-			apiImpGetLookups.run(),
-			apiImpGetSavedMappings.run()
-		]);
-
-		const rows = this.buildValueMapRows();
-
-		const mappedRows = this.applySavedValueMappings(rows);
-
-		await storeValue("impValueMapRows", mappedRows);
-
-		if (mappedRows.length > 0) {
-			await storeValue("accImportMapItems", true);
+		if (!await jsAuthSession.requireValid()) {
+			return false;
 		}
 
-		return true;
+		try {
+			const [lookups, savedMappings] = await Promise.all([
+				apiImpGetLookups.run(),
+				apiImpGetSavedMappings.run()
+			]);
+
+			if (
+				lookups?.authenticated !== true ||
+				savedMappings?.authenticated !== true
+			) {
+				showAlert(
+					"Unable to load Import mappings. Please try again.",
+					"error"
+				);
+				return false;
+			}
+
+			const rows = this.buildValueMapRows();
+			const mappedRows = this.applySavedValueMappings(rows);
+
+			await storeValue("impValueMapRows", mappedRows);
+
+			if (mappedRows.length > 0) {
+				await storeValue("accImportMapItems", true);
+			}
+
+			return true;
+
+		} catch (error) {
+			console.error("Import mapping rebuild failed:", error);
+
+			showAlert(
+				"Unable to load Import mappings. Please try again.",
+				"error"
+			);
+
+			return false;
+		}
 	},
 
 	async supplierChanged() {
@@ -368,7 +394,19 @@ export default {
      *
      * Client + Supplier/No Supplier + exact header signature
      */
+		if (!await jsAuthSession.requireValid()) {
+			return false;
+		}
+
 		const response = await apiImpGetSavedMappings.run();
+
+		if (response?.authenticated !== true) {
+			showAlert(
+				"Unable to load saved Import mappings.",
+				"error"
+			);
+			return false;
+		}
 
 		const savedRows = response?.mappings || [];
 
@@ -743,18 +781,8 @@ export default {
 		const existingIngredients =
 					apiImpGetReview.data?.ingredients || [];
 
-		const existingSupplierItems =
-					apiImpGetReview.data?.supplier_items || [];
-
 		const units =
 					apiImpGetLookups.data?.units || [];
-
-		const supplierValue =
-					selImportListSupplier.selectedOptionValue || "";
-
-		const hasSupplier =
-					supplierValue &&
-					supplierValue !== "__NO_SUPPLIER__";
 
 		const normalise = value =>
 		String(value || "")
@@ -763,69 +791,63 @@ export default {
 		.replace(/[\u0300-\u036f]/g, "")
 		.toLowerCase();
 
-		let newIngredients = 0;
-		let updatedIngredients = 0;
+		const existingByName = new Map();
+
+		existingIngredients.forEach(item => {
+			const key = normalise(item.name);
+
+			if (!existingByName.has(key)) {
+				existingByName.set(key, []);
+			}
+
+			existingByName.get(key).push(item);
+		});
+
+		const finalRowsByName = new Map();
+
 		let duplicateNames = 0;
-		let missingIngredientCategory = 0;
-		let unmappedUnits = 0;
 		let missingIngredientName = 0;
-		let unitTypeConflicts = 0;
 
 		rows.forEach(row => {
-			const ingredientName =
-						String(row.ingredient || "").trim();
+			const name = String(row.ingredient || "").trim();
 
-			if (!ingredientName) {
+			if (!name) {
 				missingIngredientName++;
 				return;
 			}
 
-			if (!row.category_id && !row.add_category) {
-				missingIngredientCategory++;
+			const key = normalise(name);
+
+			if (finalRowsByName.has(key)) {
+				duplicateNames++;
 			}
 
-			if (row.unit_source && !row.unit_id) {
-				unmappedUnits++;
-			}
+			// Last occurrence of the name wins.
+			finalRowsByName.set(key, row);
+		});
 
-			const nameNorm = normalise(ingredientName);
+		let newIngredients = 0;
+		let updatedIngredients = 0;
+		let missingIngredientCategory = 0;
+		let unmappedUnits = 0;
+		let unitTypeConflicts = 0;
+		let existingNameConflicts = 0;
 
-			let recurrenceMatch = null;
+		finalRowsByName.forEach((row, key) => {
+			const matches = existingByName.get(key) || [];
 
-			if (hasSupplier) {
-				if (row.item_number) {
-					recurrenceMatch =
-						existingSupplierItems.find(item =>
-																			 String(item.item_code || "")
-																			 .trim().toLowerCase() ===
-																			 String(row.item_number || "")
-																			 .trim().toLowerCase()
-																			);
-				} else {
-					recurrenceMatch =
-						existingSupplierItems.find(item =>
-																			 String(item.name_norm || "") ===
-																			 nameNorm
-																			);
-				}
-			}
-
-			if (recurrenceMatch) {
+			if (matches.length === 0) {
+				newIngredients++;
+			} else if (matches.length === 1) {
 				updatedIngredients++;
 
-				const existing =
-							existingIngredients.find(item =>
-																			 Number(item.id) ===
-																			 Number(recurrenceMatch.ingredient_id)
-																			);
+				const existing = matches[0];
 
-				const importedUnit =
-							units.find(unit =>
-												 Number(unit.id) === Number(row.unit_id)
-												);
+				const importedUnit = units.find(unit =>
+																				Number(unit.id) === Number(row.unit_id)
+																			 );
 
 				if (
-					existing &&
 					existing.purchase_unit_type &&
 					importedUnit?.unit_type &&
 					existing.purchase_unit_type !==
@@ -834,19 +856,16 @@ export default {
 				) {
 					unitTypeConflicts++;
 				}
-
-				return;
+			} else {
+				existingNameConflicts++;
 			}
 
-			newIngredients++;
+			if (!row.category_id && !row.add_category) {
+				missingIngredientCategory++;
+			}
 
-			const sameNameExists =
-						existingIngredients.some(item =>
-																		 normalise(item.name) === nameNorm
-																		);
-
-			if (sameNameExists) {
-				duplicateNames++;
+			if (row.unit_source && !row.unit_id) {
+				unmappedUnits++;
 			}
 		});
 
@@ -858,59 +877,95 @@ export default {
 			missingIngredientCategory,
 			unmappedUnits,
 			missingIngredientName,
-			unitTypeConflicts
+			unitTypeConflicts,
+			existingNameConflicts
 		};
 	},
 
 	async reviewImport() {
-		await apiImpGetReview.run();
+		const sessionValid = await jsAuthSession.ensureValid();
 
-		const clone = value =>
-		JSON.parse(JSON.stringify(value));
+		if (!sessionValid) {
+			if (jsAuthSession.lastFailure === "login_required") {
+				showModal(mdlLstLogin.name);
+			} else {
+				showAlert(
+					"Unable to connect to Savveyra. Please try again.",
+					"error"
+				);
+			}
 
-		const mappedRows =
-					this.buildMappedImportRows();
+			return false;
+		}
 
-		const impact =
-					this.buildImportImpact();
+		try {
+			const reviewResult = await apiImpGetReview.run();
 
-		const snapshot = {
-			supplier_id:
-			appsmith.store.impSelectedSupplierId || "",
+			if (reviewResult?.authenticated !== true) {
+				showAlert(
+					"Unable to complete Import Review. Please try again.",
+					"error"
+				);
+				return false;
+			}
 
-			header_signature:
-			appsmith.store.impAppliedHeaderSignature || "",
+			const clone = value =>
+			JSON.parse(JSON.stringify(value));
 
-			header_mappings:
-			clone(
-				appsmith.store.impAppliedHeaderMapRows || []
-			),
+			const mappedRows =
+						this.buildMappedImportRows();
 
-			value_mappings:
-			clone(
-				appsmith.store.impValueMapRows || []
-			),
+			const impact =
+						this.buildImportImpact();
 
-			rows:
-			clone(mappedRows),
+			const snapshot = {
+				supplier_id:
+				appsmith.store.impSelectedSupplierId || "",
 
-			impact:
-			clone(impact)
-		};
+				header_signature:
+				appsmith.store.impAppliedHeaderSignature || "",
 
-		await storeValue(
-			"impReviewSnapshot",
-			snapshot
-		);
+				header_mappings:
+				clone(
+					appsmith.store.impAppliedHeaderMapRows || []
+				),
 
-		await storeValue(
-			"impImpact",
-			impact
-		);
+				value_mappings:
+				clone(
+					appsmith.store.impValueMapRows || []
+				),
 
-		showModal("mdlImportConfirm");
+				rows:
+				clone(mappedRows),
 
-		return true;
+				impact:
+				clone(impact)
+			};
+
+			await storeValue(
+				"impReviewSnapshot",
+				snapshot
+			);
+
+			await storeValue(
+				"impImpact",
+				impact
+			);
+
+			showModal(mdlImportConfirm.name);
+
+			return true;
+
+		} catch (error) {
+			console.error("Lists Import Review failed:", error);
+
+			showAlert(
+				"Unable to complete Import Review. Please try again.",
+				"error"
+			);
+
+			return false;
+		}
 	},
 
 	async clearImportWorkspace() {
@@ -932,7 +987,7 @@ export default {
 		resetWidget("filImportListPriceList", true);
 		resetWidget("selImportListSupplier", true);
 
-		closeModal("mdlImportConfirm");
+		closeModal(mdlImportConfirm.name);
 
 		return true;
 	},
@@ -949,6 +1004,10 @@ export default {
 	},
 
 	async confirmImport() {
+		if (!await jsAuthSession.requireValid()) {
+			return false;
+		}
+
 		const snapshot = appsmith.store.impReviewSnapshot;
 
 		if (!snapshot) {

@@ -2,7 +2,7 @@
   "animateLoading": true,
   "borderColor": "#d4d4d8",
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
-  "bottomRow": 16,
+  "bottomRow": 22,
   "dynamicBindingPathList": [
     {
       "key": "truncateButtonColor"
@@ -17,7 +17,7 @@
   "dynamicHeight": "AUTO_HEIGHT",
   "dynamicTriggerPathList": [],
   "fontFamily": "{{appsmith.theme.fontFamily.appFont}}",
-  "fontSize": "1rem",
+  "fontSize": "0.875rem",
   "fontStyle": "",
   "isLoading": false,
   "isVisible": true,
@@ -41,7 +41,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 59,
   "shouldTruncate": false,
-  "text": "Existing Ingredients will be updated. Review any red-flagged Ingredients after import.",
+  "text": "Existing Ingredients will be updated by matching Ingredient name. If duplicate names are found in the import file, the last occurrence will be used.\n\nYou can adjust prices afterward in Ingredients, or cancel to correct your source file and import it again.",
   "textAlign": "LEFT",
   "textColor": "#231F20",
   "topRow": 11,
