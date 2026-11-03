@@ -1,6 +1,32 @@
 export default {
 	busy: false,
 
+	async clearForDifferentUser() {
+		// Hide Lists while the previous operator's state is cleared.
+		await storeValue("listsPageReady", false);
+
+		// Close editing dialogs.
+		closeModal(mdlPLAdd.name);
+		closeModal(mdlPLRename.name);
+		closeModal(mdlPLReplace.name);
+
+		// Clear the previous operator's stored workspace.
+		await clearStore();
+
+		// Clear Ingredient Import working state and uploaded file.
+		await jsIngredientImport.clearImportWorkspace();
+
+		// Clear Helper List widget state.
+		await resetWidget("selListsType", true);
+		await resetWidget("tblListsItems", true);
+		await resetWidget("inpPLAddName", true);
+		await resetWidget("inpPLRenameName", true);
+		await resetWidget("selPLReplaceWith", true);
+		await resetWidget("radPLReplaceDeleteAction", true);
+
+		return true;
+	},	
+
 	async signIn() {
 		if (this.busy) return false;
 		this.busy = true;
@@ -50,10 +76,7 @@ export default {
 						previousUserId === incomingUserId;
 
 			if (!sameUser) {
-				await clearStore();
-
-				// Remove the previous operator's selected import file.
-				await resetWidget("filImportListPriceList", true);
+				await this.clearForDifferentUser();
 			}
 
 			const expiresAt =

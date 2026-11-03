@@ -2,7 +2,6 @@
   "animateLoading": true,
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
   "bottomRow": 6,
-  "bottomRowBeforeCollapse": 6,
   "boxShadow": "none",
   "buttonColor": "{{appsmith.theme.colors.primaryColor}}",
   "buttonVariant": "PRIMARY",
@@ -12,18 +11,18 @@
       "key": "borderRadius"
     },
     {
-      "key": "isDisabled"
+      "key": "buttonColor"
     },
     {
-      "key": "buttonColor"
+      "key": "isDisabled"
     }
   ],
   "dynamicPropertyPathList": [
     {
-      "key": "isDisabled"
+      "key": "onClick"
     },
     {
-      "key": "onClick"
+      "key": "isDisabled"
     }
   ],
   "dynamicTriggerPathList": [
@@ -32,35 +31,32 @@
     }
   ],
   "isDefaultClickDisabled": true,
-  "isDisabled": "{{ !jsPicklistRules.hasSelection() || jsPicklistRules.isProtectedSystemItem() }}",
+  "isDisabled": "{{\n  !filImportListPriceList.files?.length\n}}",
   "isLoading": false,
   "isVisible": true,
   "key": "ve73w085th",
-  "leftColumn": 23,
+  "leftColumn": 17,
   "minWidth": 120,
   "mobileBottomRow": 17,
   "mobileLeftColumn": 4,
   "mobileRightColumn": 20,
   "mobileTopRow": 13,
   "needsErrorInfo": false,
-  "onClick": "{{ jsPicklistActions.openReplaceDelete() }}",
-  "originalBottomRow": 6,
-  "originalTopRow": 2,
+  "onClick": "{{ jsIngredientImport.loadFile() }}",
   "parentColumnSpace": 11.005859375,
-  "parentId": "wv7i1vgy7u",
+  "parentId": "7holcc0snt",
   "parentRowSpace": 10,
   "placement": "CENTER",
   "recaptchaType": "V3",
   "renderMode": "CANVAS",
   "resetFormOnClick": false,
   "responsiveBehavior": "hug",
-  "rightColumn": 38,
-  "text": "Replace/Delete",
-  "tooltip": "Select an item to Replace or Delete first",
+  "rightColumn": 29,
+  "text": "Load File",
+  "tooltip": "Import list",
   "topRow": 2,
-  "topRowBeforeCollapse": 2,
   "type": "BUTTON_WIDGET",
   "version": 1,
-  "widgetId": "ts0x537o5b",
-  "widgetName": "btnListsReplace"
+  "widgetId": "83v9lp0kao",
+  "widgetName": "btnImportListLoadFile"
 }

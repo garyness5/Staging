@@ -88,7 +88,7 @@ export default {
 			const verifiedUserId = String(identity.user_id);
 
 			if (verifiedUserId !== workspaceOwner) {
-				await clearStore();
+				await jsLstLogin.clearForDifferentUser();
 
 				this.lastFailure = "account_changed";
 

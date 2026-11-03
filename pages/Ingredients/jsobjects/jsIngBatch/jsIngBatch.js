@@ -110,8 +110,12 @@ export default {
 		return true;
 	},
 
+
 	async save() {
+		if (!(await jsAuthSession.requireValid())) return false;
+
 		const pending = this.pending();
+
 
 		const rows = Object.entries(pending).map(
 			([id, changes]) => ({

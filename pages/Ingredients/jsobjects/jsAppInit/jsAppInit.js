@@ -44,8 +44,10 @@ export default {
 
 			const verifiedUserId = String(identity.user_id);
 
+
 			if (verifiedUserId !== workspaceOwner) {
-				await clearStore();
+				await jsIngWorkspace.clearForDifferentUser();
+
 
 				showModal(mdlIngLogin.name);
 

@@ -238,11 +238,14 @@ export default {
 	// Name is the only required field.
 	// ============================================================
 
+
 	async save(
 		closeAfterSave = true,
 		stateOverride = null,
 		unitTypeConfirmed = false
 	) {
+		if (!(await jsAuthSession.requireValid())) return false;
+
 		const state = stateOverride || this.currentState();
 
 		if (!state.name) {
@@ -617,6 +620,8 @@ export default {
 	},
 
 	async confirmDelete() {
+		if (!(await jsAuthSession.requireValid())) return false;
+
 		const id = Number(
 			appsmith.store.IngForm_edit_id || 0
 		);

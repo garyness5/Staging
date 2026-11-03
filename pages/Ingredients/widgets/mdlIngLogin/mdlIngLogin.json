@@ -80,7 +80,7 @@
   "mobileRightColumn": 30,
   "mobileTopRow": 29,
   "needsErrorInfo": false,
-  "onClose": "{{resetWidget(\"inpIngLoginEmail\", true); resetWidget(\"inpIngLoginPw\", true);}}",
+  "onClose": "{{jsIngLogin.onClose()}}",
   "parentColumnSpace": 17.625,
   "parentId": "0",
   "parentRowSpace": 10,

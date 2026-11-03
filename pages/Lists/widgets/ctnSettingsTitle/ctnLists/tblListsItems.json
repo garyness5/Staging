@@ -1,10 +1,11 @@
 {
   "accentColor": "{{appsmith.theme.colors.primaryColor}}",
+  "allowAddNewRow": true,
   "animateLoading": true,
   "borderColor": "#E0DEDE",
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
   "borderWidth": "1",
-  "bottomRow": 54,
+  "bottomRow": 65,
   "boxShadow": "{{appsmith.theme.boxShadow.appBoxShadow}}",
   "cachedTableData": {},
   "canFreezeColumn": true,
@@ -32,29 +33,23 @@
     }
   },
   "columnOrder": [
-    "imported_data",
-    "map_to",
-    "id"
+    "name",
+    "id",
+    "active",
+    "is_system"
   ],
-  "columnUpdatedAt": 1788745589691,
+  "columnUpdatedAt": 1788745589701,
   "columnWidthMap": {
-    "Imported_Data": 270,
-    "active": 103,
-    "customColumn1": 60,
-    "field_key": 230,
-    "field_label": 189,
-    "imported_data": 269,
-    "proposal_no": 144,
-    "proposal_sequence_number": 233,
-    "proposal_status": 92,
-    "sent_at": 149,
-    "updated_at": 217
+    "active": 86,
+    "id": 74,
+    "list_id": 100,
+    "name": 270
   },
   "compactMode": "SHORT",
   "customIsLoading": false,
   "customIsLoadingValue": "",
   "defaultPageSize": 0,
-  "defaultSelectedRowIndex": "",
+  "defaultSelectedRowIndex": 0,
   "defaultSelectedRowIndices": [
     0
   ],
@@ -73,16 +68,16 @@
       "key": "tableData"
     },
     {
-      "key": "primaryColumns.imported_data.computedValue"
-    },
-    {
-      "key": "primaryColumns.map_to.computedValue"
-    },
-    {
       "key": "primaryColumns.id.computedValue"
     },
     {
-      "key": "primaryColumns.map_to.selectOptions"
+      "key": "primaryColumns.name.computedValue"
+    },
+    {
+      "key": "primaryColumns.active.computedValue"
+    },
+    {
+      "key": "primaryColumns.is_system.computedValue"
     },
     {
       "key": "isVisible"
@@ -93,55 +88,79 @@
       "key": "tableData"
     },
     {
-      "key": "onRowSelected"
-    },
-    {
-      "key": "primaryColumns.map_to.onOptionChange"
-    },
-    {
       "key": "isVisible"
     }
   ],
-  "dynamicTriggerPathList": [
-    {
-      "key": "primaryColumns.map_to.onOptionChange"
-    }
-  ],
+  "dynamicTriggerPathList": [],
   "enableClientSideSearch": true,
   "endOfData": false,
   "flexVerticalAlignment": "start",
   "horizontalAlignment": "LEFT",
-  "inlineEditingSaveOption": "CUSTOM",
+  "infiniteScrollEnabled": false,
+  "inlineEditingSaveOption": "ROW_LEVEL",
   "isLoading": false,
   "isSortable": true,
   "isVisible": "{{ appsmith.store.listsPageReady === true }}",
   "isVisibleDownload": true,
-  "isVisibleFilters": false,
+  "isVisibleFilters": true,
   "isVisiblePagination": false,
   "isVisibleSearch": true,
-  "key": "j66biknh1w",
+  "key": "o945vxl2ds",
   "label": "Data",
   "leftColumn": 0,
   "minWidth": 450,
-  "mobileBottomRow": 27,
-  "mobileLeftColumn": 0,
-  "mobileRightColumn": 12,
-  "mobileTopRow": 0,
+  "mobileBottomRow": 43,
+  "mobileLeftColumn": 3,
+  "mobileRightColumn": 37,
+  "mobileTopRow": 15,
   "needsErrorInfo": false,
-  "onRowSelected": "",
-  "originalBottomRow": 54,
-  "originalTopRow": 18,
-  "parentColumnSpace": 18.890625,
-  "parentId": "h3qxav0gki",
+  "originalBottomRow": 65,
+  "originalTopRow": 14,
+  "parentColumnSpace": 10.1346435546875,
+  "parentId": "w1ete79n8u",
   "parentRowSpace": 10,
   "primaryColumns": {
+    "active": {
+      "alias": "active",
+      "allowCellWrapping": false,
+      "allowSameOptionsInNewRow": true,
+      "cellBackground": "",
+      "columnType": "checkbox",
+      "computedValue": "{{(() => { const tableData = tblListsItems.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\ntypeof currentRow === \"undefined\"\n\t? false\n\t: currentRow.active\n)) : \ntypeof currentRow === \"undefined\"\n\t? false\n\t: currentRow.active\n })()}}",
+      "currencyCode": "USD",
+      "decimals": 0,
+      "enableFilter": true,
+      "enableSort": true,
+      "fontStyle": "",
+      "horizontalAlignment": "CENTER",
+      "id": "active",
+      "index": 2,
+      "isCellEditable": false,
+      "isCellVisible": true,
+      "isDerived": false,
+      "isDisabled": false,
+      "isDiscardVisible": true,
+      "isEditable": false,
+      "isSaveVisible": true,
+      "isVisible": false,
+      "label": "active",
+      "notation": "standard",
+      "originalId": "active",
+      "sticky": "",
+      "textColor": "",
+      "textSize": "0.875rem",
+      "thousandSeparator": true,
+      "validation": {},
+      "verticalAlignment": "CENTER",
+      "width": 150
+    },
     "id": {
       "alias": "id",
       "allowCellWrapping": false,
       "allowSameOptionsInNewRow": true,
       "cellBackground": "",
-      "columnType": "text",
-      "computedValue": "{{(() => { const tableData = tblImportMapHeaders.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (currentRow[\"id\"])) : id })()}}",
+      "columnType": "number",
+      "computedValue": "{{(() => { const tableData = tblListsItems.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\ntypeof currentRow === \"undefined\"\n? null\n: currentRow.id\n)) : \ntypeof currentRow === \"undefined\"\n? null\n: currentRow.id\n })()}}",
       "currencyCode": "USD",
       "decimals": 0,
       "enableFilter": true,
@@ -169,21 +188,21 @@
       "verticalAlignment": "CENTER",
       "width": 150
     },
-    "imported_data": {
-      "alias": "imported_data",
+    "is_system": {
+      "alias": "is_system",
       "allowCellWrapping": false,
       "allowSameOptionsInNewRow": true,
       "cellBackground": "",
-      "columnType": "text",
-      "computedValue": "{{(() => { const tableData = tblImportMapHeaders.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (currentRow[\"imported_data\"])) : imported_data })()}}",
+      "columnType": "checkbox",
+      "computedValue": "{{(() => { const tableData = tblListsItems.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\ntypeof currentRow === \"undefined\"\n? false\n: currentRow.is_system\n)) : \ntypeof currentRow === \"undefined\"\n? false\n: currentRow.is_system\n })()}}",
       "currencyCode": "USD",
       "decimals": 0,
       "enableFilter": true,
       "enableSort": true,
       "fontStyle": "",
-      "horizontalAlignment": "LEFT",
-      "id": "imported_data",
-      "index": 0,
+      "horizontalAlignment": "CENTER",
+      "id": "is_system",
+      "index": 3,
       "isCellEditable": false,
       "isCellVisible": true,
       "isDerived": false,
@@ -191,10 +210,10 @@
       "isDiscardVisible": true,
       "isEditable": false,
       "isSaveVisible": true,
-      "isVisible": true,
-      "label": "Imported Data",
+      "isVisible": false,
+      "label": "is_system",
       "notation": "standard",
-      "originalId": "imported_data",
+      "originalId": "is_system",
       "sticky": "",
       "textColor": "",
       "textSize": "0.875rem",
@@ -203,34 +222,32 @@
       "verticalAlignment": "CENTER",
       "width": 150
     },
-    "map_to": {
-      "alias": "map_to",
+    "name": {
+      "alias": "name",
       "allowCellWrapping": false,
       "allowSameOptionsInNewRow": true,
       "cellBackground": "",
-      "columnType": "select",
-      "computedValue": "{{(() => { const tableData = tblImportMapHeaders.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => ( currentRow.map_to || \"\" )) :  currentRow.map_to || \"\"  })()}}",
+      "columnType": "text",
+      "computedValue": "{{(() => { const tableData = tblListsItems.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\ntypeof currentRow === \"undefined\"\n? \"\"\n: currentRow.name\n)) : \ntypeof currentRow === \"undefined\"\n? \"\"\n: currentRow.name\n })()}}",
       "currencyCode": "USD",
       "decimals": 0,
       "enableFilter": true,
       "enableSort": true,
       "fontStyle": "",
       "horizontalAlignment": "LEFT",
-      "id": "map_to",
+      "id": "name",
       "index": 1,
-      "isCellEditable": true,
+      "isCellEditable": false,
       "isCellVisible": true,
       "isDerived": false,
       "isDisabled": false,
       "isDiscardVisible": true,
-      "isEditable": true,
+      "isEditable": false,
       "isSaveVisible": true,
       "isVisible": true,
-      "label": "Map to",
+      "label": "Item Name",
       "notation": "standard",
-      "onOptionChange": "{{\njsIngredientImport.updateHeaderMapping(\n\ttblImportMapHeaders.updatedRow.id,\n\ttblImportMapHeaders.updatedRow.map_to\n)\n}}",
-      "originalId": "map_to",
-      "selectOptions": "{{(() => { const tableData = tblImportMapHeaders.processedTableData || []; return tableData.length > 0 ? tableData.map((currentRow, currentIndex) => (\n[\n\t{ label: \"Code\", value: \"item_number\" },\n\t{ label: \"Category\", value: \"category\" },\n\t{ label: \"Ingredient\", value: \"ingredient\" },\n\t{ label: \"Qty\", value: \"qty\" },\n\t{ label: \"Unit\", value: \"unit\" },\n\t{ label: \"Cost\", value: \"cost\" }\n]\n)) : \n[\n\t{ label: \"Code\", value: \"item_number\" },\n\t{ label: \"Category\", value: \"category\" },\n\t{ label: \"Ingredient\", value: \"ingredient\" },\n\t{ label: \"Qty\", value: \"qty\" },\n\t{ label: \"Unit\", value: \"unit\" },\n\t{ label: \"Cost\", value: \"cost\" }\n]\n })()}}",
+      "originalId": "name",
       "sticky": "",
       "textColor": "",
       "textSize": "0.875rem",
@@ -245,14 +262,13 @@
   "rightColumn": 64,
   "searchKey": "",
   "serverSidePaginationEnabled": true,
-  "showInlineEditingOptionDropdown": true,
-  "tableData": "{{\nappsmith.store.impHeaderMapRows || []\n}}",
+  "tableData": "{{ apiGetHelperItems.data?.helper_items || [] }}",
   "textSize": "0.875rem",
-  "topRow": 18,
+  "topRow": 14,
   "totalRecordsCount": 0,
   "type": "TABLE_WIDGET_V2",
   "version": 2,
   "verticalAlignment": "CENTER",
-  "widgetId": "k6yjy4e1it",
-  "widgetName": "tblImportMapHeaders"
+  "widgetId": "f20z5pydgx",
+  "widgetName": "tblListsItems"
 }

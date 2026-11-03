@@ -85,11 +85,15 @@ export default {
 			await storeValue("current_user_name", identity.user_name);
 			await storeValue("current_client_name", identity.client_name);
 
-			resetWidget("inpIngLoginEmail", true);
-			resetWidget("inpIngLoginPw", true);
+			// Close the login modal while protected content remains hidden.
+			await storeValue("ingPageReady", false);
 
 			closeModal(mdlIngLogin.name);
 
+			resetWidget("inpIngLoginEmail", true);
+			resetWidget("inpIngLoginPw", true);
+
+			// Allow the modal's onClose handler to complete before loading.
 			const loaded = await jsIngPageLoad.load();
 
 			if (!loaded) {
@@ -116,7 +120,18 @@ export default {
 		}
 	},
 
-	cancel() {
+	async onClose() {
+		if (!this.busy) {
+			await storeValue("ingPageReady", false);
+		}
+
+		resetWidget("inpIngLoginEmail", true);
+		resetWidget("inpIngLoginPw", true);
+	},
+
+	async cancel() {
+		await storeValue("ingPageReady", false);
 		closeModal(mdlIngLogin.name);
+		return true;
 	}
 };

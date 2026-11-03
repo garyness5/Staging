@@ -95,6 +95,9 @@ export default {
 
 		if (valid) return true;
 
+		// Block protected content without deleting local working state.
+		await storeValue("ingPageReady", false);
+
 		if (this.lastFailure === "login_required") {
 			showModal(mdlIngLogin.name);
 		} else {

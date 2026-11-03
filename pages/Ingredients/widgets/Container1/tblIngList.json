@@ -5,7 +5,7 @@
   "borderColor": "#E0DEDE",
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
   "borderWidth": "1",
-  "bottomRow": 55,
+  "bottomRow": 69,
   "boxShadow": "{{appsmith.theme.boxShadow.appBoxShadow}}",
   "cachedTableData": {},
   "canFreezeColumn": true,
@@ -378,10 +378,10 @@
   "needsErrorInfo": false,
   "oddRowColor": "{{appsmith.theme.colors.backgroundColor}}",
   "onRowSelected": "{{ storeValue(\"IngList_selected_id\", tblIngList.selectedRow?.id ?? null) }}",
-  "originalBottomRow": 81,
-  "originalTopRow": 9,
+  "originalBottomRow": 69,
+  "originalTopRow": 14,
   "parentColumnSpace": 16.109375,
-  "parentId": "hu80in30ql",
+  "parentId": "bovounj8yr",
   "parentRowSpace": 10,
   "primaryColumns": {
     "active": {
@@ -1490,11 +1490,11 @@
   "showInlineEditingOptionDropdown": true,
   "tableData": "{{ jsIngPageLoad.isReady() ? jsIngList.filteredRows() : [] }}",
   "textSize": "0.875rem",
-  "topRow": 0,
+  "topRow": 14,
   "totalRecordsCount": "300",
   "type": "TABLE_WIDGET_V2",
   "version": 2,
   "verticalAlignment": "CENTER",
-  "widgetId": "4cpsuspbul",
+  "widgetId": "08hho9jmdk",
   "widgetName": "tblIngList"
 }
