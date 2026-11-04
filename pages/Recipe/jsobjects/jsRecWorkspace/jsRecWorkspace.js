@@ -201,6 +201,14 @@ export default {
 		);
 	},
 
+
+	loadedRevision() {
+		return Number(
+			appsmith.store.recipe_loaded_revision || 0
+		);
+	},
+
+
 	get() {
 		return this.normalizeSnapshot(
 			appsmith.store.recipe_workspace ||
@@ -326,10 +334,17 @@ export default {
 		return value;
 	},
 
+
 	async initializeFromSaved() {
 		const saved = this.savedTruth();
 
+		const revision = Number(
+			apiRecGetDetail.data?.recipe?.revision || 0
+		);
+
 		await removeValue("recipe_duplicate_initial");
+
+		await storeValue("recipe_loaded_revision", revision);
 
 		await this.setBaseline(saved);
 		await this.setWorkspace(saved);
@@ -337,10 +352,13 @@ export default {
 		return saved;
 	},
 
+
+
 	async initializeNew() {
 		const empty = this.emptySnapshot();
 
 		await removeValue("recipe_duplicate_initial");
+		await removeValue("recipe_loaded_revision");
 
 		await this.setBaseline(empty);
 		await this.setWorkspace(empty);
@@ -348,8 +366,12 @@ export default {
 		return empty;
 	},
 
+
+
 	async initializeDuplicate(snapshot) {
 		const value = this.normalizeSnapshot(snapshot);
+
+		await removeValue("recipe_loaded_revision");
 
 		await this.setBaseline(this.emptySnapshot());
 
@@ -362,6 +384,7 @@ export default {
 
 		return value;
 	},
+
 
 	isSnapshotDirty(snapshot) {
 		const current = this.normalizeSnapshot(snapshot);
@@ -425,6 +448,7 @@ export default {
 		await removeValue("recipe_workspace");
 		await removeValue("recipe_baseline");
 		await removeValue("recipe_duplicate_initial");
+		await removeValue("recipe_loaded_revision");
 
 		return true;
 	}

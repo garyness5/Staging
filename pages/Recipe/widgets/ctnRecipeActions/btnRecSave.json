@@ -42,7 +42,7 @@
   "mobileRightColumn": 18,
   "mobileTopRow": 1,
   "needsErrorInfo": false,
-  "onClick": "{{ jsRecSave.saveRecipe() }}",
+  "onClick": "{{\n(async () => {\n\tawait removeValue(\"recipe_conflict_revision\");\n\treturn await jsRecSave.saveRecipe();\n})()\n}}",
   "parentColumnSpace": 19.5,
   "parentId": "uxcwk5l4ib",
   "parentRowSpace": 10,

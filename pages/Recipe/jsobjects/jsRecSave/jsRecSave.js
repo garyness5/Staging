@@ -244,6 +244,9 @@ export default {
 
 			databaseSaved = true;
 
+			await removeValue("recipe_conflict_revision");
+			await removeValue("recipe_pending_conflict_revision");
+
 			await storeValue(
 				"current_recipe_id",
 				savedId
@@ -294,6 +297,22 @@ export default {
 
 		} catch (error) {
 			console.error("Recipe Save failed:", error);
+
+
+			const conflictRevision = this.recipeConflictResponse(error);
+
+			if (!databaseSaved && conflictRevision) {
+				await removeValue("recipe_conflict_revision");
+
+				await storeValue(
+					"recipe_pending_conflict_revision",
+					conflictRevision
+				);
+
+				showModal(mdlRecRevisionConflict.name);
+				return false;
+			}
+
 
 			if (databaseSaved) {
 				// Database commit succeeded, but frontend
@@ -752,58 +771,59 @@ export default {
 		return await this.deleteRecipeConfirm();
 	},
 
+
 	async deleteRecipeConfirm() {
 		try {
-			const result =
-						await apiRecDeleteRecipe.run();
+			const result = await apiRecDeleteRecipe.run();
 
 			if (!result?.authenticated) {
 				throw new Error("Recipe Delete authentication failed.");
 			}
 
 			const deletedId = Number(result.recipe_id || 0);
+			const currentId = Number(
+				appsmith.store.current_recipe_id || 0
+			);
 
-			const currentId =
-						Number(
-							appsmith.store.current_recipe_id || 0
-						);
+			if (!deletedId || deletedId !== currentId) {
+				showAlert("Recipe was not deleted.", "error");
+				return false;
+			}
 
-			if (
-				!deletedId ||
-				deletedId !== currentId
-			) {
+			closeModal(mdlRecDeleteConfirm.name);
+
+			await storeValue("current_recipe_id", 0);
+			await jsRecCompTable.clearRows();
+			await jsRecWorkspace.clear();
+
+			showAlert("Recipe deleted.", "success");
+			navigateTo("RecipeList");
+
+			return true;
+
+		} catch (error) {
+			const data = apiRecDeleteRecipe.data || {};
+
+			const response = [
+				JSON.stringify(data),
+				String(error?.message || "")
+			].join(" ");
+
+			if (response.includes("RECIPE_REVISION_CONFLICT")) {
+				closeModal(mdlRecDeleteConfirm.name);
+
 				showAlert(
-					"Recipe was not deleted.",
-					"error"
+					"This Recipe has been changed by another user. " +
+					"Your Recipe has not been deleted. " +
+					"Your current work is preserved. " +
+					"Reload the Recipe to review the latest saved version " +
+					"before attempting Delete again.",
+					"warning"
 				);
 
 				return false;
 			}
 
-			closeModal(
-				mdlRecDeleteConfirm.name
-			);
-
-			await storeValue(
-				"current_recipe_id",
-				0
-			);
-
-			await jsRecCompTable.clearRows();
-			await jsRecWorkspace.clear();
-
-			showAlert(
-				"Recipe deleted.",
-				"success"
-			);
-
-			navigateTo(
-				"RecipeList"
-			);
-
-			return true;
-
-		} catch (error) {
 			showAlert(
 				jsUserErrors.friendly(error),
 				"error"
@@ -873,5 +893,50 @@ export default {
 			default:
 				return false;
 		}
-	}
+	},
+
+
+	recipeConflictResponse(error) {
+		const data = apiRecSaveRecipe.data || {};
+
+		const response = [
+			JSON.stringify(data),
+			String(error?.message || "")
+		].join(" ");
+
+		if (
+			data.code !== "RECIPE_REVISION_CONFLICT" &&
+			!response.includes("RECIPE_REVISION_CONFLICT")
+		) {
+			return null;
+		}
+
+		const revision = Number(
+			data.current_revision ||
+			response.match(/current_revision["\s:]+(\d+)/)?.[1] ||
+			0
+		);
+
+		return revision > 0 ? revision : null;
+	},
+
+	async confirmRevisionOverwrite() {
+		const revision = Number(
+			appsmith.store.recipe_pending_conflict_revision || 0
+		);
+
+		if (!revision) {
+			showAlert(
+				"Recipe conflict information is missing. Please try Save again.",
+				"warning"
+			);
+			return false;
+		}
+
+		await storeValue("recipe_conflict_revision", revision);
+
+		closeModal(mdlRecRevisionConflict.name);
+
+		return await this.saveRecipe();
+	},	
 };

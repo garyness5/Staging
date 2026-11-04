@@ -11,7 +11,7 @@
           "value": "application/json"
         }
       ],
-      "body": "{{ {\n\toperation: \"delete_my_recipe\",\n\trecipe_id: Number(appsmith.store.current_recipe_id || 0)\n} }}",
+      "body": "{{ {\n\toperation: \"delete_my_recipe\",\n\trecipe_id: Number(appsmith.store.current_recipe_id || 0),\n\texpected_revision: jsRecWorkspace.loadedRevision()\n} }}\n",
       "bodyFormData": [],
       "encodeParamsToggle": true,
       "formData": {
@@ -19,7 +19,7 @@
       },
       "headers": [
         {
-          "key": "Authorization/",
+          "key": "Authorization",
           "value": "Bearer {{appsmith.store.savveyra_access_token}}"
         }
       ],

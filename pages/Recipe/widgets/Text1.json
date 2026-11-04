@@ -1,7 +1,7 @@
 {
   "animateLoading": true,
   "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",
-  "bottomRow": 114,
+  "bottomRow": 121,
   "dynamicBindingPathList": [
     {
       "key": "truncateButtonColor"
@@ -43,7 +43,7 @@
   "responsiveBehavior": "fill",
   "rightColumn": 17,
   "shouldTruncate": false,
-  "text": "{{}}",
+  "text": "{{ \n  JSON.stringify({\n    recipe_id: appsmith.store.current_recipe_id,\n    loaded_revision: appsmith.store.recipe_loaded_revision,\n    function_revision: jsRecWorkspace.loadedRevision()\n  }, null, 2)\n}}",
   "textAlign": "LEFT",
   "textColor": "#231F20",
   "topRow": 110,
