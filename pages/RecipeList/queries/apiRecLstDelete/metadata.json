@@ -11,7 +11,7 @@
           "value": "application/json"
         }
       ],
-      "body": "{{\n{\n\toperation: \"delete_my_recipe\",\n\trecipe_id: this.params.recipe_id\n}\n}}",
+      "body": "{{\n{\n\toperation: \"delete_my_recipe\",\n\trecipe_id: this.params.recipe_id,\n\texpected_revision: this.params.expected_revision\n}\n}}\n",
       "bodyFormData": [],
       "encodeParamsToggle": true,
       "formData": {

@@ -11,7 +11,7 @@
           "value": "application/json"
         }
       ],
-      "body": "{{\n{\n\toperation: \"set_my_recipe_active\",\n\trecipe_id: this.params.recipe_id,\n\tactive: this.params.active\n}\n}}",
+      "body": "{{ {\n\toperation: \"set_my_recipe_active\",\n\trecipe_id: this.params.recipe_id,\n\tactive: this.params.active,\n\texpected_revision: this.params.expected_revision\n} }}\n",
       "bodyFormData": [],
       "encodeParamsToggle": true,
       "formData": {

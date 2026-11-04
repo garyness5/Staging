@@ -50,7 +50,7 @@
   "needsErrorInfo": false,
   "onTextChanged": "{{ true }}",
   "parentColumnSpace": 17.625,
-  "parentId": "avjh3rchb8",
+  "parentId": "w9g44hmbiy",
   "parentRowSpace": 10,
   "placeholderText": "Search Recipes...",
   "renderMode": "CANVAS",
@@ -62,6 +62,6 @@
   "topRow": 2,
   "type": "INPUT_WIDGET_V2",
   "version": 2,
-  "widgetId": "nsozbjofz9",
+  "widgetId": "gj225mq86p",
   "widgetName": "inpRecLstSearch"
 }

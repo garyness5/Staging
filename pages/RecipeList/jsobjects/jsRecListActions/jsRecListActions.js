@@ -135,6 +135,7 @@ export default {
 		return true;
 	},
 
+
 	async deleteSelectedRecipeStart() {
 		if (!this.hasSelection()) {
 			showAlert("Select a Recipe first.", "warning");
@@ -142,6 +143,27 @@ export default {
 		}
 
 		const recipeId = this.selectedRecipeId();
+
+		const row = (apiRecLstGetRecipes.data?.recipes || [])
+		.find(r => Number(r.id) === recipeId);
+
+		const revision = Number(
+			appsmith.store.RecListConfirmedActive?.[String(recipeId)]?.revision
+			?? row?.revision
+		);
+
+		if (!Number.isSafeInteger(revision) || revision < 1) {
+			showAlert(
+				"Recipe revision is unavailable. Refresh RecipeList.",
+				"warning"
+			);
+			return false;
+		}
+
+		await storeValue("RecListDeleteTarget", {
+			recipe_id: recipeId,
+			expected_revision: revision
+		}, false);
 
 		try {
 			const result = await apiRecLstGetImpactCount.run({
@@ -159,6 +181,8 @@ export default {
 			return true;
 
 		} catch (error) {
+			await removeValue("RecListDeleteTarget");
+
 			showAlert(
 				"Unable to check Recipe impact. No changes were made.",
 				"error"
@@ -167,17 +191,30 @@ export default {
 		}
 	},
 
+
 	async deleteSelectedRecipeConfirm() {
-		if (!this.hasSelection()) {
-			showAlert("Select a Recipe first.", "warning");
+		const target = appsmith.store.RecListDeleteTarget;
+
+		const recipeId = Number(target?.recipe_id);
+		const revision = Number(target?.expected_revision);
+
+		if (
+			!Number.isSafeInteger(recipeId) ||
+			recipeId <= 0 ||
+			!Number.isSafeInteger(revision) ||
+			revision < 1
+		) {
+			showAlert(
+				"Delete selection is invalid. Please select the Recipe again.",
+				"error"
+			);
 			return false;
 		}
 
-		const recipeId = this.selectedRecipeId();
-
 		try {
 			const result = await apiRecLstDelete.run({
-				recipe_id: recipeId
+				recipe_id: recipeId,
+				expected_revision: revision
 			});
 
 			if (
@@ -188,6 +225,7 @@ export default {
 			}
 
 			await removeValue("current_recipe_id");
+			await removeValue("RecListDeleteTarget");
 
 			closeModal(mdlRecLstDelete.name);
 
@@ -197,15 +235,38 @@ export default {
 				refreshed?.authenticated !== true ||
 				!Array.isArray(refreshed?.recipes)
 			) {
-				throw new Error("Recipe deleted, but the list could not be refreshed.");
+				showAlert(
+					"Recipe deleted, but the list could not be refreshed.",
+					"warning"
+				);
+				return true;
 			}
 
 			showAlert("Recipe deleted.", "success");
 			return true;
 
 		} catch (error) {
+			const response = [
+				JSON.stringify(apiRecLstDelete.data || {}),
+				String(error?.message || "")
+			].join(" ");
+
+			if (response.includes("RECIPE_REVISION_CONFLICT")) {
+				closeModal(mdlRecLstDelete.name);
+				await removeValue("RecListDeleteTarget");
+
+				showAlert(
+					"This Recipe was changed by another user. " +
+					"It has not been deleted. Refresh RecipeList " +
+					"before trying again.",
+					"warning"
+				);
+
+				return false;
+			}
+
 			showAlert(
-				error?.message || "Recipe could not be deleted.",
+				jsUserErrors.friendly(error),
 				"error"
 			);
 			return false;
@@ -251,9 +312,10 @@ export default {
 		) > 0;
 	},
 
+
+
 	async setActive(row, active) {
 		const recipeId = Number(row?.id);
-		await storeValue("RecList_selected_id", recipeId);
 
 		if (!Number.isSafeInteger(recipeId) || recipeId <= 0) {
 			showAlert("Invalid Recipe ID.", "error");
@@ -263,34 +325,24 @@ export default {
 		const savedRow = (apiRecLstGetRecipes.data?.recipes || [])
 		.find(r => Number(r.id) === recipeId);
 
-		if (!savedRow) {
-			showAlert("Recipe could not be identified.", "error");
-			return false;
-		}
-
-		const requestedActive = active === true;
-
-		if (typeof active !== "boolean") {
-			showAlert("Invalid Recipe Status.", "error");
+		if (!savedRow || typeof active !== "boolean") {
+			showAlert("Invalid Recipe Status request.", "error");
 			return false;
 		}
 
 		const key = String(recipeId);
 		const confirmed = appsmith.store.RecListConfirmedActive || {};
+		const overlay = confirmed[key];
+
 		const previousActive =
-					Object.prototype.hasOwnProperty.call(confirmed, key)
-		? confirmed[key]
+					overlay && typeof overlay.active === "boolean"
+		? overlay.active
 		: savedRow.active;
 
-		if (requestedActive === previousActive) {
-			return true;
-		}
+		if (active === previousActive) return true;
 
 		if (appsmith.store.RecListRefreshing === true) {
-			showAlert(
-				"Please wait for RecipeList to finish refreshing.",
-				"warning"
-			);
+			showAlert("Please wait for RecipeList to finish refreshing.", "warning");
 			return false;
 		}
 
@@ -301,6 +353,18 @@ export default {
 			return false;
 		}
 
+		const revision = Number(
+			overlay && overlay.revision != null
+			? overlay.revision
+			: savedRow.revision
+		);
+
+		if (!Number.isSafeInteger(revision) || revision < 1) {
+			showAlert("Recipe revision is unavailable. Refresh RecipeList.", "warning");
+			return false;
+		}
+
+		await storeValue("RecList_selected_id", recipeId);
 		await storeValue(
 			"RecListStatusSaving",
 			{ ...pending, [key]: true },
@@ -310,13 +374,18 @@ export default {
 		try {
 			const result = await apiRecLstSetActive.run({
 				recipe_id: recipeId,
-				active: requestedActive
+				active: active,
+				expected_revision: revision
 			});
+
+			const newRevision = Number(result?.revision);
 
 			if (
 				result?.authenticated !== true ||
 				Number(result.recipe_id) !== recipeId ||
-				typeof result.active !== "boolean"
+				typeof result.active !== "boolean" ||
+				!Number.isSafeInteger(newRevision) ||
+				newRevision <= revision
 			) {
 				throw new Error("Recipe Status was not confirmed.");
 			}
@@ -325,7 +394,10 @@ export default {
 				"RecListConfirmedActive",
 				{
 					...(appsmith.store.RecListConfirmedActive || {}),
-					[key]: result.active
+					[key]: {
+						active: result.active,
+						revision: newRevision
+					}
 				},
 				false
 			);
@@ -333,10 +405,23 @@ export default {
 			return true;
 
 		} catch (error) {
-			showAlert(
-				"Recipe Status could not be saved. The previous Status has been restored.",
-				"error"
-			);
+			const response = [
+				JSON.stringify(apiRecLstSetActive.data || {}),
+				String(error?.message || "")
+			].join(" ");
+
+			if (response.includes("RECIPE_REVISION_CONFLICT")) {
+				showAlert(
+					"This Recipe was changed by another user. " +
+					"Status was not updated. Refresh RecipeList before trying again.",
+					"warning"
+				);
+			} else {
+				showAlert(
+					"Recipe Status could not be saved. The previous Status has been restored.",
+					"error"
+				);
+			}
 
 			return false;
 
@@ -347,11 +432,7 @@ export default {
 
 			delete current[key];
 
-			await storeValue(
-				"RecListStatusSaving",
-				current,
-				false
-			);
+			await storeValue("RecListStatusSaving", current, false);
 		}
 	},
 
@@ -421,22 +502,28 @@ export default {
 		const status = this.statusFilter();
 
 		return (apiRecLstGetRecipes.data?.recipes || [])
+
 			.map(row => {
 			const confirmed =
 						appsmith.store.RecListConfirmedActive || {};
 
-			const key = String(row.id);
+			const saved = confirmed[String(row.id)];
 
-			return {
-				...row,
-				active: Object.prototype.hasOwnProperty.call(
-					confirmed,
-					key
-				)
-				? confirmed[key]
-				: row.active
-			};
+			if (
+				saved &&
+				typeof saved === "object" &&
+				typeof saved.active === "boolean"
+			) {
+				return {
+					...row,
+					active: saved.active,
+					revision: saved.revision
+				};
+			}
+
+			return row;
 		})
+
 			.filter(row => {
 			if (status === "active" && row.active !== true) return false;
 			if (status === "inactive" && row.active !== false) return false;

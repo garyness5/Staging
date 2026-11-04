@@ -15,7 +15,11 @@
       "key": "borderRadius"
     }
   ],
-  "dynamicPropertyPathList": [],
+  "dynamicPropertyPathList": [
+    {
+      "key": "onClick"
+    }
+  ],
   "dynamicTriggerPathList": [
     {
       "key": "onClick"
@@ -33,7 +37,7 @@
   "mobileRightColumn": 47,
   "mobileTopRow": 18,
   "needsErrorInfo": false,
-  "onClick": "{{closeModal(mdlRecLstDelete.name);}}",
+  "onClick": "{{\n  closeModal(mdlRecLstDelete.name);\n  removeValue(\"RecListDeleteTarget\");\n}}",
   "originalBottomRow": 29,
   "originalTopRow": 25,
   "parentId": "vk3d15d0wr",
