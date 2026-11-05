@@ -122,10 +122,56 @@ export default {
 	},
 
 	async logout() {
+		let revoked = false;
+
+		try {
+			// Attempt server-side session revocation first.
+			// Refresh an expired access token if possible.
+			const expiresAt = Number(
+				appsmith.store.savveyra_token_expires_at || 0
+			);
+
+			if (
+				appsmith.store.savveyra_refresh_token &&
+				expiresAt <= Date.now() + 60000
+			) {
+				const refreshed = await apiLoginRefreshSupaSession.run();
+
+				if (refreshed?.access_token && refreshed?.refresh_token) {
+					await storeValue(
+						"savveyra_access_token",
+						refreshed.access_token,
+						true
+					);
+					await storeValue(
+						"savveyra_refresh_token",
+						refreshed.refresh_token,
+						true
+					);
+				}
+			}
+
+			if (appsmith.store.savveyra_access_token) {
+				await apiLoginSignOut.run();
+				revoked = true;
+			}
+		} catch (error) {
+			revoked = false;
+		}
+
+		// Explicit Logout always removes the local workspace.
 		await clearStore();
 
-		showAlert("Logged out successfully.", "success");
-		return true;
+		if (revoked) {
+			showAlert("Logged out successfully.", "success");
+		} else {
+			showAlert(
+				"Local session cleared. Server logout could not be confirmed.",
+				"warning"
+			);
+		}
+
+		return revoked;
 	},
 
 	checkToken() {

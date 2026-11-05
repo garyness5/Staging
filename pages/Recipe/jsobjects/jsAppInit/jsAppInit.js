@@ -20,10 +20,13 @@ export default {
 			);
 
 			if (!workspaceOwner) {
+				await storeValue("recReauthRequired", true);
+
 				showAlert(
 					"Please sign in to Savveyra.",
 					"warning"
 				);
+
 				return false;
 			}
 
@@ -32,10 +35,17 @@ export default {
 			const sessionValid = await jsAuthSession.ensureValid();
 
 			if (!sessionValid) {
-				showAlert(
-					"Your Savveyra session has expired. Please sign in again.",
-					"warning"
-				);
+				if (jsAuthSession.lastFailure === "login_required") {
+					await storeValue("recReauthRequired", true);
+					showModal(mdlRecReauth.name);
+				} else {
+					await storeValue("recReauthRequired", false);
+					showAlert(
+						"Unable to connect to Savveyra. Please check your connection and try again.",
+						"warning"
+					);
+				}
+
 				return false;
 			}
 
@@ -89,6 +99,8 @@ export default {
 				"current_user_name",
 				identity.user_name
 			);
+
+			await storeValue("recReauthRequired", false);
 
 			return true;
 

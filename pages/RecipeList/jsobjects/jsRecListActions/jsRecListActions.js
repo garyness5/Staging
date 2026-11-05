@@ -166,7 +166,7 @@ export default {
 		}, false);
 
 		try {
-			const result = await apiRecLstGetImpactCount.run({
+			const result = await apiSecurityTest.run({
 				recipe_id: recipeId
 			});
 
@@ -275,25 +275,25 @@ export default {
 
 	impactRecipeCount() {
 		return Number(
-			apiRecLstGetImpactCount.data?.impact?.recipe_count || 0
+			apiSecurityTest.data?.impact?.recipe_count || 0
 		);
 	},
 
 	impactDishCount() {
 		return Number(
-			apiRecLstGetImpactCount.data?.impact?.dish_count || 0
+			apiSecurityTest.data?.impact?.dish_count || 0
 		);
 	},
 
 	impactMenuCount() {
 		return Number(
-			apiRecLstGetImpactCount.data?.impact?.menu_count || 0
+			apiSecurityTest.data?.impact?.menu_count || 0
 		);
 	},
 
 	impactEventCount() {
 		return Number(
-			apiRecLstGetImpactCount.data?.impact?.event_count || 0
+			apiSecurityTest.data?.impact?.event_count || 0
 		);
 	},
 

@@ -1,12 +1,20 @@
 export default {
+	lastFailure: null,
+	refreshInProgress: null,
+
 	async ensureValid() {
+		this.lastFailure = null;
+
 		const token = appsmith.store.savveyra_access_token;
 		const refreshToken = appsmith.store.savveyra_refresh_token;
 		const expiresAt = Number(
 			appsmith.store.savveyra_token_expires_at || 0
 		);
 
-		if (!refreshToken) return false;
+		if (!refreshToken) {
+			this.lastFailure = "login_required";
+			return false;
+		}
 
 		if (token && expiresAt > Date.now() + 5 * 60 * 1000) {
 			return true;
@@ -15,21 +23,27 @@ export default {
 		return await this.refresh();
 	},
 
-	async testExpiredToken() {
-		await storeValue(
-			"savveyra_token_expires_at",
-			0,
-			true
-		);
+	async refresh() {
+		if (this.refreshInProgress) {
+			return await this.refreshInProgress;
+		}
 
-		return await this.ensureValid();
+		this.refreshInProgress = this.performRefresh();
+
+		try {
+			return await this.refreshInProgress;
+		} finally {
+			this.refreshInProgress = null;
+		}
 	},
 
-	async refresh() {
+
+	async performRefresh() {
 		try {
 			const result = await apiRecLstRefreshSupaSession.run();
 
 			if (!result?.access_token || !result?.refresh_token) {
+				this.lastFailure = "service_unavailable";
 				return false;
 			}
 
@@ -51,9 +65,53 @@ export default {
 				true
 			);
 
+			this.lastFailure = null;
 			return true;
+
 		} catch (error) {
+			const meta = apiRecLstRefreshSupaSession.responseMeta || {};
+			const data = apiRecLstRefreshSupaSession.data || {};
+
+			const status = parseInt(
+				String(meta.statusCode || ""),
+				10
+			);
+
+			const errorCode = String(
+				data.error_code || ""
+			).toLowerCase();
+
+			const authFailureCodes = [
+				"refresh_token_not_found",
+				"invalid_refresh_token",
+				"invalid_grant"
+			];
+
+			const invalidToken =
+						status === 401 ||
+						(
+							status === 400 &&
+							(
+								errorCode === "validation_failed" ||
+								authFailureCodes.includes(errorCode)
+							)
+						);
+
+			this.lastFailure = invalidToken
+				? "login_required"
+			: "service_unavailable";
+
 			return false;
 		}
-	}
+	},
+
+	async testExpiredToken() {
+		await storeValue(
+			"savveyra_token_expires_at",
+			0,
+			true
+		);
+
+		return await this.ensureValid();
+	},
 };

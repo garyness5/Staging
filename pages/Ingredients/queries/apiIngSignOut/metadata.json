@@ -1,6 +1,6 @@
 {
-  "gitSyncId": "6ad02e5d7089041c6d575f1b_5d6c4cb4-598e-4664-b035-46a053fa085c",
-  "id": "RecipeList_apiRecLstGetImpactCount",
+  "gitSyncId": "6ad02e5d7089041c6d575f1b_e2457374-caa9-4305-bff0-e64369f131ff",
+  "id": "Ingredients_apiIngSignOut",
   "pluginId": "restapi-plugin",
   "pluginType": "API",
   "unpublishedAction": {
@@ -11,7 +11,7 @@
           "value": "application/json"
         }
       ],
-      "body": "{{\n{\n\toperation: \"get_my_recipe_impact\",\n\trecipe_id: this.params.recipe_id\n}\n}}",
+      "body": "{\n\t\"email\": \"{{inpLoginEmail.text}}\",\n\t\"password\": \"{{inpLoginPassword.text}}\"\n}",
       "bodyFormData": [],
       "encodeParamsToggle": true,
       "formData": {
@@ -26,7 +26,7 @@
       "httpMethod": "POST",
       "httpVersion": "HTTP11",
       "paginationType": "NONE",
-      "path": "/functions/v1/savveyra-security",
+      "path": "/auth/v1/logout",
       "pluginSpecifiedTemplates": [
         {
           "value": true
@@ -44,15 +44,15 @@
     },
     "dynamicBindingPathList": [
       {
-        "key": "headers[0].value"
+        "key": "body"
       },
       {
-        "key": "body"
+        "key": "headers[0].value"
       }
     ],
-    "name": "apiRecLstGetImpactCount",
-    "pageId": "RecipeList",
+    "name": "apiIngSignOut",
+    "pageId": "Ingredients",
     "runBehaviour": "MANUAL",
-    "userSetOnLoad": true
+    "userSetOnLoad": false
   }
 }

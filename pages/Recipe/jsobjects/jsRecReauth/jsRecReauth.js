@@ -1,4 +1,5 @@
 export default {
+
 	async signIn(email, password) {
 		try {
 			const result = await apiRecReauthenticate.run({
@@ -8,7 +9,7 @@ export default {
 
 			if (!result?.access_token || !result?.refresh_token) {
 				showAlert("Sign-in failed. Please check your credentials.", "error");
-				return false;
+				return { success: false };
 			}
 
 			const identity = await apiRecReauthIdentity.run({
@@ -21,7 +22,7 @@ export default {
 				!identity?.client_id
 			) {
 				showAlert("Unable to verify your account.", "error");
-				return false;
+				return { success: false };
 			}
 
 			const owner = String(
@@ -30,12 +31,10 @@ export default {
 
 			const incoming = String(identity.user_id);
 
-			if (!owner || incoming !== owner) {
-				showAlert(
-					"This workspace belongs to another operator. Use Logout to switch accounts.",
-					"warning"
-				);
-				return false;
+			const sameUser = owner !== "" && owner === incoming;
+
+			if (!sameUser) {
+				await jsRecWorkspace.clearForDifferentUser();
 			}
 
 			await storeValue("savveyra_access_token", result.access_token, true);
@@ -46,31 +45,91 @@ export default {
 				true
 			);
 
-			showAlert("Session restored. Your unsaved work is preserved.", "success");
-			return true;
+			await storeValue("workspace_owner_user_id", incoming, true);
+			await storeValue("current_user_id", incoming);
+			await storeValue("current_client_id", identity.client_id);
+			await storeValue("current_user_name", identity.user_name);
+			await storeValue("current_client_name", identity.client_name);
+			await storeValue("recReauthRequired", false);
+
+			if (!sameUser) {
+				return {
+					success: true,
+					destination: "RecipeList"
+				};
+			}
+
+			showAlert(
+				"Session restored. Your unsaved work is preserved.",
+				"success"
+			);
+
+			return {
+				success: true,
+				destination: "Recipe"
+			};
 
 		} catch (error) {
 			showAlert("Unable to sign in. Please try again.", "error");
-			return false;
+			return { success: false };
 		}
 	},
 
+
+
 	async submit() {
-		const success = await this.signIn(
+		const result = await this.signIn(
 			inpRecReauthEmail.text,
 			inpRecReauthPassword.text
 		);
 
-		if (success) {
-			closeModal(mdlRecReauth.name);
-			await resetWidget("inpRecReauthEmail", true);
-			await resetWidget("inpRecReauthPassword", true);
+		if (!result?.success) {
+			return false;
 		}
 
-		return success;
+		if (result.destination === "RecipeList") {
+			navigateTo("RecipeList");
+			return true;
+		}
+
+		closeModal(mdlRecReauth.name);
+
+		await resetWidget("inpRecReauthEmail", true);
+		await resetWidget("inpRecReauthPassword", true);
+
+		return true;
 	},
 
-	cancel() {
+
+	async openSignIn() {
+		await resetWidget("inpRecReauthEmail", true);
+		await resetWidget("inpRecReauthPassword", true);
+
+		showModal(mdlRecReauth.name);
+	},
+
+	async logout() {
+		let revoked = false;
+
+		try {
+			if (appsmith.store.savveyra_access_token) {
+				await apiRecSignOut.run();
+				revoked = true;
+			}
+		} catch (error) {
+			console.error(
+				"Recipe session revocation failed:",
+				error
+			);
+		}
+
+		// Explicit Logout discards the current operator's workspace.
+		await clearStore();
+
 		closeModal(mdlRecReauth.name);
+
+		navigateTo("Login");
+
+		return revoked;
 	}
 };

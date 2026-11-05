@@ -32,7 +32,7 @@
     }
   ],
   "isDefaultClickDisabled": true,
-  "isDisabled": "{{\napiRecLstDelete.isLoading ||\napiRecLstGetImpactCount.isLoading\n}}",
+  "isDisabled": "{{\napiRecLstDelete.isLoading ||\napiSecurityTest.isLoading\n}}",
   "isLoading": false,
   "isVisible": true,
   "key": "db5p08m351",

@@ -1,0 +1,4 @@
+{
+	"email": "{{inpRecReauthEmail.text}}",
+	"password": "{{inpRecReauthPassword.text}}"
+}

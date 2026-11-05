@@ -1,6 +1,6 @@
 {
-  "gitSyncId": "6ad02e5d7089041c6d575f1b_31bed278-618c-4425-92db-8d39d1412800",
-  "id": "Recipe_jsAuthSession.testExpiredToken",
+  "gitSyncId": "6ad02e5d7089041c6d575f1b_5cd486b0-d363-4835-8793-9f0c0e7069e4",
+  "id": "Recipe_jsAuthSession.performRefresh",
   "pluginId": "js-plugin",
   "pluginType": "JS",
   "unpublishedAction": {
@@ -22,8 +22,8 @@
         "key": "body"
       }
     ],
-    "fullyQualifiedName": "jsAuthSession.testExpiredToken",
-    "name": "testExpiredToken",
+    "fullyQualifiedName": "jsAuthSession.performRefresh",
+    "name": "performRefresh",
     "pageId": "Recipe",
     "runBehaviour": "MANUAL",
     "userSetOnLoad": false
