@@ -11,7 +11,7 @@
           "value": "application/json"
         }
       ],
-      "body": "{\n\t\"email\": \"{{inpRecReauthEmail.text}}\",\n\t\"password\": \"{{inpRecReauthPassword.text}}\"\n}",
+      "body": "{\n\t\"email\": \"{{inpRecLoginEmail.text}}\",\n\t\"password\": \"{{inpRecLoginPassword.text}}\"\n}",
       "bodyFormData": [],
       "encodeParamsToggle": true,
       "formData": {

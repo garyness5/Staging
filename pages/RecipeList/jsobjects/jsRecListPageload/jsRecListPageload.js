@@ -7,7 +7,7 @@ export default {
 			const ok = await jsAppInit.init();
 
 			if (!ok) {
-				console.error("RecipeList: initialization failed.");
+				await storeValue("recListPageReady", false);
 				return false;
 			}
 

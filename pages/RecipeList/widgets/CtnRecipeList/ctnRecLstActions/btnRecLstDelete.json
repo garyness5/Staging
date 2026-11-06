@@ -29,7 +29,7 @@
   ],
   "iconAlign": "left",
   "isDefaultClickDisabled": true,
-  "isDisabled": "{{ apiRecLstDelete.isLoading }}",
+  "isDisabled": "{{\n  !jsRecListActions.hasSelection() ||\n  apiRecLstDelete.isLoading ||\n  apiRecLstGetImpactCount.isLoading\n}}",
   "isLoading": false,
   "isVisible": true,
   "key": "o01hoigeqy",

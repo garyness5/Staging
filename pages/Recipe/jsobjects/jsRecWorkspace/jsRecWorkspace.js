@@ -420,7 +420,7 @@ export default {
 		closeModal(mdlRecIngAddIng.name);
 		closeModal(mdlRecUnsavedChanges.name);
 		closeModal(mdlRecDiscardConfirm.name);
-		closeModal(mdlRecReauth.name);
+		closeModal(mdlRecLogin.name);
 
 		// Clear all previous operator's stored state.
 		await clearStore();

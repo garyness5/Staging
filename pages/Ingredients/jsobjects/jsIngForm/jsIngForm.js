@@ -598,6 +598,10 @@ export default {
 			return false;
 		}
 
+		if (!(await jsAuthSession.requireValid())) {
+			return false;
+		}
+
 		try {
 			const response = await apiIngGetImpactCount.run({
 				ingredient_id: id

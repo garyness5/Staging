@@ -49,7 +49,7 @@
     ],
     "name": "apiRecLstRefreshSupaSession",
     "pageId": "Recipe",
-    "runBehaviour": "MANUAL",
+    "runBehaviour": "AUTOMATIC",
     "userSetOnLoad": false
   }
 }

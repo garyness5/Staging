@@ -1,4 +1,4 @@
 {
-	"email": "{{inpRecReauthEmail.text}}",
-	"password": "{{inpRecReauthPassword.text}}"
+	"email": "{{inpRecLoginEmail.text}}",
+	"password": "{{inpRecLoginPassword.text}}"
 }

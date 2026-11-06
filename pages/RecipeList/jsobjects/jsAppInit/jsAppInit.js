@@ -12,24 +12,32 @@ export default {
 		}
 	},
 
+
 	async init() {
 		try {
-			const workspaceOwner = String(
+			const owner = String(
 				appsmith.store.workspace_owner_user_id || ""
 			);
 
-			if (!workspaceOwner) {
-				showAlert("Please sign in to Savveyra.", "warning");
+			if (!owner) {
+				await storeValue("recLstReauthRequired", true);
+				showModal(mdlRecLstLogin.name);
 				return false;
 			}
 
-			const sessionValid = await jsAuthSession.ensureValid();
+			const valid = await jsAuthSession.ensureValid();
 
-			if (!sessionValid) {
-				showAlert(
-					"Your Savveyra session has expired. Please sign in again.",
-					"warning"
-				);
+			if (!valid) {
+				if (jsAuthSession.lastFailure === "login_required") {
+					await storeValue("recLstReauthRequired", true);
+					showModal(mdlRecLstLogin.name);
+				} else {
+					await storeValue("recLstReauthRequired", false);
+					showAlert(
+						"Unable to connect to Savveyra. Please check your connection.",
+						"warning"
+					);
+				}
 				return false;
 			}
 
@@ -40,38 +48,30 @@ export default {
 				!identity.user_id ||
 				!identity.client_id
 			) {
-				showAlert(
-					"Unable to verify your Savveyra account.",
-					"warning"
-				);
+				showAlert("Unable to verify your account.", "warning");
 				return false;
 			}
 
-			const verifiedUserId = String(identity.user_id);
+			const verifiedUser = String(identity.user_id);
 
-			if (verifiedUserId !== workspaceOwner) {
+			if (verifiedUser !== owner) {
 				await clearStore();
-
-				showAlert(
-					"The authenticated account has changed. Please sign in again.",
-					"warning"
-				);
+				await storeValue("recLstReauthRequired", true);
+				showModal(mdlRecLstLogin.name);
 				return false;
 			}
 
+			await storeValue("current_user_id", verifiedUser);
 			await storeValue("current_client_id", identity.client_id);
-			await storeValue("current_user_id", verifiedUserId);
-			await storeValue("current_client_name", identity.client_name);
 			await storeValue("current_user_name", identity.user_name);
+			await storeValue("current_client_name", identity.client_name);
+			await storeValue("recLstReauthRequired", false);
 
 			return true;
 
 		} catch (error) {
-			showAlert(
-				"Unable to verify your Savveyra session.",
-				"error"
-			);
+			showAlert("Unable to verify your Savveyra session.", "error");
 			return false;
 		}
-	}
+	},
 };

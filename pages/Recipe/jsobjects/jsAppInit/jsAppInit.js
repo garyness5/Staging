@@ -37,7 +37,7 @@ export default {
 			if (!sessionValid) {
 				if (jsAuthSession.lastFailure === "login_required") {
 					await storeValue("recReauthRequired", true);
-					showModal(mdlRecReauth.name);
+					showModal(mdlRecLogin.name);
 				} else {
 					await storeValue("recReauthRequired", false);
 					showAlert(

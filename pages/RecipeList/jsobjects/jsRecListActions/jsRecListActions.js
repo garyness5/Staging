@@ -137,6 +137,14 @@ export default {
 
 
 	async deleteSelectedRecipeStart() {
+		if (!(await jsAuthSession.ensureValid())) {
+			showAlert(
+				"Your session needs to be renewed. Please sign in again before continuing.",
+				"warning"
+			);
+			return false;
+		}
+
 		if (!this.hasSelection()) {
 			showAlert("Select a Recipe first.", "warning");
 			return false;
@@ -166,7 +174,7 @@ export default {
 		}, false);
 
 		try {
-			const result = await apiSecurityTest.run({
+			const result = await apiRecLstGetImpactCount.run({
 				recipe_id: recipeId
 			});
 
@@ -193,6 +201,14 @@ export default {
 
 
 	async deleteSelectedRecipeConfirm() {
+		if (!(await jsAuthSession.ensureValid())) {
+			showAlert(
+				"Your session needs to be renewed. Please sign in again before continuing.",
+				"warning"
+			);
+			return false;
+		}
+
 		const target = appsmith.store.RecListDeleteTarget;
 
 		const recipeId = Number(target?.recipe_id);
@@ -275,25 +291,25 @@ export default {
 
 	impactRecipeCount() {
 		return Number(
-			apiSecurityTest.data?.impact?.recipe_count || 0
+			apiRecLstGetImpactCount.data?.impact?.recipe_count || 0
 		);
 	},
 
 	impactDishCount() {
 		return Number(
-			apiSecurityTest.data?.impact?.dish_count || 0
+			apiRecLstGetImpactCount.data?.impact?.dish_count || 0
 		);
 	},
 
 	impactMenuCount() {
 		return Number(
-			apiSecurityTest.data?.impact?.menu_count || 0
+			apiRecLstGetImpactCount.data?.impact?.menu_count || 0
 		);
 	},
 
 	impactEventCount() {
 		return Number(
-			apiSecurityTest.data?.impact?.event_count || 0
+			apiRecLstGetImpactCount.data?.impact?.event_count || 0
 		);
 	},
 
@@ -315,6 +331,14 @@ export default {
 
 
 	async setActive(row, active) {
+		if (!(await jsAuthSession.ensureValid())) {
+			showAlert(
+				"Your session needs to be renewed. Please sign in again before continuing.",
+				"warning"
+			);
+			return false;
+		}
+
 		const recipeId = Number(row?.id);
 
 		if (!Number.isSafeInteger(recipeId) || recipeId <= 0) {
@@ -437,6 +461,14 @@ export default {
 	},
 
 	async refresh() {
+		if (!(await jsAuthSession.ensureValid())) {
+			showAlert(
+				"Your session needs to be renewed. Please sign in again before continuing.",
+				"warning"
+			);
+			return false;
+		}
+
 		const saving = appsmith.store.RecListStatusSaving || {};
 
 		if (Object.values(saving).some(value => value === true)) {
