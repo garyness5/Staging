@@ -79,13 +79,9 @@ export default {
 			.map(Number)
 		};
 
-		if (!(await jsAuthSession.ensureValid())) {
-			showAlert(
-				"Your session needs to be renewed. Your Ingredient entries have been preserved.",
-				"warning"
-			);
+		if (!(await jsAuthSession.requireValid())) {
 			return false;
-		}	
+		}
 
 		try {
 			const result = await apiRecSaveIngredient.run({

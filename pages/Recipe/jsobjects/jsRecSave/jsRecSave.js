@@ -219,20 +219,7 @@ export default {
 				snapshot
 			);
 
-			const sessionValid = await jsAuthSession.ensureValid();
-
-			if (!sessionValid) {
-				if (jsAuthSession.lastFailure === "login_required") {
-					await storeValue("recReauthRequired", true);
-					showModal(mdlRecLogin.name);
-				} else {
-					await storeValue("recReauthRequired", false);
-					showAlert(
-						"Unable to connect to Savveyra. Your Recipe has not been saved. Please try again.",
-						"warning"
-					);
-				}
-
+			if (!(await jsAuthSession.requireValid())) {
 				return false;
 			}
 
@@ -783,23 +770,9 @@ export default {
 
 	async deleteRecipeConfirm() {
 		try {
-			const sessionValid = await jsAuthSession.ensureValid();
-
-			if (!sessionValid) {
-				if (jsAuthSession.lastFailure === "login_required") {
-					await storeValue("recReauthRequired", true);
-					showModal(mdlRecLogin.name);
-				} else {
-					await storeValue("recReauthRequired", false);
-					showAlert(
-						"Unable to connect to Savveyra. Your Recipe has not been deleted. Please try again.",
-						"warning"
-					);
-				}
-
+			if (!(await jsAuthSession.requireValid())) {
 				return false;
 			}
-
 			const result = await apiRecDeleteRecipe.run();
 
 			if (!result?.authenticated) {

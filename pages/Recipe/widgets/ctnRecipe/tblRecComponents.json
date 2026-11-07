@@ -301,7 +301,7 @@
   "inlineEditingSaveOption": "CUSTOM",
   "isLoading": false,
   "isSortable": true,
-  "isVisible": "{{ appsmith.store.recPageReady === true }}",
+  "isVisible": "{{ appsmith.store.recPageReady === true && !!appsmith.store.savveyra_access_token }}",
   "isVisibleDownload": true,
   "isVisibleFilters": false,
   "isVisiblePagination": false,

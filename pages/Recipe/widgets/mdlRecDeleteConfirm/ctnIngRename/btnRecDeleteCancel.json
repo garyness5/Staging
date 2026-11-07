@@ -37,7 +37,7 @@
   "mobileRightColumn": 63,
   "mobileTopRow": 18,
   "needsErrorInfo": false,
-  "onClick": "{{\ncloseModal(\"mdlRecDeleteConfirm\")\n.then(() => removeValue(\"recipe_impact_mode\"))\n.then(() => removeValue(\"recipe_save_snapshot\"))\n.then(() => removeValue(\"recipe_unit_change_confirmed\"))\n}}",
+  "onClick": "{{\ncloseModal(mdlRecDeleteConfirm.name)\n}}",
   "originalBottomRow": 43,
   "originalTopRow": 39,
   "parentId": "2le9if6hq5",

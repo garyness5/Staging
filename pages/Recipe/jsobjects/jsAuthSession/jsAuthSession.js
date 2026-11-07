@@ -40,7 +40,7 @@ export default {
 
 	async performRefresh() {
 		try {
-			const result = await apiRecLstRefreshSupaSession.run();
+			const result = await apiRecRefreshSupaSession.run();
 
 			if (!result?.access_token || !result?.refresh_token) {
 				this.lastFailure = "service_unavailable";
@@ -69,8 +69,8 @@ export default {
 			return true;
 
 		} catch (error) {
-			const meta = apiRecLstRefreshSupaSession.responseMeta || {};
-			const data = apiRecLstRefreshSupaSession.data || {};
+			const meta = apiRecRefreshSupaSession.responseMeta || {};
+			const data = apiRecRefreshSupaSession.data || {};
 
 			const status = parseInt(
 				String(meta.statusCode || ""),
@@ -105,13 +105,23 @@ export default {
 		}
 	},
 
-	async testExpiredToken() {
-		await storeValue(
-			"savveyra_token_expires_at",
-			0,
-			true
-		);
+	async requireValid() {
+		const valid = await this.ensureValid();
+		if (valid) return true;
 
-		return await this.ensureValid();
+		await storeValue("recPageReady", false);
+
+		if (this.lastFailure === "login_required") {
+			await clearStore();
+			navigateTo("Login", {}, "SAME_WINDOW");
+		} else {
+			showAlert(
+				"Unable to connect to Savveyra. Please try again.",
+				"error"
+			);
+		}
+
+		return false;
 	},
+
 };

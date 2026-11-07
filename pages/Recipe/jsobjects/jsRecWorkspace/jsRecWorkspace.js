@@ -352,8 +352,6 @@ export default {
 		return saved;
 	},
 
-
-
 	async initializeNew() {
 		const empty = this.emptySnapshot();
 
@@ -365,8 +363,6 @@ export default {
 
 		return empty;
 	},
-
-
 
 	async initializeDuplicate(snapshot) {
 		const value = this.normalizeSnapshot(snapshot);
@@ -384,7 +380,6 @@ export default {
 
 		return value;
 	},
-
 
 	isSnapshotDirty(snapshot) {
 		const current = this.normalizeSnapshot(snapshot);
@@ -409,39 +404,6 @@ export default {
 		return await this.setWorkspace(
 			this.baseline()
 		);
-	},
-
-	async clearForDifferentUser() {
-		// Make Recipe unavailable during account transition.
-		await storeValue("recPageReady", false);
-
-		// Close all Recipe dialogs.
-		closeModal(mdlRecDeleteConfirm.name);
-		closeModal(mdlRecIngAddIng.name);
-		closeModal(mdlRecUnsavedChanges.name);
-		closeModal(mdlRecDiscardConfirm.name);
-		closeModal(mdlRecLogin.name);
-
-		// Clear all previous operator's stored state.
-		await clearStore();
-
-		// Reset Recipe header controls.
-		await resetWidget("inpRecName", true);
-		await resetWidget("selRecCategory", true);
-		await resetWidget("chkRecActive", true);
-		await resetWidget("inpRecYieldQty", true);
-		await resetWidget("selRecYieldUnit", true);
-		await resetWidget("inpRecExtraPercent", true);
-		await resetWidget("msRecDietTags", true);
-		await resetWidget("rteRecNotes", true);
-
-		// Clear component table.
-		await resetWidget("tblRecComponents", true);
-
-		// Clear Quick Add Ingredient form.
-		await resetWidget("mdlRecIngAddIng", true);
-
-		return true;
 	},
 
 	async clear() {

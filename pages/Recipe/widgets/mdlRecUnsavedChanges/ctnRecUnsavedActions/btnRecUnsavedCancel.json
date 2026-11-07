@@ -37,7 +37,7 @@
   "mobileRightColumn": 63,
   "mobileTopRow": 18,
   "needsErrorInfo": false,
-  "onClick": "{{\njsRecSave.pendingAction = null;\ncloseModal(\"mdlRecUnsavedChanges\");\n}}",
+  "onClick": "{{\ncloseModal(mdlRecUnsavedChanges.name)\n}}",
   "originalBottomRow": 30,
   "originalTopRow": 26,
   "parentId": "qoct7lx8ir",

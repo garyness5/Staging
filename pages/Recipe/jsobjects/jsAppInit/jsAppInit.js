@@ -1,4 +1,6 @@
 export default {
+	lastFailure: null,
+
 	async clearIdentity() {
 		const keys = [
 			"current_client_id",
@@ -13,106 +15,104 @@ export default {
 	},
 
 	async init() {
+		this.lastFailure = null;
+
 		try {
-			// A workspace must have a verified owner.
 			const workspaceOwner = String(
 				appsmith.store.workspace_owner_user_id || ""
 			);
 
 			if (!workspaceOwner) {
-				await storeValue("recReauthRequired", true);
-
-				showAlert(
-					"Please sign in to Savveyra.",
-					"warning"
-				);
-
+				this.lastFailure = "login_required";
+				await storeValue("recPageReady", false);
+				await clearStore();
+				navigateTo("Login", {}, "SAME_WINDOW");
 				return false;
 			}
 
-			// Validate or refresh the existing session.
-			// A failed refresh must not erase unsaved work.
 			const sessionValid = await jsAuthSession.ensureValid();
 
 			if (!sessionValid) {
-				if (jsAuthSession.lastFailure === "login_required") {
-					await storeValue("recReauthRequired", true);
-					showModal(mdlRecLogin.name);
+				this.lastFailure =
+					jsAuthSession.lastFailure === "login_required"
+					? "login_required"
+				: "service_unavailable";
+
+				await storeValue("recPageReady", false);
+
+				if (this.lastFailure === "login_required") {
+					await clearStore();
+					navigateTo("Login", {}, "SAME_WINDOW");
 				} else {
-					await storeValue("recReauthRequired", false);
 					showAlert(
-						"Unable to connect to Savveyra. Please check your connection and try again.",
-						"warning"
+						"Unable to connect to Savveyra. Please try again.",
+						"error"
 					);
 				}
 
 				return false;
 			}
 
-			// Verify identity with the authenticated backend.
 			const identity = await apiGetMyIdentity.run();
 
 			if (
 				identity?.authenticated !== true ||
-				!identity.user_id ||
-				!identity.client_id
+				!identity?.user_id ||
+				!identity?.client_id
 			) {
-				showAlert(
-					"Unable to verify your Savveyra account.",
-					"warning"
-				);
+				this.lastFailure =
+					identity?.authenticated === false
+					? "login_required"
+				: "identity_unavailable";
+
+				await storeValue("recPageReady", false);
+
+				if (this.lastFailure === "login_required") {
+					await clearStore();
+					navigateTo("Login", {}, "SAME_WINDOW");
+				} else {
+					showAlert(
+						"Unable to verify your Savveyra account. Please try again.",
+						"error"
+					);
+				}
+
 				return false;
 			}
 
 			const verifiedUserId = String(identity.user_id);
 
-			// Never allow one user's workspace to operate
-			// under another authenticated identity.
 			if (verifiedUserId !== workspaceOwner) {
-				await jsRecWorkspace.clearForDifferentUser();
-
-				showAlert(
-					"The authenticated account has changed. Please sign in again.",
-					"warning"
-				);
-
+				this.lastFailure = "account_changed";
+				await storeValue("recPageReady", false);
+				await clearStore();
+				navigateTo("Login", {}, "SAME_WINDOW");
 				return false;
 			}
 
-			// The verified user owns this workspace.
-			await storeValue(
-				"current_client_id",
-				identity.client_id
-			);
-
-			await storeValue(
-				"current_user_id",
-				verifiedUserId
-			);
-
-			await storeValue(
-				"current_client_name",
-				identity.client_name
-			);
-
-			await storeValue(
-				"current_user_name",
-				identity.user_name
-			);
-
-			await storeValue("recReauthRequired", false);
+			await storeValue("current_client_id", identity.client_id);
+			await storeValue("current_user_id", verifiedUserId);
+			await storeValue("current_client_name", identity.client_name);
+			await storeValue("current_user_name", identity.user_name);
 
 			return true;
 
 		} catch (error) {
-			// Keep the local workspace for same-user reauthentication.
-			// Protected page initialization remains unsuccessful.
+			this.lastFailure = "service_unavailable";
+
+			console.error(
+				"Recipe initialization identity check failed:",
+				error
+			);
+
+			await storeValue("recPageReady", false);
+
 			showAlert(
-				"Unable to verify your Savveyra session.",
+				"Unable to connect to Savveyra. Please try again.",
 				"error"
 			);
 
 			return false;
 		}
-	}
+	},
 };

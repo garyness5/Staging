@@ -4,7 +4,7 @@
   "bottomRow": 25,
   "boxShadow": "none",
   "canEscapeKeyClose": true,
-  "canOutsideClickClose": false,
+  "canOutsideClickClose": true,
   "children": [
     {
       "borderRadius": "{{appsmith.theme.borderRadius.appBorderRadius}}",

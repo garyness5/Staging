@@ -11,23 +11,16 @@
     },
     {
       "key": "borderRadius"
-    },
-    {
-      "key": "isVisible"
     }
   ],
   "dynamicHeight": "AUTO_HEIGHT",
-  "dynamicPropertyPathList": [
-    {
-      "key": "isVisible"
-    }
-  ],
+  "dynamicPropertyPathList": [],
   "dynamicTriggerPathList": [],
   "fontFamily": "{{appsmith.theme.fontFamily.appFont}}",
   "fontSize": "1.25rem",
   "fontStyle": "BOLD",
   "isLoading": false,
-  "isVisible": "{{\nappsmith.store.recListPageReady === true &&\nappsmith.store.recLstReauthRequired !== true &&\n!!appsmith.store.savveyra_access_token\n}}",
+  "isVisible": true,
   "key": "0zrazz6boc",
   "leftColumn": 0,
   "maxDynamicHeight": 9000,

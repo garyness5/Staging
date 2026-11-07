@@ -13,10 +13,17 @@
     },
     {
       "key": "defaultText"
+    },
+    {
+      "key": "isVisible"
     }
   ],
   "dynamicHeight": "FIXED",
-  "dynamicPropertyPathList": [],
+  "dynamicPropertyPathList": [
+    {
+      "key": "isVisible"
+    }
+  ],
   "dynamicTriggerPathList": [],
   "flexVerticalAlignment": "start",
   "inputType": "html",
@@ -24,7 +31,7 @@
   "isDisabled": false,
   "isLoading": false,
   "isRequired": false,
-  "isVisible": true,
+  "isVisible": "{{ appsmith.store.recPageReady === true && !!appsmith.store.savveyra_access_token }}",
   "key": "3owaxufmk6",
   "labelAlignment": "left",
   "labelPosition": "Top",

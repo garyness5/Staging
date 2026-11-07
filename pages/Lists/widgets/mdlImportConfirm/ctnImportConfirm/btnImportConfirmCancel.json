@@ -37,7 +37,7 @@
   "mobileRightColumn": 47,
   "mobileTopRow": 18,
   "needsErrorInfo": false,
-  "onClick": "{{\nremoveValue(\"impReviewSnapshot\");\nremoveValue(\"impImpact\");\ncloseModal(\"mdlImportConfirm\");\n}}",
+  "onClick": "{{\ncloseModal(mdlImportConfirm.name)\n}}",
   "originalBottomRow": 62,
   "originalTopRow": 58,
   "parentId": "el7rrrcdzp",

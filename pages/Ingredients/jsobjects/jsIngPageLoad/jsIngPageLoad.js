@@ -50,23 +50,4 @@ export default {
 	isReady() {
 		return appsmith.store.ingPageReady === true;
 	},
-
-	async measureLoad() {
-		const start = Date.now();
-
-		const success = await this.load();
-
-		const elapsed = Date.now() - start;
-
-		console.log(
-			`Ingredients load: ${elapsed} ms (${(elapsed / 1000).toFixed(2)} seconds)`
-		);
-
-		showAlert(
-			`Ingredients load: ${(elapsed / 1000).toFixed(2)} seconds`,
-			success ? "success" : "error"
-		);
-
-		return elapsed;
-	}
 };
