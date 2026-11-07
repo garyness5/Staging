@@ -86,5 +86,25 @@ export default {
 
 			return false;
 		}
-	}
+	},
+
+	async requireValid() {
+		const valid = await this.ensureValid();
+		if (valid) return true;
+
+		await storeValue("recListPageReady", false);
+
+		if (this.lastFailure === "login_required") {
+			await clearStore();
+			navigateTo("Login", {}, "SAME_WINDOW");
+		} else {
+			showAlert(
+				"Unable to connect to Savveyra. Please try again.",
+				"error"
+			);
+		}
+
+		return false;
+	},
+
 };

@@ -135,13 +135,8 @@ export default {
 		return true;
 	},
 
-
 	async deleteSelectedRecipeStart() {
-		if (!(await jsAuthSession.ensureValid())) {
-			showAlert(
-				"Your session needs to be renewed. Please sign in again before continuing.",
-				"warning"
-			);
+		if (!(await jsAuthSession.requireValid())) {
 			return false;
 		}
 
@@ -201,14 +196,9 @@ export default {
 
 
 	async deleteSelectedRecipeConfirm() {
-		if (!(await jsAuthSession.ensureValid())) {
-			showAlert(
-				"Your session needs to be renewed. Please sign in again before continuing.",
-				"warning"
-			);
+		if (!(await jsAuthSession.requireValid())) {
 			return false;
 		}
-
 		const target = appsmith.store.RecListDeleteTarget;
 
 		const recipeId = Number(target?.recipe_id);
@@ -331,11 +321,7 @@ export default {
 
 
 	async setActive(row, active) {
-		if (!(await jsAuthSession.ensureValid())) {
-			showAlert(
-				"Your session needs to be renewed. Please sign in again before continuing.",
-				"warning"
-			);
+		if (!(await jsAuthSession.requireValid())) {
 			return false;
 		}
 
@@ -461,14 +447,9 @@ export default {
 	},
 
 	async refresh() {
-		if (!(await jsAuthSession.ensureValid())) {
-			showAlert(
-				"Your session needs to be renewed. Please sign in again before continuing.",
-				"warning"
-			);
+		if (!(await jsAuthSession.requireValid())) {
 			return false;
 		}
-
 		const saving = appsmith.store.RecListStatusSaving || {};
 
 		if (Object.values(saving).some(value => value === true)) {

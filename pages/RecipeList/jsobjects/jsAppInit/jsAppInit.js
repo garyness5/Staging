@@ -1,4 +1,6 @@
 export default {
+	lastFailure: null,
+
 	async clearIdentity() {
 		const keys = [
 			"current_client_id",
@@ -12,32 +14,42 @@ export default {
 		}
 	},
 
-
 	async init() {
+		this.lastFailure = null;
+
 		try {
-			const owner = String(
+			const workspaceOwner = String(
 				appsmith.store.workspace_owner_user_id || ""
 			);
 
-			if (!owner) {
-				await storeValue("recLstReauthRequired", true);
-				showModal(mdlRecLstLogin.name);
+			if (!workspaceOwner) {
+				this.lastFailure = "login_required";
+				await storeValue("recListPageReady", false);
+				await clearStore();
+				navigateTo("Login", {}, "SAME_WINDOW");
 				return false;
 			}
 
-			const valid = await jsAuthSession.ensureValid();
+			const sessionValid = await jsAuthSession.ensureValid();
 
-			if (!valid) {
-				if (jsAuthSession.lastFailure === "login_required") {
-					await storeValue("recLstReauthRequired", true);
-					showModal(mdlRecLstLogin.name);
+			if (!sessionValid) {
+				this.lastFailure =
+					jsAuthSession.lastFailure === "login_required"
+					? "login_required"
+				: "service_unavailable";
+
+				await storeValue("recListPageReady", false);
+
+				if (this.lastFailure === "login_required") {
+					await clearStore();
+					navigateTo("Login", {}, "SAME_WINDOW");
 				} else {
-					await storeValue("recLstReauthRequired", false);
 					showAlert(
-						"Unable to connect to Savveyra. Please check your connection.",
-						"warning"
+						"Unable to connect to Savveyra. Please try again.",
+						"error"
 					);
 				}
+
 				return false;
 			}
 
@@ -45,32 +57,61 @@ export default {
 
 			if (
 				identity?.authenticated !== true ||
-				!identity.user_id ||
-				!identity.client_id
+				!identity?.user_id ||
+				!identity?.client_id
 			) {
-				showAlert("Unable to verify your account.", "warning");
+				this.lastFailure =
+					identity?.authenticated === false
+					? "login_required"
+				: "identity_unavailable";
+
+				await storeValue("recListPageReady", false);
+
+				if (this.lastFailure === "login_required") {
+					await clearStore();
+					navigateTo("Login", {}, "SAME_WINDOW");
+				} else {
+					showAlert(
+						"Unable to verify your Savveyra account. Please try again.",
+						"error"
+					);
+				}
+
 				return false;
 			}
 
-			const verifiedUser = String(identity.user_id);
+			const verifiedUserId = String(identity.user_id);
 
-			if (verifiedUser !== owner) {
+			if (verifiedUserId !== workspaceOwner) {
+				this.lastFailure = "account_changed";
+				await storeValue("recListPageReady", false);
 				await clearStore();
-				await storeValue("recLstReauthRequired", true);
-				showModal(mdlRecLstLogin.name);
+				navigateTo("Login", {}, "SAME_WINDOW");
 				return false;
 			}
 
-			await storeValue("current_user_id", verifiedUser);
 			await storeValue("current_client_id", identity.client_id);
-			await storeValue("current_user_name", identity.user_name);
+			await storeValue("current_user_id", verifiedUserId);
 			await storeValue("current_client_name", identity.client_name);
-			await storeValue("recLstReauthRequired", false);
+			await storeValue("current_user_name", identity.user_name);
 
 			return true;
 
 		} catch (error) {
-			showAlert("Unable to verify your Savveyra session.", "error");
+			this.lastFailure = "service_unavailable";
+
+			console.error(
+				"RecipeList initialization identity check failed:",
+				error
+			);
+
+			await storeValue("recListPageReady", false);
+
+			showAlert(
+				"Unable to connect to Savveyra. Please try again.",
+				"error"
+			);
+
 			return false;
 		}
 	},

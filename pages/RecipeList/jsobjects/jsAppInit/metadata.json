@@ -6,6 +6,11 @@
     "pageId": "RecipeList",
     "pluginId": "js-plugin",
     "pluginType": "JS",
-    "variables": []
+    "variables": [
+      {
+        "name": "lastFailure",
+        "value": "null"
+      }
+    ]
   }
 }

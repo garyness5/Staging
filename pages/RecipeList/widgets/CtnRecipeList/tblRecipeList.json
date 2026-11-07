@@ -57,7 +57,7 @@
     "deleted",
     "revision"
   ],
-  "columnUpdatedAt": 1793748276125,
+  "columnUpdatedAt": 1794064427368,
   "columnWidthMap": {
     "active": 88,
     "category_id": 118,
@@ -207,7 +207,7 @@
   "inlineEditingSaveOption": "CUSTOM",
   "isLoading": false,
   "isSortable": true,
-  "isVisible": "{{\nappsmith.store.recListPageReady === true &&\nappsmith.store.recLstReauthRequired !== true &&\n!!appsmith.store.savveyra_access_token\n}}",
+  "isVisible": "{{ appsmith.store.recListPageReady === true && !!appsmith.store.savveyra_access_token }}",
   "isVisibleDownload": true,
   "isVisibleFilters": true,
   "isVisiblePagination": false,

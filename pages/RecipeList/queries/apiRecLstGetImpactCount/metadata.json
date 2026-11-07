@@ -52,7 +52,7 @@
     ],
     "name": "apiRecLstGetImpactCount",
     "pageId": "RecipeList",
-    "runBehaviour": "AUTOMATIC",
-    "userSetOnLoad": false
+    "runBehaviour": "MANUAL",
+    "userSetOnLoad": true
   }
 }

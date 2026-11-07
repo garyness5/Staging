@@ -72,7 +72,7 @@
   "flexVerticalAlignment": "stretch",
   "isCanvas": true,
   "isLoading": false,
-  "isVisible": "{{ \n  !!appsmith.store.savveyra_access_token\n}}",
+  "isVisible": "{{ appsmith.store.recListPageReady === true && !!appsmith.store.savveyra_access_token }}",
   "key": "ykb9pi7dve",
   "leftColumn": 0,
   "maxDynamicHeight": 9000,
