@@ -98,7 +98,8 @@ export default {
 		await storeValue("listsPageReady", false);
 
 		if (this.lastFailure === "login_required") {
-			showModal(mdlLstLogin.name);
+			await clearStore();
+			navigateTo("Login", {}, "SAME_WINDOW");
 		} else {
 			showAlert(
 				"Unable to connect to Savveyra. Please try again.",
@@ -108,4 +109,5 @@ export default {
 
 		return false;
 	}
+
 };

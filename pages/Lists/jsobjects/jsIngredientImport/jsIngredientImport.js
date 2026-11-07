@@ -883,18 +883,7 @@ export default {
 	},
 
 	async reviewImport() {
-		const sessionValid = await jsAuthSession.ensureValid();
-
-		if (!sessionValid) {
-			if (jsAuthSession.lastFailure === "login_required") {
-				showModal(mdlLstLogin.name);
-			} else {
-				showAlert(
-					"Unable to connect to Savveyra. Please try again.",
-					"error"
-				);
-			}
-
+		if (!await jsAuthSession.requireValid()) {
 			return false;
 		}
 

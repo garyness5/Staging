@@ -12,21 +12,29 @@ export default {
 		}
 	},
 
+
 	async init() {
 		try {
 			const workspaceOwner = String(
 				appsmith.store.workspace_owner_user_id || ""
 			);
 
+			// No existing workspace: use standalone Login.
 			if (!workspaceOwner) {
-				showModal(mdlIngLogin.name);
+				await storeValue("ingPageReady", false);
+				await clearStore();
+				navigateTo("Login", {}, "SAME_WINDOW");
 				return false;
 			}
 
-			const sessionValid =
-						await jsAuthSession.requireValid();
+			// Existing workspace: renew the session when necessary.
+			const sessionValid = await jsAuthSession.requireValid();
 
-			if (!sessionValid) return false;
+			if (!sessionValid) {
+				// requireValid handles recovery or connection errors.
+				// Do not discard the existing working state.
+				return false;
+			}
 
 			const identity = await apiIngGetMyIdentity.run();
 
@@ -35,27 +43,24 @@ export default {
 				!identity?.user_id ||
 				!identity?.client_id
 			) {
+				await storeValue("ingPageReady", false);
+
 				showAlert(
 					"Unable to verify your Savveyra account.",
 					"error"
 				);
+
 				return false;
 			}
 
 			const verifiedUserId = String(identity.user_id);
 
-
 			if (verifiedUserId !== workspaceOwner) {
+				// A different authenticated operator must never inherit
+				// the previous operator's Ingredients workspace.
 				await jsIngWorkspace.clearForDifferentUser();
 
-
-				showModal(mdlIngLogin.name);
-
-				showAlert(
-					"The authenticated account has changed. Please sign in again.",
-					"warning"
-				);
-
+				navigateTo("Ingredients", {}, "SAME_WINDOW");
 				return false;
 			}
 
@@ -69,6 +74,8 @@ export default {
 		} catch (error) {
 			console.error("Ingredients initialization failed:", error);
 
+			await storeValue("ingPageReady", false);
+
 			showAlert(
 				"Unable to verify your Savveyra session.",
 				"error"
@@ -76,5 +83,6 @@ export default {
 
 			return false;
 		}
-	}
+	},
+
 };

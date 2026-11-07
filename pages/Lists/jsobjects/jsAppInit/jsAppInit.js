@@ -24,18 +24,13 @@ export default {
 
 			if (!workspaceOwner) {
 				this.lastFailure = "login_required";
-
-				showModal(mdlLstLogin.name);
-
-				showAlert(
-					"Please sign in to continue using Savveyra.",
-					"warning"
-				);
+				await storeValue("listsPageReady", false);
+				await clearStore();
+				navigateTo("Login", {}, "SAME_WINDOW");
 				return false;
 			}
 
-			const sessionValid =
-						await jsAuthSession.ensureValid();
+			const sessionValid = await jsAuthSession.ensureValid();
 
 			if (!sessionValid) {
 				this.lastFailure =
@@ -43,18 +38,17 @@ export default {
 					? "login_required"
 				: "service_unavailable";
 
-				if (this.lastFailure === "login_required") {
-					showModal(mdlLstLogin.name);
-				}
+				await storeValue("listsPageReady", false);
 
-				showAlert(
-					this.lastFailure === "login_required"
-					? "Please sign in to continue using Savveyra."
-					: "Unable to connect to Savveyra. Please try again.",
-					this.lastFailure === "login_required"
-					? "warning"
-					: "error"
-				);
+				if (this.lastFailure === "login_required") {
+					await clearStore();
+					navigateTo("Login", {}, "SAME_WINDOW");
+				} else {
+					showAlert(
+						"Unable to connect to Savveyra. Please try again.",
+						"error"
+					);
+				}
 
 				return false;
 			}
@@ -71,16 +65,17 @@ export default {
 					? "login_required"
 				: "identity_unavailable";
 
-				if (this.lastFailure === "login_required") {
-					showModal(mdlLstLogin.name);
-				}
+				await storeValue("listsPageReady", false);
 
-				showAlert(
-					this.lastFailure === "login_required"
-					? "Please sign in to continue using Savveyra."
-					: "Unable to verify your Savveyra account. Please try again.",
-					"warning"
-				);
+				if (this.lastFailure === "login_required") {
+					await clearStore();
+					navigateTo("Login", {}, "SAME_WINDOW");
+				} else {
+					showAlert(
+						"Unable to verify your Savveyra account. Please try again.",
+						"error"
+					);
+				}
 
 				return false;
 			}
@@ -88,37 +83,17 @@ export default {
 			const verifiedUserId = String(identity.user_id);
 
 			if (verifiedUserId !== workspaceOwner) {
-				await jsLstLogin.clearForDifferentUser();
-
 				this.lastFailure = "account_changed";
-
-				showAlert(
-					"The authenticated account has changed. Please sign in again.",
-					"warning"
-				);
-
+				await storeValue("listsPageReady", false);
+				await clearStore();
+				navigateTo("Login", {}, "SAME_WINDOW");
 				return false;
 			}
 
-			await storeValue(
-				"current_client_id",
-				identity.client_id
-			);
-
-			await storeValue(
-				"current_user_id",
-				verifiedUserId
-			);
-
-			await storeValue(
-				"current_client_name",
-				identity.client_name
-			);
-
-			await storeValue(
-				"current_user_name",
-				identity.user_name
-			);
+			await storeValue("current_client_id", identity.client_id);
+			await storeValue("current_user_id", verifiedUserId);
+			await storeValue("current_client_name", identity.client_name);
+			await storeValue("current_user_name", identity.user_name);
 
 			return true;
 
@@ -129,6 +104,8 @@ export default {
 				"Lists initialization identity check failed:",
 				error
 			);
+
+			await storeValue("listsPageReady", false);
 
 			showAlert(
 				"Unable to connect to Savveyra. Please try again.",

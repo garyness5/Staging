@@ -11,7 +11,7 @@
           "value": "application/json"
         }
       ],
-      "body": "{\n\t\"email\": \"{{inpLoginEmail.text}}\",\n\t\"password\": \"{{inpLoginPassword.text}}\"\n}",
+      "body": "\n{}\n",
       "bodyFormData": [],
       "encodeParamsToggle": true,
       "formData": {
@@ -43,9 +43,6 @@
       "pluginId": "restapi-plugin"
     },
     "dynamicBindingPathList": [
-      {
-        "key": "body"
-      },
       {
         "key": "headers[0].value"
       }
