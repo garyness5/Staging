@@ -1,4 +1,6 @@
 export default {
+	lastFailure: null,
+
 	async clearIdentity() {
 		const keys = [
 			"current_client_id",
@@ -12,27 +14,42 @@ export default {
 		}
 	},
 
-
 	async init() {
+		this.lastFailure = null;
+
 		try {
 			const workspaceOwner = String(
 				appsmith.store.workspace_owner_user_id || ""
 			);
 
-			// No existing workspace: use standalone Login.
 			if (!workspaceOwner) {
+				this.lastFailure = "login_required";
 				await storeValue("ingPageReady", false);
 				await clearStore();
 				navigateTo("Login", {}, "SAME_WINDOW");
 				return false;
 			}
 
-			// Existing workspace: renew the session when necessary.
-			const sessionValid = await jsAuthSession.requireValid();
+			const sessionValid = await jsAuthSession.ensureValid();
 
 			if (!sessionValid) {
-				// requireValid handles recovery or connection errors.
-				// Do not discard the existing working state.
+				this.lastFailure =
+					jsAuthSession.lastFailure === "login_required"
+					? "login_required"
+				: "service_unavailable";
+
+				await storeValue("ingPageReady", false);
+
+				if (this.lastFailure === "login_required") {
+					await clearStore();
+					navigateTo("Login", {}, "SAME_WINDOW");
+				} else {
+					showAlert(
+						"Unable to connect to Savveyra. Please try again.",
+						"error"
+					);
+				}
+
 				return false;
 			}
 
@@ -43,12 +60,22 @@ export default {
 				!identity?.user_id ||
 				!identity?.client_id
 			) {
+				this.lastFailure =
+					identity?.authenticated === false
+					? "login_required"
+				: "identity_unavailable";
+
 				await storeValue("ingPageReady", false);
 
-				showAlert(
-					"Unable to verify your Savveyra account.",
-					"error"
-				);
+				if (this.lastFailure === "login_required") {
+					await clearStore();
+					navigateTo("Login", {}, "SAME_WINDOW");
+				} else {
+					showAlert(
+						"Unable to verify your Savveyra account. Please try again.",
+						"error"
+					);
+				}
 
 				return false;
 			}
@@ -56,11 +83,10 @@ export default {
 			const verifiedUserId = String(identity.user_id);
 
 			if (verifiedUserId !== workspaceOwner) {
-				// A different authenticated operator must never inherit
-				// the previous operator's Ingredients workspace.
-				await jsIngWorkspace.clearForDifferentUser();
-
-				navigateTo("Ingredients", {}, "SAME_WINDOW");
+				this.lastFailure = "account_changed";
+				await storeValue("ingPageReady", false);
+				await clearStore();
+				navigateTo("Login", {}, "SAME_WINDOW");
 				return false;
 			}
 
@@ -72,12 +98,17 @@ export default {
 			return true;
 
 		} catch (error) {
-			console.error("Ingredients initialization failed:", error);
+			this.lastFailure = "service_unavailable";
+
+			console.error(
+				"Ingredients initialization identity check failed:",
+				error
+			);
 
 			await storeValue("ingPageReady", false);
 
 			showAlert(
-				"Unable to verify your Savveyra session.",
+				"Unable to connect to Savveyra. Please try again.",
 				"error"
 			);
 

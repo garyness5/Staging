@@ -95,11 +95,11 @@ export default {
 
 		if (valid) return true;
 
-		// Block protected content without deleting local working state.
 		await storeValue("ingPageReady", false);
 
 		if (this.lastFailure === "login_required") {
-			showModal(mdlIngLogin.name);
+			await clearStore();
+			navigateTo("Login", {}, "SAME_WINDOW");
 		} else {
 			showAlert(
 				"Unable to connect to Savveyra. Please try again.",
@@ -108,5 +108,5 @@ export default {
 		}
 
 		return false;
-	}
+	},
 };

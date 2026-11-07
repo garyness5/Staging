@@ -1,8 +1,8 @@
 {
-  "gitSyncId": "6ad02e5d7089041c6d575f1b_01c42217-c35f-44a8-b11e-ceac897fd0c9",
-  "id": "Ingredients_jsIngLogin",
+  "gitSyncId": "6ad02e5d7089041c6d575f1b_5b1649d6-06ee-446d-9f23-67979613f434",
+  "id": "Ingredients_jsIngLogout",
   "unpublishedCollection": {
-    "name": "jsIngLogin",
+    "name": "jsIngLogout",
     "pageId": "Ingredients",
     "pluginId": "js-plugin",
     "pluginType": "JS",
