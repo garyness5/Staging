@@ -11,7 +11,7 @@
           "value": "application/json"
         }
       ],
-      "body": "{{\n{\n\toperation: \"my_recipe_detail\",\n\trecipe_id: Number(appsmith.store.current_recipe_id || 0)\n}\n}}\n",
+      "body": "{{\n{\n\toperation: \"my_recipe_detail\",\n\trecipe_id: Number(appsmith.store.current_recipe_id || 0)\n}\n}}",
       "bodyFormData": [],
       "encodeParamsToggle": true,
       "formData": {
